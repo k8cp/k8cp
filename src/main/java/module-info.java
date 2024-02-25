@@ -9,4 +9,6 @@ module io.github.vcvitaly.k8cp {
 
     opens io.github.vcvitaly.k8cp to javafx.fxml;
     exports io.github.vcvitaly.k8cp;
+    exports io.github.vcvitaly.k8cp.controller;
+    opens io.github.vcvitaly.k8cp.controller to javafx.fxml;
 }
