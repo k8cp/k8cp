@@ -5,17 +5,24 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="io.github.vcvitaly.k8cp.controller.menu.MenuController">
+<VBox maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.vcvitaly.k8cp.controller.menu.MenuController">
   <MenuBar>
+      <Menu mnemonicParsing="false" text="Menu">
+        <items>
+            <MenuItem mnemonicParsing="false" text="New window" />
+          <MenuItem mnemonicParsing="false" text="Exit" />
+        </items>
+      </Menu>
     <Menu mnemonicParsing="false" text="File">
-      <MenuItem mnemonicParsing="false" text="Close"/>
+         <MenuItem mnemonicParsing="false" text="Copy" />
+         <MenuItem mnemonicParsing="false" text="Move" />
+      <MenuItem mnemonicParsing="false" text="Close" />
     </Menu>
     <Menu mnemonicParsing="false" text="Edit">
-      <MenuItem mnemonicParsing="false" text="Delete"/>
+      <MenuItem mnemonicParsing="false" text="Delete" />
     </Menu>
     <Menu mnemonicParsing="false" text="Help">
-      <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About"/>
+      <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About" />
     </Menu>
   </MenuBar>
 </VBox>
