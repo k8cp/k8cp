@@ -3,7 +3,8 @@ plugins {
     id 'application'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'org.openjfx.javafxplugin' version '0.1.0'
-    id 'org.beryx.jlink' version '2.25.0'
+    id 'org.beryx.jlink' version '3.0.1'
+    id "io.freefair.lombok" version "8.6"
 }
 
 group 'io.github.vcvitaly'
@@ -17,8 +18,10 @@ ext {
     junitVersion = '5.10.0'
 }
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -30,7 +33,7 @@ application {
 }
 
 javafx {
-    version = '21'
+    version = JavaVersion.VERSION_21
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
