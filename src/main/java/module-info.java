@@ -7,6 +7,10 @@ module io.github.vcvitaly.k8cp {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
 
+    requires org.slf4j;
+    requires ch.qos.logback.core;
+    requires ch.qos.logback.classic;
+
     requires static lombok;
 
     opens io.github.vcvitaly.k8cp to javafx.fxml;
