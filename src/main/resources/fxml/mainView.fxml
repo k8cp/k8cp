@@ -13,143 +13,129 @@
       <fx:include source="menu.fxml" />
    </VBox>
    <SplitPane dividerPositions="0.5" prefHeight="375.0" prefWidth="600.0">
-     <items>
-       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
-            <children>
-               <VBox prefHeight="373.0" prefWidth="300.0">
-                  <children>
-                     <HBox prefHeight="100.0" prefWidth="200.0">
-                        <children>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Parent directory" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-home" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Home" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fa-refresh" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Refresh" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-copy" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Copy" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-arrow-alt-circle-right" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Move" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-trash" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Delete" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-edit" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Rename" />
-                              </tooltip>
-                           </Button>
-                        </children>
-                     </HBox>
-                  </children>
-               </VBox>
-            </children>
-         </AnchorPane>
-       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
-            <children>
-               <VBox prefHeight="200.0" prefWidth="300.0">
-                  <children>
-                     <HBox prefHeight="100.0" prefWidth="200.0">
-                        <children>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Parent directory" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-home" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Home" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fa-refresh" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Refresh" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-copy" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Copy" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-arrow-alt-circle-left" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Move" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-trash" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Delete" />
-                              </tooltip>
-                           </Button>
-                           <Button mnemonicParsing="false">
-                              <graphic>
-                                 <FontIcon iconLiteral="fas-edit" iconSize="15" />
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Rename" />
-                              </tooltip>
-                           </Button>
-                        </children>
-                     </HBox>
-                  </children>
-               </VBox>
-            </children>
-         </AnchorPane>
-     </items>
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
+         <VBox prefHeight="373.0" prefWidth="300.0">
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <Button fx:id="parentLeftBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Parent directory" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="homeLeftBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-home" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Home" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="refreshLeftBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fa-refresh" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Refresh" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="copyLeftBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-copy" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Copy" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="moveLeftBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-arrow-alt-circle-right" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Move" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="deleteLeftBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-trash" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Delete" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="renameLeftBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-edit" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Rename" />
+                  </tooltip>
+               </Button>
+            </HBox>
+         </VBox>
+      </AnchorPane>
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
+         <VBox prefHeight="200.0" prefWidth="300.0">
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <Button fx:id="parentRightBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Parent directory" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="homeRightBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-home" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Home" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="refreshRightBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fa-refresh" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Refresh" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="copyRightBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-copy" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Copy" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="moveRightBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-arrow-alt-circle-left" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Move" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="deleteRightBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-trash" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Delete" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="renameRightBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="fas-edit" iconSize="15" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Rename" />
+                  </tooltip>
+               </Button>
+            </HBox>
+         </VBox>
+      </AnchorPane>
    </SplitPane>
 </VBox>
