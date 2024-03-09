@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -9,50 +11,62 @@
    <VBox prefWidth="600.0">
       <fx:include source="menu.fxml" />
    </VBox>
-   <HBox prefHeight="307.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
-      <VBox prefHeight="373.0" prefWidth="300.0">
-         <children>
-            <HBox prefHeight="100.0" prefWidth="200.0">
-               <children>
-                  <Button mnemonicParsing="false" text="Copy">
-                     <graphic>
-                        <FontIcon iconLiteral="far-copy" />
-                     </graphic>
-                  </Button>
-                  <Button mnemonicParsing="false" text="Move">
-                     <graphic>
-                        <FontIcon iconLiteral="far-arrow-alt-circle-right" />
-                     </graphic>
-                  </Button>
-                  <Button mnemonicParsing="false" text="Delete">
-                     <graphic>
-                        <FontIcon iconLiteral="fas-trash" />
-                     </graphic>
-                  </Button>
-               </children>
-            </HBox>
-         </children></VBox>
-      <VBox prefHeight="200.0" prefWidth="300.0">
-         <children>
-            <HBox prefHeight="100.0" prefWidth="200.0">
-               <children>
-                  <Button mnemonicParsing="false" text="Copy">
-                     <graphic>
-                        <FontIcon iconLiteral="far-copy" />
-                     </graphic>
-                  </Button>
-                  <Button mnemonicParsing="false" text="Move">
-                     <graphic>
-                        <FontIcon iconLiteral="far-arrow-alt-circle-left" />
-                     </graphic>
-                  </Button>
-                  <Button mnemonicParsing="false" text="Delete">
-                     <graphic>
-                        <FontIcon iconLiteral="fas-trash" />
-                     </graphic>
-                  </Button>
-               </children>
-            </HBox>
-         </children></VBox>
-   </HBox>
+   <SplitPane dividerPositions="0.5" prefHeight="375.0" prefWidth="600.0">
+     <items>
+       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
+            <children>
+               <VBox prefHeight="373.0" prefWidth="300.0">
+                  <children>
+                     <HBox prefHeight="100.0" prefWidth="200.0">
+                        <children>
+                           <Button mnemonicParsing="false" text="Copy">
+                              <graphic>
+                                 <FontIcon iconLiteral="far-copy" />
+                              </graphic>
+                           </Button>
+                           <Button mnemonicParsing="false" text="Move">
+                              <graphic>
+                                 <FontIcon iconLiteral="far-arrow-alt-circle-right" />
+                              </graphic>
+                           </Button>
+                           <Button mnemonicParsing="false" text="Delete">
+                              <graphic>
+                                 <FontIcon iconLiteral="fas-trash" />
+                              </graphic>
+                           </Button>
+                        </children>
+                     </HBox>
+                  </children>
+               </VBox>
+            </children>
+         </AnchorPane>
+       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
+            <children>
+               <VBox prefHeight="200.0" prefWidth="300.0">
+                  <children>
+                     <HBox prefHeight="100.0" prefWidth="200.0">
+                        <children>
+                           <Button mnemonicParsing="false" text="Copy">
+                              <graphic>
+                                 <FontIcon iconLiteral="far-copy" />
+                              </graphic>
+                           </Button>
+                           <Button mnemonicParsing="false" text="Move">
+                              <graphic>
+                                 <FontIcon iconLiteral="far-arrow-alt-circle-left" />
+                              </graphic>
+                           </Button>
+                           <Button mnemonicParsing="false" text="Delete">
+                              <graphic>
+                                 <FontIcon iconLiteral="fas-trash" />
+                              </graphic>
+                           </Button>
+                        </children>
+                     </HBox>
+                  </children>
+               </VBox>
+            </children>
+         </AnchorPane>
+     </items>
+   </SplitPane>
 </VBox>
