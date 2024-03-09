@@ -22,7 +22,31 @@
                         <children>
                            <Button mnemonicParsing="false">
                               <graphic>
-                                 <FontIcon iconLiteral="far-copy" />
+                                 <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip text="Parent directory" />
+                              </tooltip>
+                           </Button>
+                           <Button mnemonicParsing="false">
+                              <graphic>
+                                 <FontIcon iconLiteral="fas-home" iconSize="15" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip text="Home" />
+                              </tooltip>
+                           </Button>
+                           <Button mnemonicParsing="false">
+                              <graphic>
+                                 <FontIcon iconLiteral="fa-refresh" iconSize="15" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip text="Refresh" />
+                              </tooltip>
+                           </Button>
+                           <Button mnemonicParsing="false">
+                              <graphic>
+                                 <FontIcon iconLiteral="fas-copy" iconSize="15" />
                               </graphic>
                               <tooltip>
                                  <Tooltip text="Copy" />
@@ -30,7 +54,7 @@
                            </Button>
                            <Button mnemonicParsing="false">
                               <graphic>
-                                 <FontIcon iconLiteral="far-arrow-alt-circle-right" />
+                                 <FontIcon iconLiteral="fas-arrow-alt-circle-right" iconSize="15" />
                               </graphic>
                               <tooltip>
                                  <Tooltip text="Move" />
@@ -38,10 +62,18 @@
                            </Button>
                            <Button mnemonicParsing="false">
                               <graphic>
-                                 <FontIcon iconLiteral="far-trash-alt" />
+                                 <FontIcon iconLiteral="fas-trash" iconSize="15" />
                               </graphic>
                               <tooltip>
                                  <Tooltip text="Delete" />
+                              </tooltip>
+                           </Button>
+                           <Button mnemonicParsing="false">
+                              <graphic>
+                                 <FontIcon iconLiteral="fas-edit" iconSize="15" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip text="Rename" />
                               </tooltip>
                            </Button>
                         </children>
@@ -58,7 +90,31 @@
                         <children>
                            <Button mnemonicParsing="false">
                               <graphic>
-                                 <FontIcon iconLiteral="far-copy" />
+                                 <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip text="Parent directory" />
+                              </tooltip>
+                           </Button>
+                           <Button mnemonicParsing="false">
+                              <graphic>
+                                 <FontIcon iconLiteral="fas-home" iconSize="15" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip text="Home" />
+                              </tooltip>
+                           </Button>
+                           <Button mnemonicParsing="false">
+                              <graphic>
+                                 <FontIcon iconLiteral="fa-refresh" iconSize="15" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip text="Refresh" />
+                              </tooltip>
+                           </Button>
+                           <Button mnemonicParsing="false">
+                              <graphic>
+                                 <FontIcon iconLiteral="fas-copy" iconSize="15" />
                               </graphic>
                               <tooltip>
                                  <Tooltip text="Copy" />
@@ -66,7 +122,7 @@
                            </Button>
                            <Button mnemonicParsing="false">
                               <graphic>
-                                 <FontIcon iconLiteral="far-arrow-alt-circle-left" />
+                                 <FontIcon iconLiteral="fas-arrow-alt-circle-left" iconSize="15" />
                               </graphic>
                               <tooltip>
                                  <Tooltip text="Move" />
@@ -74,10 +130,18 @@
                            </Button>
                            <Button mnemonicParsing="false">
                               <graphic>
-                                 <FontIcon iconLiteral="far-trash-alt" />
+                                 <FontIcon iconLiteral="fas-trash" iconSize="15" />
                               </graphic>
                               <tooltip>
                                  <Tooltip text="Delete" />
+                              </tooltip>
+                           </Button>
+                           <Button mnemonicParsing="false">
+                              <graphic>
+                                 <FontIcon iconLiteral="fas-edit" iconSize="15" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip text="Rename" />
                               </tooltip>
                            </Button>
                         </children>
