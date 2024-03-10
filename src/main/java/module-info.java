@@ -16,8 +16,8 @@ module io.github.vcvitaly.k8cp {
     requires ch.qos.logback.classic;
 
     requires static lombok;
-    requires client.java;
-    requires client.java.api;
+    requires io.kubernetes.client.java;
+    requires io.kubernetes.client.java.api;
 
     requires org.apache.commons.io;
 

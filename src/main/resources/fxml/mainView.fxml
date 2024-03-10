@@ -6,16 +6,17 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.BreadCrumbBar?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.vcvitaly.k8cp.controller.MainController">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.vcvitaly.k8cp.controller.MainController">
    <VBox prefWidth="600.0">
       <fx:include source="menu.fxml" />
    </VBox>
-   <SplitPane dividerPositions="0.5" prefHeight="375.0" prefWidth="600.0">
+   <SplitPane dividerPositions="0.5" prefHeight="575.0" prefWidth="800.0">
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
-         <VBox prefHeight="373.0" prefWidth="300.0">
-            <HBox prefHeight="100.0" prefWidth="200.0">
+         <VBox prefHeight="575.0" prefWidth="400.0">
+            <HBox prefHeight="60.0" prefWidth="400.0">
                <Button fx:id="parentLeftBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
@@ -73,11 +74,12 @@
                   </tooltip>
                </Button>
             </HBox>
+            <BreadCrumbBar fx:id="leftBreadcrumbBar" />
          </VBox>
       </AnchorPane>
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
-         <VBox prefHeight="200.0" prefWidth="300.0">
-            <HBox prefHeight="100.0" prefWidth="200.0">
+         <VBox prefHeight="575.0" prefWidth="400.0">
+            <HBox prefHeight="60.0" prefWidth="400.0">
                <Button fx:id="parentRightBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
@@ -135,6 +137,7 @@
                   </tooltip>
                </Button>
             </HBox>
+            <BreadCrumbBar fx:id="rightBreadcrumbBar" />
          </VBox>
       </AnchorPane>
    </SplitPane>
