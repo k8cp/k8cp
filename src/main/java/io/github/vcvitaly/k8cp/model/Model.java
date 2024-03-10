@@ -2,10 +2,15 @@ package io.github.vcvitaly.k8cp.model;
 
 import io.github.vcvitaly.k8cp.view.ViewFactory;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Model {
+
+    @Getter
+    @Setter
+    private String podName;
 
     @Getter
     private final ViewFactory viewFactory;

@@ -2,6 +2,9 @@ module io.github.vcvitaly.k8cp {
     requires javafx.controls;
     requires javafx.fxml;
 
+    requires java.annotation;
+//    requires jsr305;
+
     requires org.controlsfx.controls;
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
@@ -13,6 +16,10 @@ module io.github.vcvitaly.k8cp {
     requires ch.qos.logback.classic;
 
     requires static lombok;
+    requires client.java;
+    requires client.java.api;
+
+    requires org.apache.commons.io;
 
     opens io.github.vcvitaly.k8cp to javafx.fxml;
     exports io.github.vcvitaly.k8cp;
