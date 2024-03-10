@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -17,7 +16,7 @@
    </VBox>
    <SplitPane dividerPositions="0.5" prefHeight="575.0" prefWidth="800.0">
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
-         <VBox prefHeight="575.0" prefWidth="400.0">
+         <VBox prefHeight="575.0" prefWidth="400.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <HBox prefHeight="60.0" prefWidth="400.0">
                <Button fx:id="parentLeftBtn" mnemonicParsing="false">
                   <graphic>
@@ -79,16 +78,11 @@
             <HBox prefHeight="25.0" prefWidth="400.0" styleClass="breadcrumb-container" stylesheets="@../styles/innerContainer.css">
                <BreadCrumbBar fx:id="leftBreadcrumbBar" prefHeight="25.0" />
             </HBox>
-            <TableView fx:id="leftView" prefHeight="490.0" prefWidth="400.0">
-              <columns>
-                <TableColumn prefWidth="75.0" text="C1" />
-                <TableColumn prefWidth="75.0" text="C2" />
-              </columns>
-            </TableView>
+            <TableView fx:id="leftView" prefHeight="490.0" prefWidth="400.0" />
          </VBox>
       </AnchorPane>
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
-         <VBox prefHeight="575.0" prefWidth="400.0">
+         <VBox prefHeight="575.0" prefWidth="400.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <HBox prefHeight="60.0" prefWidth="400.0">
                <Button fx:id="parentRightBtn" mnemonicParsing="false">
                   <graphic>
@@ -150,12 +144,7 @@
             <HBox prefHeight="25.0" prefWidth="400.0" styleClass="breadcrumb-container" stylesheets="@../styles/innerContainer.css">
                <BreadCrumbBar fx:id="rightBreadcrumbBar" prefHeight="25.0" />
             </HBox>
-            <TableView fx:id="rightView" prefHeight="490.0" prefWidth="400.0">
-              <columns>
-                <TableColumn prefWidth="75.0" text="C1" />
-                <TableColumn prefWidth="75.0" text="C2" />
-              </columns>
-            </TableView>
+            <TableView fx:id="rightView" prefHeight="490.0" prefWidth="400.0" />
          </VBox>
       </AnchorPane>
    </SplitPane>
