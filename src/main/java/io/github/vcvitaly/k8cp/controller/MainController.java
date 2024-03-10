@@ -1,11 +1,13 @@
 package io.github.vcvitaly.k8cp.controller;
 
 import io.github.vcvitaly.k8cp.dto.BreadCrumbFileDto;
+import io.github.vcvitaly.k8cp.dto.FileItemDto;
+import io.github.vcvitaly.k8cp.model.Mock;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.TableView;
 import org.controlsfx.control.BreadCrumbBar;
 
 public class MainController implements Initializable {
@@ -17,6 +19,7 @@ public class MainController implements Initializable {
     public Button deleteLeftBtn;
     public Button renameLeftBtn;
     public BreadCrumbBar<BreadCrumbFileDto> leftBreadcrumbBar;
+    public TableView<FileItemDto> leftView;
     public Button parentRightBtn;
     public Button homeRightBtn;
     public Button refreshRightBtn;
@@ -25,25 +28,29 @@ public class MainController implements Initializable {
     public Button deleteRightBtn;
     public Button renameRightBtn;
     public BreadCrumbBar<BreadCrumbFileDto> rightBreadcrumbBar;
+    public TableView<FileItemDto> rightView;
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         mockLeftBreadcrumbBar();
         mockRightBreadcrumbBar();
+        mockLeftView();
+        mockRightView();
     }
 
     private void mockLeftBreadcrumbBar() {
-        BreadCrumbFileDto dto1 = new BreadCrumbFileDto("C:\\", "C");
-        BreadCrumbFileDto dto2 = new BreadCrumbFileDto("C:\\Users\\", "Users");
-        final TreeItem<BreadCrumbFileDto> treeItem = BreadCrumbBar.buildTreeModel(dto1, dto2);
-        leftBreadcrumbBar.setSelectedCrumb(treeItem);
+        leftBreadcrumbBar.setSelectedCrumb(Mock.leftBreadcrumbItem());
     }
 
     private void mockRightBreadcrumbBar() {
-        BreadCrumbFileDto dto1 = new BreadCrumbFileDto("/home", "home");
-        BreadCrumbFileDto dto2 = new BreadCrumbFileDto("/home/user", "user");
-        final TreeItem<BreadCrumbFileDto> treeItem = BreadCrumbBar.buildTreeModel(dto1, dto2);
-        rightBreadcrumbBar.setSelectedCrumb(treeItem);
+        rightBreadcrumbBar.setSelectedCrumb(Mock.rightBreadcrumbItem());
+    }
+
+    private void mockLeftView() {
+        leftView.setItems(Mock.leftViewItems());
+    }
+    private void mockRightView() {
+        rightView.setItems(Mock.rightViewItems());
     }
 }

@@ -6,8 +6,9 @@ import lombok.Data;
 @Data
 @Builder
 public class FileItemDto {
+    private String path;
     private String name;
-    private int size;
+    private String size;
     private String sizeUnit;
     private String fileType;
     private String changedAt;
