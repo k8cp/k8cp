@@ -25,6 +25,7 @@ module io.github.vcvitaly.k8cp {
     exports io.github.vcvitaly.k8cp;
     exports io.github.vcvitaly.k8cp.controller;
     exports io.github.vcvitaly.k8cp.controller.menu;
+    exports io.github.vcvitaly.k8cp.dto;
     opens io.github.vcvitaly.k8cp.controller to javafx.fxml;
     opens io.github.vcvitaly.k8cp.controller.menu to javafx.fxml;
 }

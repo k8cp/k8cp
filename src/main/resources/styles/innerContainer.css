@@ -1,0 +1,8 @@
+.inner-container {
+    -fx-border-color: #AAAAAA;
+    -fx-border-width: 0 0 1 0;
+}
+
+.breadcrumb-container {
+    -fx-background-color: #A7E2F6;
+}

@@ -74,7 +74,9 @@
                   </tooltip>
                </Button>
             </HBox>
-            <BreadCrumbBar fx:id="leftBreadcrumbBar" />
+            <HBox prefHeight="25.0" prefWidth="400.0" styleClass="breadcrumb-container" stylesheets="@../styles/innerContainer.css">
+               <BreadCrumbBar fx:id="leftBreadcrumbBar" prefHeight="25.0" />
+            </HBox>
          </VBox>
       </AnchorPane>
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
@@ -137,7 +139,9 @@
                   </tooltip>
                </Button>
             </HBox>
-            <BreadCrumbBar fx:id="rightBreadcrumbBar" />
+            <HBox prefHeight="25.0" prefWidth="400.0" styleClass="breadcrumb-container" stylesheets="@../styles/innerContainer.css">
+               <BreadCrumbBar fx:id="rightBreadcrumbBar" prefHeight="25.0" />
+            </HBox>
          </VBox>
       </AnchorPane>
    </SplitPane>
