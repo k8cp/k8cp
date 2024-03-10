@@ -3,7 +3,8 @@ plugins {
     id 'application'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'org.openjfx.javafxplugin' version '0.1.0'
-    id 'org.beryx.jlink' version '2.25.0'
+    id 'org.beryx.jlink' version '3.0.1'
+    id "io.freefair.lombok" version "8.6"
 }
 
 group 'io.github.vcvitaly'
@@ -14,11 +15,13 @@ repositories {
 }
 
 ext {
-    junitVersion = '5.10.0'
+    junitVersion = '5.10.2'
 }
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -30,7 +33,7 @@ application {
 }
 
 javafx {
-    version = '21'
+    version = JavaVersion.VERSION_21
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
@@ -40,10 +43,26 @@ dependencies {
         exclude(group: 'org.openjfx')
     }
     implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1')
+    implementation 'org.kordamp.ikonli:ikonli-fontawesome-pack:12.3.1'
+    implementation 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1'
     implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    implementation 'ch.qos.logback:logback-core:1.5.2'
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+    implementation 'ch.qos.logback:logback-classic:1.5.2'
+
+    implementation ("io.kubernetes:client-java:20.0.0") {
+        exclude group: "com.google.code.findbugs", module: "jsr305"
+        exclude group: "com.amazonaws", module: "aws-java-sdk-sts"
+    }
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation "org.assertj:assertj-core:3.25.1"
+
 }
 
 test {
