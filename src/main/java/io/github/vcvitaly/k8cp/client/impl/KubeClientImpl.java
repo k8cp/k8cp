@@ -5,8 +5,10 @@ import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
-import io.kubernetes.client.util.Config;
+import io.kubernetes.client.util.ClientBuilder;
+import io.kubernetes.client.util.KubeConfig;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,16 +22,17 @@ import static java.util.Collections.emptyList;
 public class KubeClientImpl implements KubeClient {
 
     private static final int WAIT_TIMEOUT_MS = 250;
-    private final Exec exec = new Exec();
+    private final Exec exec;
 
-    public KubeClientImpl() {
+    public KubeClientImpl(String kubeConfigPath) {
         ApiClient client = null;
-        try {
-            client = Config.defaultClient();
+        try (final FileReader fr = new FileReader(kubeConfigPath)) {
+            client = ClientBuilder.kubeconfig(KubeConfig.loadKubeConfig(fr)).build();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         Configuration.setDefaultApiClient(client);
+        exec = new Exec();
     }
 
     @Override
