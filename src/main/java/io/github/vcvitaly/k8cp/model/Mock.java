@@ -26,9 +26,9 @@ public class Mock {
     }
 
     public static ObservableList<FileItemDto> leftViewItems() {
-        final String parentDirName = "C";
+        final String parentDirName = "..";
         FileItemDto parentDirDto = FileItemDto.builder()
-                .path("C:\\Users\\" + parentDirName)
+                .path("C:\\Users\\")
                 .name(parentDirName)
                 .size("")
                 .sizeUnit("")
@@ -46,8 +46,8 @@ public class Mock {
                 .build();
         final String dirName = "some_dir";
         FileItemDto dirDto = FileItemDto.builder()
-                .path("C:\\Users\\" + fileName)
-                .name(fileName)
+                .path("C:\\Users\\" + dirName)
+                .name(dirName)
                 .size(String.valueOf(4))
                 .sizeUnit(FileSizeUnit.KB.toString())
                 .fileType(FileType.DIRECTORY.toString())
@@ -57,9 +57,9 @@ public class Mock {
     }
 
     public static ObservableList<FileItemDto> rightViewItems() {
-        final String parentDirName = "home";
+        final String parentDirName = "..";
         FileItemDto parentDirDto = FileItemDto.builder()
-                .path("/home" + parentDirName)
+                .path("/home")
                 .name(parentDirName)
                 .size("")
                 .sizeUnit("")
