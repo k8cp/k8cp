@@ -9,7 +9,7 @@ import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
-import io.github.vcvitaly.k8cp.util.FileUtil;
+import io.github.vcvitaly.k8cp.util.UnixPathUtil;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +42,8 @@ public class KubeServiceImpl implements KubeService {
         final String date = parts[5];
         final String time = parts[6];
         final String nameRaw = parts[7];
-        final String fullPath = FileUtil.concatPaths(path, nameRaw);
-        final String name = FileUtil.stripEndingSlashFromPath(nameRaw);
+        final String fullPath = UnixPathUtil.concatPaths(path, nameRaw);
+        final String name = UnixPathUtil.stripEndingSlashFromPath(nameRaw);
         final FileSizeDto fileSizeDto = sizeConverter.toFileSizeDto(size);
         return FileDto.builder()
                 .path(fullPath)
