@@ -1,7 +1,7 @@
 package io.github.vcvitaly.k8cp.service.impl;
 
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
-import io.github.vcvitaly.k8cp.dto.KubeConfigChoiceDto;
+import io.github.vcvitaly.k8cp.dto.KubeConfigSelectionDto;
 import io.github.vcvitaly.k8cp.exception.FileSystemException;
 import io.github.vcvitaly.k8cp.exception.KubeConfigLoadingException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
@@ -21,20 +21,20 @@ public class KubeConfigSelectionServiceImpl implements KubeConfigSelectionServic
     private final KubeConfigHelper kubeConfigHelper;
 
     @Override
-    public List<KubeConfigChoiceDto> getConfigChoices(String kubeFolderPath) throws FileSystemException, KubeContextExtractionException {
-        final List<KubeConfigChoiceDto> list = new ArrayList<>();
+    public List<KubeConfigSelectionDto> getConfigChoices(String kubeFolderPath) throws FileSystemException, KubeContextExtractionException {
+        final List<KubeConfigSelectionDto> list = new ArrayList<>();
         for (Path path : localFsClient.listFiles(kubeFolderPath)) {
             if (kubeConfigHelper.validate(path.toString())) {
-                KubeConfigChoiceDto configChoiceDto = toConfigChoiceDto(path);
+                KubeConfigSelectionDto configChoiceDto = toConfigChoiceDto(path);
                 list.add(configChoiceDto);
             }
         }
         return list;
     }
 
-    private KubeConfigChoiceDto toConfigChoiceDto(Path path) throws KubeContextExtractionException {
+    private KubeConfigSelectionDto toConfigChoiceDto(Path path) throws KubeContextExtractionException {
         final String pathStr = path.toString();
-        return KubeConfigChoiceDto.builder()
+        return KubeConfigSelectionDto.builder()
                 .contextName(getContextName(pathStr))
                 .fileName(path.getFileName().toString())
                 .path(pathStr)

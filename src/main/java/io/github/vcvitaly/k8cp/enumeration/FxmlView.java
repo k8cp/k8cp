@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 public enum FxmlView {
     MAIN("/fxml/main.fxml"),
     ABOUT("/fxml/about.fxml"),
-    CONFIG_CHOICE("/fxml/kubeConfigSelection.fxml"),
+    KUBE_CONFIG_SELECTION("/fxml/kubeConfigSelection.fxml"),
     ERROR("/fxml/error.fxml");
 
     @Getter
