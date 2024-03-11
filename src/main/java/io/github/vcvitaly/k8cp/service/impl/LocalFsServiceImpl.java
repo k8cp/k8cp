@@ -14,6 +14,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
@@ -25,21 +26,20 @@ public class LocalFsServiceImpl implements LocalFsService {
 
     @Override
     public List<FileDto> listFiles(String path) throws FileSystemException {
-        try {
-            return listFilesInternal(path);
-        } catch (IOException e) {
-            throw new FileSystemException(e);
-        }
+        return listFilesInternal(path);
     }
 
-    private List<FileDto> listFilesInternal(String path) throws IOException {
+    private List<FileDto> listFilesInternal(String path) throws FileSystemException {
         final List<Path> paths = localFsClient.listFiles(path);
-        return paths.stream()
-                .map(this::toFileDto)
-                .toList();
+        List<FileDto> list = new ArrayList<>();
+        for (Path p : paths) {
+            FileDto fileDto = toFileDto(p);
+            list.add(fileDto);
+        }
+        return list;
     }
 
-    private FileDto toFileDto(Path path) {
+    private FileDto toFileDto(Path path) throws FileSystemException {
         try {
             final long size = Files.size(path);
             final FileSizeDto fileSizeDto = sizeConverter.toFileSizeDto(size);
@@ -54,7 +54,7 @@ public class LocalFsServiceImpl implements LocalFsService {
                     .changedAt(toLocalDateTime(attrs.lastModifiedTime()))
                     .build();
         } catch (IOException e) {
-            throw new FileSystemException(e);
+            throw new FileSystemException("An error while reading attributes for " + path, e);
         }
     }
 

@@ -17,15 +17,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ViewFactory {
 
+    private static final String MAIN_ICON_PATH = "/images/k8cp_icon.png";
+
     public void showMainWindow() {
-        createStageAndShow(FxmlView.MAIN, Modality.NONE);
+        createStageAndShow(FxmlView.MAIN, Modality.NONE, Constants.TITLE);
     }
 
     public void showAboutModal() {
-        createStageAndShow(FxmlView.ABOUT, Modality.APPLICATION_MODAL);
+        createStageAndShow(FxmlView.ABOUT, Modality.APPLICATION_MODAL, Constants.TITLE);
     }
 
-    private void createStageAndShow(FxmlView fxmlView, Modality modality) {
+    private void createStageAndShow(FxmlView fxmlView, Modality modality, String title) {
         FXMLLoader loader = FxmlLoaderUtil.createFxmlLoader(fxmlView);
         Scene scene;
         try {
@@ -36,7 +38,7 @@ public class ViewFactory {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.getIcons().add(getMainIcon());
-        stage.setTitle(Constants.TITLE);
+        stage.setTitle(title);
         stage.initModality(modality);
         stage.show();
         log.info("Shown " + fxmlView);
@@ -44,7 +46,7 @@ public class ViewFactory {
 
     private Image getMainIcon() {
         return new Image(
-                ResourceUtil.getResource("/images/k8cp_icon.png").toString()
+                ResourceUtil.getResource(MAIN_ICON_PATH).toString()
         );
     }
 }

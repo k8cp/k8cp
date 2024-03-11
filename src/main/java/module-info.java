@@ -20,6 +20,7 @@ module io.github.vcvitaly.k8cp {
     requires io.kubernetes.client.java.api;
 
     requires org.apache.commons.io;
+    requires org.yaml.snakeyaml;
 
     opens io.github.vcvitaly.k8cp to javafx.fxml;
     exports io.github.vcvitaly.k8cp;

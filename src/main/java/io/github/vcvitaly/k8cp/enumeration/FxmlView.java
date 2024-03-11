@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum FxmlView {
-    MAIN("/fxml/mainView.fxml"),
-    ABOUT("/fxml/aboutView.fxml");
+    MAIN("/fxml/main.fxml"),
+    ABOUT("/fxml/about.fxml"),
+    CONFIG_CHOICE("/fxml/kubeConfigSelection.fxml"),
+    ERROR("/fxml/error.fxml");
 
     @Getter
     private final String resourcePath;
