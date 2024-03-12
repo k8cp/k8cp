@@ -3,6 +3,8 @@ package io.github.vcvitaly.k8cp.controller;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.util.Constants;
+import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -26,12 +28,19 @@ public class KubeNamespaceSelectionController implements Initializable {
         prevBtn.setOnAction(e -> onPrev());
         nextBtn.setOnAction(e -> onNext());
         try {
-            final List<KubeNamespace> namespaces = Model.getKubeService().getNamespaces();
+            final List<KubeNamespace> namespaces = Model.getKubeNamespaces();
             namespaceSelector.setItems(FXCollections.observableList(namespaces));
+            final KubeNamespace selectedItem = ItemSelectionUtil.getSelectionItem(
+                    namespaces,
+                    selection -> selection.name().equals(Constants.DEFAULT_NAMESPACE_NAME)
+            );
+            namespaceSelector.setValue(selectedItem);
+            setKubeNamespaceSelection(selectedItem);
+            namespaceSelector.valueProperty().addListener(observable -> setKubeNamespaceSelection());
             nextBtn.setDisable(false);
         } catch (KubeApiException e) {
             log.error("Could not get namespaces list", e);
-            errorLbl.setText("Could not find any namespace on that cluster");
+            errorLbl.setText("Could not get namespaces list");
             Model.getInstance().getViewFactory().showErrorModal(e.getMessage());
         }
     }
@@ -39,12 +48,21 @@ public class KubeNamespaceSelectionController implements Initializable {
     private void onNext() {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
         Model.getInstance().getViewFactory().closeStage(selectionStage);
-        Model.getInstance().getViewFactory().showMainWindow();
+        Model.getInstance().getViewFactory().showKubePodSelectionWindow();
     }
 
     private void onPrev() {
         final Stage selectionStage = (Stage) prevBtn.getScene().getWindow();
         Model.getInstance().getViewFactory().closeStage(selectionStage);
         Model.getInstance().getViewFactory().showKubeConfigSelectionWindow();
+    }
+
+    private void setKubeNamespaceSelection() {
+        final KubeNamespace selection = namespaceSelector.getValue();
+        setKubeNamespaceSelection(selection);
+    }
+
+    private void setKubeNamespaceSelection(KubeNamespace selection) {
+        Model.setKubeNamespaceSelection(selection);
     }
 }

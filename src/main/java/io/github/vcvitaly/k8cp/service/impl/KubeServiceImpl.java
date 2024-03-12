@@ -4,6 +4,7 @@ import io.github.vcvitaly.k8cp.client.KubeClient;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileSizeContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
+import io.github.vcvitaly.k8cp.domain.KubePod;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
@@ -43,6 +44,11 @@ public class KubeServiceImpl implements KubeService {
     @Override
     public List<KubeNamespace> getNamespaces() throws KubeApiException {
         return kubeClient.getNamespaces();
+    }
+
+    @Override
+    public List<KubePod> getPods(String namespace) throws KubeApiException {
+        return kubeClient.getPods(namespace);
     }
 
     private FileInfoContainer toFileInfoContainer(String path, String lsLine) {

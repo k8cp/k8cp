@@ -3,6 +3,7 @@ package io.github.vcvitaly.k8cp.client.impl;
 import io.github.vcvitaly.k8cp.client.KubeClient;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
+import io.github.vcvitaly.k8cp.domain.KubePod;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeExecException;
 import io.kubernetes.client.Exec;
@@ -13,6 +14,8 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.KubeConfig;
 import java.io.BufferedReader;
@@ -31,7 +34,7 @@ import static java.util.Collections.emptyList;
 public class KubeClientImpl implements KubeClient {
 
     private static final int WAIT_TIMEOUT_MS = 250;
-    public static final String UNKNOWN_NAMESPACE_NAME = "UNKNOWN";
+    public static final String UNKNOWN_OBJECT_NAME = "UNKNOWN";
     private final KubeConfigContainer configContainer;
     private final Exec exec;
     private final CoreV1Api api;
@@ -70,6 +73,19 @@ public class KubeClientImpl implements KubeClient {
                     .toList();
         } catch (ApiException e) {
             throw new KubeApiException("Could not get a list of namespaces for [%s]".formatted(configContainer), e);
+        }
+    }
+
+    @Override
+    public List<KubePod> getPods(String namespace) throws KubeApiException {
+        try {
+            final V1PodList v1PodList = api.listNamespacedPod(namespace).execute();
+            return v1PodList.getItems().stream()
+                    .map(this::extractPodName)
+                    .map(KubePod::new)
+                    .toList();
+        } catch (ApiException e) {
+            throw new KubeApiException("Could not get a list of pods in [%s] namespace".formatted(namespace), e);
         }
     }
 
@@ -136,12 +152,19 @@ public class KubeClientImpl implements KubeClient {
     }
 
     private String extractNamespaceName(V1Namespace v1Namespace) {
-        final V1ObjectMeta metadata = v1Namespace.getMetadata();
+        return extractObjectName(v1Namespace.getMetadata());
+    }
+
+    private String extractObjectName(V1ObjectMeta metadata) {
         if (metadata == null) {
-            return UNKNOWN_NAMESPACE_NAME;
+            return UNKNOWN_OBJECT_NAME;
         } else {
             final String name = metadata.getName();
-            return name == null ? UNKNOWN_NAMESPACE_NAME : name;
+            return name == null ? UNKNOWN_OBJECT_NAME : name;
         }
+    }
+
+    private String extractPodName(V1Pod v1Pod) {
+        return extractObjectName(v1Pod.getMetadata());
     }
 }

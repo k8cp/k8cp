@@ -56,7 +56,7 @@ public class KubeConfigSelectionController implements Initializable {
         if (file != null) {
             try {
                 final KubeConfigContainer selection = Model.getInstance().getKubeConfigSelectionDto(file.toPath());
-                Model.getInstance().setKubeConfigSelection(selection);
+                setKubeConfigSelection(selection);
                 nextBtn.setDisable(false);
                 chooseFileLbl.setVisible(false);
                 configSelector.setVisible(false);
@@ -101,6 +101,6 @@ public class KubeConfigSelectionController implements Initializable {
     }
 
     private void setKubeConfigSelection(KubeConfigContainer selection) {
-        Model.getInstance().setKubeConfigSelection(selection);
+        Model.setKubeConfigSelection(selection);
     }
 }

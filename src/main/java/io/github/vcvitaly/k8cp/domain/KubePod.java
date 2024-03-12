@@ -1,6 +1,9 @@
 package io.github.vcvitaly.k8cp.domain;
 
-public record KubeNamespace(String name) {
+import lombok.Builder;
+
+@Builder
+public record KubePod(String name) {
 
     @Override
     public String toString() {
