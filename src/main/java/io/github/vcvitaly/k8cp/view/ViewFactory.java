@@ -82,6 +82,15 @@ public class ViewFactory {
         );
     }
 
+    public void showKubePodSelectionWindow() {
+        createStageAndShow(
+                StageCreationParam.builder()
+                        .fxmlView(FxmlView.KUBE_POD_SELECTION)
+                        .resizeable(false)
+                        .build()
+        );
+    }
+
     private void createStageAndShow(StageCreationParam param) {
         final FxmlView fxmlView = param.getFxmlView();
         final FXMLLoader loader = FxmlLoaderUtil.createFxmlLoader(fxmlView);
