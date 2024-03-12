@@ -5,6 +5,7 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileSizeContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
+import io.github.vcvitaly.k8cp.exception.KubeExecException;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
@@ -27,10 +28,14 @@ public class KubeServiceImpl implements KubeService {
         final ArrayList<String> partsList = new ArrayList<>(LS_PARTS);
         partsList.add("'%s'".formatted(path));
         final String[] cmdParts  = partsList.toArray(String[]::new);
-        final List<String> lines = kubeClient.execAndReturnOut(namespace, podName, cmdParts);
-        return lines.stream()
-                .map(line -> toFileDto(path, line))
-                .toList();
+        try {
+            final List<String> lines = kubeClient.execAndReturnOut(namespace, podName, cmdParts);
+            return lines.stream()
+                    .map(line -> toFileDto(path, line))
+                    .toList();
+        } catch (KubeExecException e) {
+            throw new IOOperationException("Could not get a list of files at [%s@%s]".formatted(podName, path), e);
+        }
     }
 
     private FileInfoContainer toFileDto(String path, String lsLine) {

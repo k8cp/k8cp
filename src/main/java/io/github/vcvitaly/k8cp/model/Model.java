@@ -2,7 +2,7 @@ package io.github.vcvitaly.k8cp.model;
 
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
-import io.github.vcvitaly.k8cp.domain.KubeConfig;
+import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.service.HomePathProvider;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Model {
 
     @Getter
-    private final AtomicReference<KubeConfig> kubeConfigSelectionRef;
+    private final AtomicReference<KubeConfigContainer> kubeConfigSelectionRef;
 
     @Getter
     @Setter
@@ -53,22 +53,22 @@ public class Model {
         kubeConfigSelectionService = new KubeConfigSelectionServiceImpl(localFsClient, kubeConfigHelper);
     }
 
-    public ObservableList<KubeConfig> getKubeConfigList() throws IOOperationException, KubeContextExtractionException {
+    public ObservableList<KubeConfigContainer> getKubeConfigList() throws IOOperationException, KubeContextExtractionException {
         final String homePath = homePathProvider.provideHomePath();
-        final List<KubeConfig> configChoices = kubeConfigSelectionService
+        final List<KubeConfigContainer> configChoices = kubeConfigSelectionService
                 .getConfigChoices(Paths.get(homePath, Constants.KUBE_FOLDER).toString());
         return FXCollections.observableList(configChoices);
     }
 
-    public KubeConfig getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
+    public KubeConfigContainer getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
         return kubeConfigSelectionService.toKubeConfig(path);
     }
 
-    public KubeConfig getKubeConfigSelection() {
+    public KubeConfigContainer getKubeConfigSelection() {
         return kubeConfigSelectionRef.get();
     }
 
-    public void setKubeConfigSelection(KubeConfig selection) {
+    public void setKubeConfigSelection(KubeConfigContainer selection) {
         kubeConfigSelectionRef.set(selection);
     }
 

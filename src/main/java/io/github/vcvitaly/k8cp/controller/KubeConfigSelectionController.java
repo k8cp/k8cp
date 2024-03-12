@@ -1,6 +1,6 @@
 package io.github.vcvitaly.k8cp.controller;
 
-import io.github.vcvitaly.k8cp.domain.KubeConfig;
+import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.model.Model;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class KubeConfigSelectionController implements Initializable {
     public Label chooseFileLbl;
-    public ChoiceBox<KubeConfig> configSelector;
+    public ChoiceBox<KubeConfigContainer> configSelector;
     public Label chooseFromFsLbl;
     public Button fsChooserBtn;
     public Label selectedKubeConfigFileLbl;
@@ -28,7 +28,7 @@ public class KubeConfigSelectionController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        final ObservableList<KubeConfig> kubeConfigList;
+        final ObservableList<KubeConfigContainer> kubeConfigList;
         nextBtn.setOnAction(e -> onNext());
         fsChooserBtn.setOnAction(e -> onFileSelection());
         try {
@@ -55,7 +55,7 @@ public class KubeConfigSelectionController implements Initializable {
         final File file = getFileFromFileChooser();
         if (file != null) {
             try {
-                final KubeConfig selection = Model.getInstance().getKubeConfigSelectionDto(file.toPath());
+                final KubeConfigContainer selection = Model.getInstance().getKubeConfigSelectionDto(file.toPath());
                 Model.getInstance().setKubeConfigSelection(selection);
                 nextBtn.setDisable(false);
                 chooseFileLbl.setVisible(false);
@@ -68,7 +68,7 @@ public class KubeConfigSelectionController implements Initializable {
         }
     }
 
-    private void setItemsIfKubeConfigsFound(ObservableList<KubeConfig> kubeConfigList) {
+    private void setItemsIfKubeConfigsFound(ObservableList<KubeConfigContainer> kubeConfigList) {
         configSelector.setItems(kubeConfigList);
         configSelector.setValue(
                 kubeConfigList.stream()
@@ -94,7 +94,7 @@ public class KubeConfigSelectionController implements Initializable {
     }
 
     private void setKubeConfigSelection() {
-        final KubeConfig selection = configSelector.getValue();
+        final KubeConfigContainer selection = configSelector.getValue();
         Model.getInstance().setKubeConfigSelection(selection);
     }
 

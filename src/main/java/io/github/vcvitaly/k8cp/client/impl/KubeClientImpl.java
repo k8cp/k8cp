@@ -1,11 +1,18 @@
 package io.github.vcvitaly.k8cp.client.impl;
 
 import io.github.vcvitaly.k8cp.client.KubeClient;
+import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
+import io.github.vcvitaly.k8cp.domain.KubeNamespace;
+import io.github.vcvitaly.k8cp.exception.KubeApiException;
+import io.github.vcvitaly.k8cp.exception.KubeExecException;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.models.V1Namespace;
+import io.kubernetes.client.openapi.models.V1NamespaceList;
+import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.KubeConfig;
 import java.io.BufferedReader;
@@ -14,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,27 +31,45 @@ import static java.util.Collections.emptyList;
 public class KubeClientImpl implements KubeClient {
 
     private static final int WAIT_TIMEOUT_MS = 250;
+    public static final String UNKNOWN_NAMESPACE_NAME = "UNKNOWN";
+    private final KubeConfigContainer configContainer;
     private final Exec exec;
     private final CoreV1Api api;
 
-    public KubeClientImpl(String kubeConfigPath) {
+    public KubeClientImpl(KubeConfigContainer kubeConfig) {
+        this.configContainer = kubeConfig;
         ApiClient client;
-        try (final FileReader fr = new FileReader(kubeConfigPath)) {
+        try (final FileReader fr = new FileReader(kubeConfig.path())) {
             client = ClientBuilder.kubeconfig(KubeConfig.loadKubeConfig(fr)).build();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         Configuration.setDefaultApiClient(client);
-        exec = new Exec(client);
-        api = new CoreV1Api(client);
+        exec = new Exec();
+        api = new CoreV1Api();
     }
 
     @Override
-    public List<String> execAndReturnOut(String namespace, String podName, String[] cmdParts) {
+    public List<String> execAndReturnOut(String namespace, String podName, String[] cmdParts) throws KubeExecException {
         try {
             return executeAndReturnOutInternal(namespace, podName, cmdParts);
         } catch (IOException | ApiException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new KubeExecException(
+                    "Could not execute %s".formatted(Arrays.toString(cmdParts)), e
+            );
+        }
+    }
+
+    @Override
+    public List<KubeNamespace> getNamespaces() throws KubeApiException {
+        try {
+            final V1NamespaceList v1NamespaceList = api.listNamespace().execute();
+            return v1NamespaceList.getItems().stream()
+                    .map(this::extractNamespaceName)
+                    .map(KubeNamespace::new)
+                    .toList();
+        } catch (ApiException e) {
+            throw new KubeApiException("Could not get a list of namespaces for [%s]".formatted(configContainer), e);
         }
     }
 
@@ -107,5 +133,15 @@ public class KubeClientImpl implements KubeClient {
         }
 
         return out;
+    }
+
+    private String extractNamespaceName(V1Namespace v1Namespace) {
+        final V1ObjectMeta metadata = v1Namespace.getMetadata();
+        if (metadata == null) {
+            return UNKNOWN_NAMESPACE_NAME;
+        } else {
+            final String name = metadata.getName();
+            return name == null ? UNKNOWN_NAMESPACE_NAME : name;
+        }
     }
 }
