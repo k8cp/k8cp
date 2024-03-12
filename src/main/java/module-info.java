@@ -21,6 +21,10 @@ module io.github.vcvitaly.k8cp {
 
     requires org.apache.commons.io;
     requires org.yaml.snakeyaml;
+    requires com.google.gson;
+    requires kotlin.stdlib;
+    requires org.apache.commons.lang3;
+    requires org.bouncycastle.pkix;
 
     opens io.github.vcvitaly.k8cp to javafx.fxml;
     exports io.github.vcvitaly.k8cp;
