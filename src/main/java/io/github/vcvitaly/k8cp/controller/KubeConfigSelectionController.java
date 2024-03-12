@@ -5,6 +5,7 @@ import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.util.Constants;
+import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -75,16 +76,12 @@ public class KubeConfigSelectionController implements Initializable {
 
     private void setItemsIfKubeConfigsFound(ObservableList<KubeConfigContainer> kubeConfigList) {
         configSelector.setItems(kubeConfigList);
-        configSelector.setValue(
-                kubeConfigList.stream()
-                        .filter(selection -> selection.fileName().equals(Constants.DEFAULT_CONFIG_FILE_NAME))
-                        .findFirst()
-                        .orElseGet(
-                                () -> kubeConfigList.stream().findFirst().orElseThrow(
-                                        () -> new IllegalArgumentException("Please check that the list is not empty first")
-                                )
-                        )
+        final KubeConfigContainer selectedItem = ItemSelectionUtil.getSelectionItem(
+                kubeConfigList,
+                selection -> selection.fileName().equals(Constants.DEFAULT_CONFIG_FILE_NAME)
         );
+        configSelector.setValue(selectedItem);
+        setKubeConfigSelection(selectedItem);
         configSelector.valueProperty().addListener(observable -> setKubeConfigSelection());
         nextBtn.setDisable(false);
     }
@@ -100,6 +97,10 @@ public class KubeConfigSelectionController implements Initializable {
 
     private void setKubeConfigSelection() {
         final KubeConfigContainer selection = configSelector.getValue();
+        setKubeConfigSelection(selection);
+    }
+
+    private void setKubeConfigSelection(KubeConfigContainer selection) {
         Model.getInstance().setKubeConfigSelection(selection);
     }
 }

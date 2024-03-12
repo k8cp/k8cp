@@ -65,7 +65,7 @@ public class Model {
 
     public void setKubeConfigSelection(KubeConfigContainer selection) {
         kubeConfigSelectionRef.set(selection);
-        log.info("Set selection to {}", selection);
+        log.info("Set selection to [{}]", selection);
     }
 
     public static Model getInstance() {
