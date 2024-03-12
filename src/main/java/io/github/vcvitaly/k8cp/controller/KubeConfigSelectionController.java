@@ -74,7 +74,11 @@ public class KubeConfigSelectionController implements Initializable {
                 kubeConfigList.stream()
                         .filter(selection -> selection.fileName().equals(Constants.DEFAULT_CONFIG_FILE_NAME))
                         .findFirst()
-                        .orElseGet(() -> kubeConfigList.stream().findFirst().get())
+                        .orElseGet(
+                                () -> kubeConfigList.stream().findFirst().orElseThrow(
+                                        () -> new IllegalArgumentException("Please check that the list is not empty first")
+                                )
+                        )
         );
         configSelector.valueProperty().addListener(observable -> setKubeConfigSelection());
         nextBtn.setDisable(false);

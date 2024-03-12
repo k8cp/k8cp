@@ -27,7 +27,7 @@ public class KubeClientImpl implements KubeClient {
     private final CoreV1Api api;
 
     public KubeClientImpl(String kubeConfigPath) {
-        ApiClient client = null;
+        ApiClient client;
         try (final FileReader fr = new FileReader(kubeConfigPath)) {
             client = ClientBuilder.kubeconfig(KubeConfig.loadKubeConfig(fr)).build();
         } catch (IOException e) {
