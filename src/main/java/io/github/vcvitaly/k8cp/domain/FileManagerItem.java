@@ -1,11 +1,10 @@
-package io.github.vcvitaly.k8cp.dto;
+package io.github.vcvitaly.k8cp.domain;
 
-import java.io.File;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class FileItemDto {
+public class FileManagerItem {
     private String path;
     private String name;
     private String size;
@@ -13,7 +12,7 @@ public class FileItemDto {
     private String changedAt;
 
     @Builder
-    public FileItemDto(String path, String name, String size, String sizeUnit, String fileType, String changedAt) {
+    public FileManagerItem(String path, String name, String size, String sizeUnit, String fileType, String changedAt) {
         this.path = path;
         this.name = name;
         this.size = "%s %s".formatted(size, sizeUnit);

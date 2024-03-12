@@ -1,8 +1,8 @@
 package io.github.vcvitaly.k8cp.service.impl;
 
 import io.github.vcvitaly.k8cp.client.KubeClient;
-import io.github.vcvitaly.k8cp.dto.FileDto;
-import io.github.vcvitaly.k8cp.dto.FileSizeDto;
+import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
+import io.github.vcvitaly.k8cp.domain.FileSizeContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.KubeService;
@@ -23,7 +23,7 @@ public class KubeServiceImpl implements KubeService {
     private final SizeConverter sizeConverter;
 
     @Override
-    public List<FileDto> listFiles(String namespace, String podName, String path) throws IOOperationException {
+    public List<FileInfoContainer> listFiles(String namespace, String podName, String path) throws IOOperationException {
         final ArrayList<String> partsList = new ArrayList<>(LS_PARTS);
         partsList.add("'%s'".formatted(path));
         final String[] cmdParts  = partsList.toArray(String[]::new);
@@ -33,7 +33,7 @@ public class KubeServiceImpl implements KubeService {
                 .toList();
     }
 
-    private FileDto toFileDto(String path, String lsLine) {
+    private FileInfoContainer toFileDto(String path, String lsLine) {
         final String[] parts = lsLine.split("\\s+");
         final String attrs = parts[0];
         final long size = Long.parseLong(parts[4]);
@@ -42,13 +42,13 @@ public class KubeServiceImpl implements KubeService {
         final String nameRaw = parts[7];
         final String fullPath = UnixPathUtil.concatPaths(path, nameRaw);
         final String name = UnixPathUtil.stripEndingSlashFromPath(nameRaw);
-        final FileSizeDto fileSizeDto = sizeConverter.toFileSizeDto(size);
-        return FileDto.builder()
+        final FileSizeContainer fileSizeContainer = sizeConverter.toFileSizeDto(size);
+        return FileInfoContainer.builder()
                 .path(fullPath)
                 .name(name)
                 .sizeBytes(size)
-                .size(fileSizeDto.sizeInUnit())
-                .sizeUnit(fileSizeDto.unit())
+                .size(fileSizeContainer.sizeInUnit())
+                .sizeUnit(fileSizeContainer.unit())
                 .fileType(getType(attrs))
                 .changedAt(DateTimeUtil.toLocalDate(date, time))
                 .build();

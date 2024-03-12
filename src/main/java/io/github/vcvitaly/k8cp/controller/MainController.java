@@ -1,7 +1,7 @@
 package io.github.vcvitaly.k8cp.controller;
 
-import io.github.vcvitaly.k8cp.dto.BreadCrumbFileDto;
-import io.github.vcvitaly.k8cp.dto.FileItemDto;
+import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
+import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.model.Mock;
 import java.net.URL;
 import java.util.List;
@@ -22,8 +22,8 @@ public class MainController implements Initializable {
     public Button moveLeftBtn;
     public Button deleteLeftBtn;
     public Button renameLeftBtn;
-    public BreadCrumbBar<BreadCrumbFileDto> leftBreadcrumbBar;
-    public TableView<FileItemDto> leftView;
+    public BreadCrumbBar<BreadCrumbFile> leftBreadcrumbBar;
+    public TableView<FileManagerItem> leftView;
     public Button parentRightBtn;
     public Button homeRightBtn;
     public Button refreshRightBtn;
@@ -31,8 +31,8 @@ public class MainController implements Initializable {
     public Button moveRightBtn;
     public Button deleteRightBtn;
     public Button renameRightBtn;
-    public BreadCrumbBar<BreadCrumbFileDto> rightBreadcrumbBar;
-    public TableView<FileItemDto> rightView;
+    public BreadCrumbBar<BreadCrumbFile> rightBreadcrumbBar;
+    public TableView<FileManagerItem> rightView;
 
 
     @Override
@@ -67,7 +67,7 @@ public class MainController implements Initializable {
         return new Label("No rows to display");
     }
 
-    private List<TableColumn<FileItemDto, String>> getTableColumns() {
+    private List<TableColumn<FileManagerItem, String>> getTableColumns() {
         return List.of(
                 getTableColumn("Name", "name"),
                 getTableColumn("Size", "size"),
@@ -76,8 +76,8 @@ public class MainController implements Initializable {
         );
     }
 
-    private TableColumn<FileItemDto, String> getTableColumn(String colName, String dtoFieldName) {
-        TableColumn<FileItemDto, String> col = new TableColumn<>(colName);
+    private TableColumn<FileManagerItem, String> getTableColumn(String colName, String dtoFieldName) {
+        TableColumn<FileManagerItem, String> col = new TableColumn<>(colName);
         col.setCellValueFactory(new PropertyValueFactory<>(dtoFieldName));
         return col;
     }
