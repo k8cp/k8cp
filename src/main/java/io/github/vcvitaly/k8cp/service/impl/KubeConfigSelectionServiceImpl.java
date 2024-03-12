@@ -7,6 +7,7 @@ import io.github.vcvitaly.k8cp.exception.KubeConfigLoadingException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.service.KubeConfigSelectionService;
 import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class KubeConfigSelectionServiceImpl implements KubeConfigSelectionServic
     public List<KubeConfigSelectionDto> getConfigChoices(String kubeFolderPath) throws FileSystemException, KubeContextExtractionException {
         final List<KubeConfigSelectionDto> list = new ArrayList<>();
         for (Path path : localFsClient.listFiles(kubeFolderPath)) {
-            if (kubeConfigHelper.validate(path.toString())) {
+            if (!Files.isDirectory(path) && Files.isReadable(path) && kubeConfigHelper.validate(path.toString())) {
                 KubeConfigSelectionDto configChoiceDto = toConfigChoiceDto(path);
                 list.add(configChoiceDto);
             }

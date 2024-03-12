@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,21 +30,8 @@ public class KubeConfigSelectionController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         final ObservableList<KubeConfigSelectionDto> kubeConfigList;
-        fsChooserBtn.setOnAction(e -> {
-            final File file = getFileFromFileChooser();
-            if (file != null) {
-                try {
-                    final KubeConfigSelectionDto selection = Model.getInstance().getKubeConfigSelectionDto(file.toPath());
-                    Model.getInstance().setKubeConfigSelection(selection);
-                    nextBtn.setDisable(false);
-                    chooseFileLbl.setVisible(false);
-                    configSelector.setVisible(false);
-                    chooseFromFsLbl.setVisible(false);
-                } catch (KubeContextExtractionException ex) {
-                    Model.getInstance().getViewFactory().showErrorModal(ex.getMessage());
-                }
-            }
-        });
+        nextBtn.setOnAction(e -> onNext());
+        fsChooserBtn.setOnAction(e -> onFileSelection());
         try {
             kubeConfigList = Model.getInstance().getKubeConfigList();
             if (!kubeConfigList.isEmpty()) {
@@ -55,6 +43,29 @@ public class KubeConfigSelectionController implements Initializable {
             log.error("Could not get kube config list", e);
             setItemsIfNoKubeConfigFound();
             Model.getInstance().getViewFactory().showErrorModal(e.getMessage());
+        }
+    }
+
+    private void onNext() {
+        final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
+        Model.getInstance().getViewFactory().closeStage(selectionStage);
+        Model.getInstance().getViewFactory().showMainWindow();
+    }
+
+    private void onFileSelection() {
+        final File file = getFileFromFileChooser();
+        if (file != null) {
+            try {
+                final KubeConfigSelectionDto selection = Model.getInstance().getKubeConfigSelectionDto(file.toPath());
+                Model.getInstance().setKubeConfigSelection(selection);
+                nextBtn.setDisable(false);
+                chooseFileLbl.setVisible(false);
+                configSelector.setVisible(false);
+                chooseFromFsLbl.setVisible(false);
+                selectedKubeConfigFileLbl.setText("You selected: " + selection.toString());
+            } catch (KubeContextExtractionException ex) {
+                Model.getInstance().getViewFactory().showErrorModal(ex.getMessage());
+            }
         }
     }
 
