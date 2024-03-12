@@ -1,6 +1,6 @@
 package io.github.vcvitaly.k8cp.service.impl;
 
-import io.github.vcvitaly.k8cp.exception.FileSystemException;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeConfigLoadingException;
 import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
 import java.io.FileReader;
@@ -18,7 +18,7 @@ public class KubeConfigHelperImpl implements KubeConfigHelper {
     private static final String CURRENT_CONTEXT_KEY = "current-context";
 
     @Override
-    public boolean validate(String path) throws FileSystemException {
+    public boolean validate(String path) throws IOOperationException {
         try {
             final Map<String, Object> configMap = getConfigMap(path);
             return configMap.containsKey(CLUSTERS_KEY) && configMap.containsKey(CONTEXTS_KEY);
@@ -28,17 +28,17 @@ public class KubeConfigHelperImpl implements KubeConfigHelper {
     }
 
     @Override
-    public String extractContextName(String path) throws FileSystemException, KubeConfigLoadingException {
+    public String extractContextName(String path) throws IOOperationException, KubeConfigLoadingException {
         final Object contexts = getConfigMap(path).get(CURRENT_CONTEXT_KEY);
         return contexts.toString();
     }
 
-    private Map<String, Object> getConfigMap(String path) throws KubeConfigLoadingException, FileSystemException {
+    private Map<String, Object> getConfigMap(String path) throws KubeConfigLoadingException, IOOperationException {
         try (final FileReader fr = new FileReader(path)) {
             Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
             return yaml.load(fr);
         } catch (IOException e) {
-            throw new FileSystemException(ERROR_MSG + path, e);
+            throw new IOOperationException(ERROR_MSG + path, e);
         } catch (Exception e) {
             throw new KubeConfigLoadingException(ERROR_MSG + path, e);
         }

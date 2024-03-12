@@ -39,18 +39,18 @@ public class KubeClientImpl implements KubeClient {
     }
 
     @Override
-    public List<String> execAndReturnOut(String podName, String[] cmdParts) {
+    public List<String> execAndReturnOut(String namespace, String podName, String[] cmdParts) {
         try {
-            return executeAndReturnOutInternal(podName, cmdParts);
+            return executeAndReturnOutInternal(namespace, podName, cmdParts);
         } catch (IOException | ApiException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private List<String> executeAndReturnOutInternal(String podName, String[] cmdParts) throws IOException, ApiException, InterruptedException {
+    private List<String> executeAndReturnOutInternal(String namespace, String podName, String[] cmdParts) throws IOException, ApiException, InterruptedException {
         boolean tty = System.console() != null;
         final Process proc =
-                exec.exec("default", podName, cmdParts, true, tty);
+                exec.exec(namespace, podName, cmdParts, true, tty);
         final var ref = new Object() {
             List<String> outLines = new ArrayList<>();
             List<String> errLines = new ArrayList<>();

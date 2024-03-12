@@ -3,7 +3,7 @@ package io.github.vcvitaly.k8cp.model;
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
 import io.github.vcvitaly.k8cp.dto.KubeConfigDto;
-import io.github.vcvitaly.k8cp.exception.FileSystemException;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.service.HomePathProvider;
 import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
@@ -53,7 +53,7 @@ public class Model {
         kubeConfigSelectionService = new KubeConfigSelectionServiceImpl(localFsClient, kubeConfigHelper);
     }
 
-    public ObservableList<KubeConfigDto> getKubeConfigList() throws FileSystemException, KubeContextExtractionException {
+    public ObservableList<KubeConfigDto> getKubeConfigList() throws IOOperationException, KubeContextExtractionException {
         final String homePath = homePathProvider.provideHomePath();
         final List<KubeConfigDto> configChoices = kubeConfigSelectionService
                 .getConfigChoices(Paths.get(homePath, Constants.KUBE_FOLDER).toString());

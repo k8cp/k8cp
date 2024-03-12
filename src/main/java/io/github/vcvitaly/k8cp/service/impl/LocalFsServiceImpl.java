@@ -4,7 +4,7 @@ import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.dto.FileDto;
 import io.github.vcvitaly.k8cp.dto.FileSizeDto;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
-import io.github.vcvitaly.k8cp.exception.FileSystemException;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import java.io.IOException;
@@ -25,11 +25,11 @@ public class LocalFsServiceImpl implements LocalFsService {
     private final SizeConverter sizeConverter;
 
     @Override
-    public List<FileDto> listFiles(String path) throws FileSystemException {
+    public List<FileDto> listFiles(String namespace, String podName, String path) throws IOOperationException {
         return listFilesInternal(path);
     }
 
-    private List<FileDto> listFilesInternal(String path) throws FileSystemException {
+    private List<FileDto> listFilesInternal(String path) throws IOOperationException {
         final List<Path> paths = localFsClient.listFiles(path);
         List<FileDto> list = new ArrayList<>();
         for (Path p : paths) {
@@ -39,7 +39,7 @@ public class LocalFsServiceImpl implements LocalFsService {
         return list;
     }
 
-    private FileDto toFileDto(Path path) throws FileSystemException {
+    private FileDto toFileDto(Path path) throws IOOperationException {
         try {
             final long size = Files.size(path);
             final FileSizeDto fileSizeDto = sizeConverter.toFileSizeDto(size);
@@ -54,7 +54,7 @@ public class LocalFsServiceImpl implements LocalFsService {
                     .changedAt(toLocalDateTime(attrs.lastModifiedTime()))
                     .build();
         } catch (IOException e) {
-            throw new FileSystemException("An error while reading attributes for " + path, e);
+            throw new IOOperationException("An error while reading attributes for " + path, e);
         }
     }
 

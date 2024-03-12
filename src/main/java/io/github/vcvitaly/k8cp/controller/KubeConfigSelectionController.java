@@ -1,7 +1,7 @@
 package io.github.vcvitaly.k8cp.controller;
 
 import io.github.vcvitaly.k8cp.dto.KubeConfigDto;
-import io.github.vcvitaly.k8cp.exception.FileSystemException;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.util.Constants;
@@ -38,7 +38,7 @@ public class KubeConfigSelectionController implements Initializable {
             } else {
                 setItemsIfNoKubeConfigFound();
             }
-        } catch (FileSystemException | KubeContextExtractionException e) {
+        } catch (IOOperationException | KubeContextExtractionException e) {
             log.error("Could not get kube config list", e);
             setItemsIfNoKubeConfigFound();
             Model.getInstance().getViewFactory().showErrorModal(e.getMessage());

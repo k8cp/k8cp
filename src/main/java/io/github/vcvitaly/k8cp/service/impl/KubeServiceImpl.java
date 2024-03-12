@@ -4,8 +4,7 @@ import io.github.vcvitaly.k8cp.client.KubeClient;
 import io.github.vcvitaly.k8cp.dto.FileDto;
 import io.github.vcvitaly.k8cp.dto.FileSizeDto;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
-import io.github.vcvitaly.k8cp.exception.FileSystemException;
-import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
@@ -24,12 +23,11 @@ public class KubeServiceImpl implements KubeService {
     private final SizeConverter sizeConverter;
 
     @Override
-    public List<FileDto> listFiles(String path) throws FileSystemException {
+    public List<FileDto> listFiles(String namespace, String podName, String path) throws IOOperationException {
         final ArrayList<String> partsList = new ArrayList<>(LS_PARTS);
         partsList.add("'%s'".formatted(path));
         final String[] cmdParts  = partsList.toArray(String[]::new);
-        final String podName = Model.getInstance().getPodName();
-        final List<String> lines = kubeClient.execAndReturnOut(podName, cmdParts);
+        final List<String> lines = kubeClient.execAndReturnOut(namespace, podName, cmdParts);
         return lines.stream()
                 .map(line -> toFileDto(path, line))
                 .toList();

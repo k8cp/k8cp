@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface KubeClient {
 
-    List<String> execAndReturnOut(String podName, String[] cmdParts);
+    List<String> execAndReturnOut(String namespace, String podName, String[] cmdParts);
 }
