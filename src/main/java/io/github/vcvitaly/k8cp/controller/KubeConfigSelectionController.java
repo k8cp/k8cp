@@ -19,7 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class KubeConfigSelectionController implements Initializable {
-    public ChoiceBox<KubeConfigSelectionDto> kubeConfigSelector;
+    public Label chooseFileLbl;
+    public ChoiceBox<KubeConfigSelectionDto> configSelector;
+    public Label chooseFromFsLbl;
     public Button fsChooserBtn;
     public Label selectedKubeConfigFileLbl;
     public Button nextBtn;
@@ -34,6 +36,9 @@ public class KubeConfigSelectionController implements Initializable {
                     final KubeConfigSelectionDto selection = Model.getInstance().getKubeConfigSelectionDto(file.toPath());
                     Model.getInstance().setKubeConfigSelection(selection);
                     nextBtn.setDisable(false);
+                    chooseFileLbl.setVisible(false);
+                    configSelector.setVisible(false);
+                    chooseFromFsLbl.setVisible(false);
                 } catch (KubeContextExtractionException ex) {
                     Model.getInstance().getViewFactory().showErrorModal(ex.getMessage());
                 }
@@ -54,23 +59,28 @@ public class KubeConfigSelectionController implements Initializable {
     }
 
     private void setItemsIfKubeConfigsFound(ObservableList<KubeConfigSelectionDto> kubeConfigList) {
-        kubeConfigSelector.setItems(kubeConfigList);
-        kubeConfigSelector.setValue(
+        configSelector.setItems(kubeConfigList);
+        configSelector.setValue(
                 kubeConfigList.stream()
                         .filter(selection -> selection.fileName().equals(Constants.DEFAULT_CONFIG_FILE_NAME))
                         .findFirst()
                         .orElseGet(() -> kubeConfigList.stream().findFirst().get())
         );
-        kubeConfigSelector.valueProperty().addListener(observable -> setKubeConfigSelection());
+        configSelector.valueProperty().addListener(observable -> setKubeConfigSelection());
         nextBtn.setDisable(false);
     }
 
     private void setItemsIfNoKubeConfigFound() {
-        kubeConfigSelector.setItems(FXCollections.emptyObservableList());
+        chooseFileLbl.setVisible(false);
+        configSelector.setVisible(false);
+        chooseFromFsLbl.setText("""
+            Could not find any configs in $HOME/.kube
+            Please select a config from file system
+        """);
     }
 
     private void setKubeConfigSelection() {
-        final KubeConfigSelectionDto selection = kubeConfigSelector.getValue();
+        final KubeConfigSelectionDto selection = configSelector.getValue();
         Model.getInstance().setKubeConfigSelection(selection);
     }
 
