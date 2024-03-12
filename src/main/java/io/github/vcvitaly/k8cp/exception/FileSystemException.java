@@ -1,6 +1,6 @@
 package io.github.vcvitaly.k8cp.exception;
 
-public class FileSystemException extends RuntimeException {
+public class FileSystemException extends Exception {
 
     public FileSystemException(String message) {
         super(message);

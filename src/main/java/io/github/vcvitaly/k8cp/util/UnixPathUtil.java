@@ -3,7 +3,7 @@ package io.github.vcvitaly.k8cp.util;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class FileUtil {
+public class UnixPathUtil {
 
     public static String stripEndingSlashFromPath(String path) {
         if (path.endsWith("/")) {

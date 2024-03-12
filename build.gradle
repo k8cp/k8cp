@@ -1,8 +1,11 @@
+import org.openjfx.gradle.JavaFXPlatform
+
 plugins {
     id 'java'
     id 'application'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id "com.google.osdetector" version "1.7.3"
     id 'org.beryx.jlink' version '3.0.1'
     id "io.freefair.lombok" version "8.6"
 }
@@ -16,11 +19,12 @@ repositories {
 
 ext {
     junitVersion = '5.10.2'
+    platform = getPlatform()
+    javaVer = JavaVersion.VERSION_21
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = javaVer
 }
 
 tasks.withType(JavaCompile) {
@@ -33,7 +37,7 @@ application {
 }
 
 javafx {
-    version = JavaVersion.VERSION_21
+    version = javaVer
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
@@ -79,4 +83,18 @@ jlink {
 
 jlinkZip {
     group = 'distribution'
+}
+
+configurations
+        .matching(it -> it.name.contains("downloadSources"))
+        .configureEach {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+        attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, platform.osFamily))
+        attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, platform.arch))
+    }
+}
+
+def getPlatform() {
+    return JavaFXPlatform.detect(osdetector);
 }
