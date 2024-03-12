@@ -23,6 +23,7 @@ public class KubeNamespaceSelectionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        prevBtn.setOnAction(e -> onPrev());
         nextBtn.setOnAction(e -> onNext());
         try {
             final List<KubeNamespace> namespaces = Model.getKubeService().getNamespaces();
@@ -39,5 +40,11 @@ public class KubeNamespaceSelectionController implements Initializable {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
         Model.getInstance().getViewFactory().closeStage(selectionStage);
         Model.getInstance().getViewFactory().showMainWindow();
+    }
+
+    private void onPrev() {
+        final Stage selectionStage = (Stage) prevBtn.getScene().getWindow();
+        Model.getInstance().getViewFactory().closeStage(selectionStage);
+        Model.getInstance().getViewFactory().showKubeConfigSelectionWindow();
     }
 }
