@@ -31,14 +31,14 @@ public class KubeServiceImpl implements KubeService {
         try {
             final List<String> lines = kubeClient.execAndReturnOut(namespace, podName, cmdParts);
             return lines.stream()
-                    .map(line -> toFileDto(path, line))
+                    .map(line -> toFileInfoContainer(path, line))
                     .toList();
         } catch (KubeExecException e) {
             throw new IOOperationException("Could not get a list of files at [%s@%s]".formatted(podName, path), e);
         }
     }
 
-    private FileInfoContainer toFileDto(String path, String lsLine) {
+    private FileInfoContainer toFileInfoContainer(String path, String lsLine) {
         final String[] parts = lsLine.split("\\s+");
         final String attrs = parts[0];
         final long size = Long.parseLong(parts[4]);
