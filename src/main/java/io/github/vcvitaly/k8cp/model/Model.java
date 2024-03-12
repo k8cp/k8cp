@@ -13,6 +13,7 @@ import io.github.vcvitaly.k8cp.service.impl.KubeConfigHelperImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigSelectionServiceImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.view.ViewFactory;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,7 +46,7 @@ public class Model {
 
     private Model() {
         kubeConfigSelectionRef = new AtomicReference<>();
-        viewFactory = new ViewFactory();
+        viewFactory = ViewFactory.getInstance();
         localFsClient = new LocalFsClientImpl();
         kubeConfigHelper = new KubeConfigHelperImpl();
         homePathProvider = new HomePathProviderImpl();
@@ -57,6 +58,10 @@ public class Model {
         final List<KubeConfigSelectionDto> configChoices = kubeConfigSelectionService
                 .getConfigChoices(Paths.get(homePath, Constants.KUBE_FOLDER).toString());
         return FXCollections.observableList(configChoices);
+    }
+
+    public KubeConfigSelectionDto getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
+        return kubeConfigSelectionService.toConfigChoiceDto(path);
     }
 
     public KubeConfigSelectionDto getKubeConfigSelection() {

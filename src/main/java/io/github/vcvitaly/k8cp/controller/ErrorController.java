@@ -8,13 +8,16 @@ import javafx.scene.control.Label;
 public class ErrorController implements Initializable {
     public Label errorLbl;
 
+    private final String errorMsg;
+
     /* TODO (VChura) implement functionality to report an error */
 
     public ErrorController(String errorMsg) {
-        errorLbl.setText(errorMsg);
+        this.errorMsg = errorMsg;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        errorLbl.setText(errorMsg);
     }
 }

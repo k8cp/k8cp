@@ -32,7 +32,8 @@ public class KubeConfigSelectionServiceImpl implements KubeConfigSelectionServic
         return list;
     }
 
-    private KubeConfigSelectionDto toConfigChoiceDto(Path path) throws KubeContextExtractionException {
+    @Override
+    public KubeConfigSelectionDto toConfigChoiceDto(Path path) throws KubeContextExtractionException {
         final String pathStr = path.toString();
         return KubeConfigSelectionDto.builder()
                 .contextName(getContextName(pathStr))
