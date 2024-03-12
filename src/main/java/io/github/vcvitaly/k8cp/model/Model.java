@@ -2,7 +2,7 @@ package io.github.vcvitaly.k8cp.model;
 
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
-import io.github.vcvitaly.k8cp.dto.KubeConfigSelectionDto;
+import io.github.vcvitaly.k8cp.dto.KubeConfigDto;
 import io.github.vcvitaly.k8cp.exception.FileSystemException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.service.HomePathProvider;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Model {
 
     @Getter
-    private AtomicReference<KubeConfigSelectionDto> kubeConfigSelectionRef;
+    private final AtomicReference<KubeConfigDto> kubeConfigSelectionRef;
 
     @Getter
     @Setter
@@ -53,22 +53,22 @@ public class Model {
         kubeConfigSelectionService = new KubeConfigSelectionServiceImpl(localFsClient, kubeConfigHelper);
     }
 
-    public ObservableList<KubeConfigSelectionDto> getKubeConfigList() throws FileSystemException, KubeContextExtractionException {
+    public ObservableList<KubeConfigDto> getKubeConfigList() throws FileSystemException, KubeContextExtractionException {
         final String homePath = homePathProvider.provideHomePath();
-        final List<KubeConfigSelectionDto> configChoices = kubeConfigSelectionService
+        final List<KubeConfigDto> configChoices = kubeConfigSelectionService
                 .getConfigChoices(Paths.get(homePath, Constants.KUBE_FOLDER).toString());
         return FXCollections.observableList(configChoices);
     }
 
-    public KubeConfigSelectionDto getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
-        return kubeConfigSelectionService.toConfigChoiceDto(path);
+    public KubeConfigDto getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
+        return kubeConfigSelectionService.toConfigDto(path);
     }
 
-    public KubeConfigSelectionDto getKubeConfigSelection() {
+    public KubeConfigDto getKubeConfigSelection() {
         return kubeConfigSelectionRef.get();
     }
 
-    public void setKubeConfigSelection(KubeConfigSelectionDto selection) {
+    public void setKubeConfigSelection(KubeConfigDto selection) {
         kubeConfigSelectionRef.set(selection);
     }
 

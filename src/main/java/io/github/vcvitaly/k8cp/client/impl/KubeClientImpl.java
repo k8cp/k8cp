@@ -5,6 +5,7 @@ import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
+import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.KubeConfig;
 import java.io.BufferedReader;
@@ -23,6 +24,7 @@ public class KubeClientImpl implements KubeClient {
 
     private static final int WAIT_TIMEOUT_MS = 250;
     private final Exec exec;
+    private final CoreV1Api api;
 
     public KubeClientImpl(String kubeConfigPath) {
         ApiClient client = null;
@@ -32,7 +34,8 @@ public class KubeClientImpl implements KubeClient {
             throw new RuntimeException(e);
         }
         Configuration.setDefaultApiClient(client);
-        exec = new Exec();
+        exec = new Exec(client);
+        api = new CoreV1Api(client);
     }
 
     @Override
