@@ -5,7 +5,10 @@ import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.KubeClientImpl;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
+import io.github.vcvitaly.k8cp.domain.KubeNamespace;
+import io.github.vcvitaly.k8cp.domain.KubePod;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
+import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.service.HomePathProvider;
 import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
@@ -32,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Model {
     private static final AtomicReference<KubeConfigContainer> kubeConfigSelectionRef = new AtomicReference<>();
+    private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
+    private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
     private static final String NEW_INSTANCE_OF_MSG = "Created a new instance of %s";
 
     @Getter
@@ -63,17 +68,34 @@ public class Model {
         return kubeConfigSelectionService.toKubeConfig(path);
     }
 
-    public void setKubeConfigSelection(KubeConfigContainer selection) {
+    public static void setKubeConfigSelection(KubeConfigContainer selection) {
         kubeConfigSelectionRef.set(selection);
-        log.info("Set selection to [{}]", selection);
+        log.info("Set kube config selection to [{}]", selection);
+    }
+
+    public static void setKubeNamespaceSelection(KubeNamespace selection) {
+        kubeNamespaceSelectionRef.set(selection);
+        log.info("Set kube namespace selection to [{}]", selection);
+    }
+
+    public static void setKubePodSelection(KubePod selection) {
+        kubePodSelectionRef.set(selection);
+        log.info("Set kube pod selection to [{}]", selection);
     }
 
     public static Model getInstance() {
         return ModelHolder.model;
     }
 
-    public static KubeService getKubeService() {
-        return KubeServiceHolder.kubeService;
+    public static List<KubeNamespace> getKubeNamespaces() throws KubeApiException {
+        return KubeServiceHolder.kubeService.getNamespaces();
+    }
+
+    public static List<KubePod> getKubePods() throws KubeApiException {
+        if (kubeNamespaceSelectionRef.get() == null) {
+            throw new IllegalStateException("Kube namespace has to be selected first");
+        }
+        return KubeServiceHolder.kubeService.getPods(kubeNamespaceSelectionRef.get().name());
     }
 
     private static class ModelHolder {

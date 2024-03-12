@@ -11,4 +11,6 @@ public class Constants {
     public static final String KUBE_FOLDER = ".kube";
 
     public static final String DEFAULT_CONFIG_FILE_NAME = "config";
+
+    public static final String DEFAULT_NAMESPACE_NAME = "default";
 }
