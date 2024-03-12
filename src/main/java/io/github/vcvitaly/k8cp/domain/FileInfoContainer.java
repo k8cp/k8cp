@@ -1,4 +1,4 @@
-package io.github.vcvitaly.k8cp.dto;
+package io.github.vcvitaly.k8cp.domain;
 
 import io.github.vcvitaly.k8cp.enumeration.FileSizeUnit;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class FileDto {
+public class FileInfoContainer {
     private String path;
     private String name;
     private long sizeBytes;

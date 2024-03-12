@@ -73,6 +73,15 @@ public class ViewFactory {
         );
     }
 
+    public void showKubeNamespaceSelectionWindow() {
+        createStageAndShow(
+                StageCreationParam.builder()
+                        .fxmlView(FxmlView.KUBE_NAMESPACE_SELECTION)
+                        .resizeable(false)
+                        .build()
+        );
+    }
+
     private void createStageAndShow(StageCreationParam param) {
         final FxmlView fxmlView = param.getFxmlView();
         final FXMLLoader loader = FxmlLoaderUtil.createFxmlLoader(fxmlView);

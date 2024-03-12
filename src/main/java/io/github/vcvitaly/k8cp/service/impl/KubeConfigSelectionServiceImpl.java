@@ -1,8 +1,8 @@
 package io.github.vcvitaly.k8cp.service.impl;
 
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
-import io.github.vcvitaly.k8cp.dto.KubeConfigSelectionDto;
-import io.github.vcvitaly.k8cp.exception.FileSystemException;
+import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeConfigLoadingException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
 import io.github.vcvitaly.k8cp.service.KubeConfigSelectionService;
@@ -22,21 +22,21 @@ public class KubeConfigSelectionServiceImpl implements KubeConfigSelectionServic
     private final KubeConfigHelper kubeConfigHelper;
 
     @Override
-    public List<KubeConfigSelectionDto> getConfigChoices(String kubeFolderPath) throws FileSystemException, KubeContextExtractionException {
-        final List<KubeConfigSelectionDto> list = new ArrayList<>();
+    public List<KubeConfigContainer> getConfigChoices(String kubeFolderPath) throws IOOperationException, KubeContextExtractionException {
+        final List<KubeConfigContainer> list = new ArrayList<>();
         for (Path path : localFsClient.listFiles(kubeFolderPath)) {
             if (!Files.isDirectory(path) && Files.isReadable(path) && kubeConfigHelper.validate(path.toString())) {
-                KubeConfigSelectionDto configChoiceDto = toConfigChoiceDto(path);
-                list.add(configChoiceDto);
+                KubeConfigContainer kubeConfigContainer = toKubeConfig(path);
+                list.add(kubeConfigContainer);
             }
         }
         return list;
     }
 
     @Override
-    public KubeConfigSelectionDto toConfigChoiceDto(Path path) throws KubeContextExtractionException {
+    public KubeConfigContainer toKubeConfig(Path path) throws KubeContextExtractionException {
         final String pathStr = path.toString();
-        return KubeConfigSelectionDto.builder()
+        return KubeConfigContainer.builder()
                 .contextName(getContextName(pathStr))
                 .fileName(path.getFileName().toString())
                 .path(pathStr)
@@ -46,7 +46,7 @@ public class KubeConfigSelectionServiceImpl implements KubeConfigSelectionServic
     private String getContextName(String kubeConfigPath) throws KubeContextExtractionException {
         try {
             return kubeConfigHelper.extractContextName(kubeConfigPath);
-        } catch (FileSystemException | KubeConfigLoadingException e) {
+        } catch (IOOperationException | KubeConfigLoadingException e) {
             throw new KubeContextExtractionException("Could not extract context name from " + kubeConfigPath, e);
         }
     }
