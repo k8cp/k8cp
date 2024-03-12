@@ -3,8 +3,10 @@ package io.github.vcvitaly.k8cp.service.impl;
 import io.github.vcvitaly.k8cp.client.KubeClient;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileSizeContainer;
+import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
+import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeExecException;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
@@ -36,6 +38,11 @@ public class KubeServiceImpl implements KubeService {
         } catch (KubeExecException e) {
             throw new IOOperationException("Could not get a list of files at [%s@%s]".formatted(podName, path), e);
         }
+    }
+
+    @Override
+    public List<KubeNamespace> getNamespaces() throws KubeApiException {
+        return kubeClient.getNamespaces();
     }
 
     private FileInfoContainer toFileInfoContainer(String path, String lsLine) {

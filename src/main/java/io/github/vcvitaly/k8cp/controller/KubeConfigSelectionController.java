@@ -28,11 +28,10 @@ public class KubeConfigSelectionController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        final ObservableList<KubeConfigContainer> kubeConfigList;
         nextBtn.setOnAction(e -> onNext());
         fsChooserBtn.setOnAction(e -> onFileSelection());
         try {
-            kubeConfigList = Model.getInstance().getKubeConfigList();
+            final ObservableList<KubeConfigContainer> kubeConfigList = Model.getInstance().getKubeConfigList();
             if (!kubeConfigList.isEmpty()) {
                 setItemsIfKubeConfigsFound(kubeConfigList);
             } else {
@@ -48,7 +47,7 @@ public class KubeConfigSelectionController implements Initializable {
     private void onNext() {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
         Model.getInstance().getViewFactory().closeStage(selectionStage);
-        Model.getInstance().getViewFactory().showMainWindow();
+        Model.getInstance().getViewFactory().showKubeNamespaceSelectionWindow();
     }
 
     private void onFileSelection() {
@@ -66,6 +65,12 @@ public class KubeConfigSelectionController implements Initializable {
                 Model.getInstance().getViewFactory().showErrorModal(ex.getMessage());
             }
         }
+    }
+
+    private File getFileFromFileChooser() {
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        return fileChooser.showOpenDialog(Model.getInstance().getViewFactory().getCurrentStage());
     }
 
     private void setItemsIfKubeConfigsFound(ObservableList<KubeConfigContainer> kubeConfigList) {
@@ -96,11 +101,5 @@ public class KubeConfigSelectionController implements Initializable {
     private void setKubeConfigSelection() {
         final KubeConfigContainer selection = configSelector.getValue();
         Model.getInstance().setKubeConfigSelection(selection);
-    }
-
-    private File getFileFromFileChooser() {
-        final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        return fileChooser.showOpenDialog(Model.getInstance().getViewFactory().getCurrentStage());
     }
 }
