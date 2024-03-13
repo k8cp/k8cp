@@ -29,6 +29,7 @@ import io.github.vcvitaly.k8cp.util.Constants;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.collections.FXCollections;
@@ -82,9 +83,11 @@ public class Model {
 
     public static List<BreadCrumbFile> resolveLocalBreadcrumbTree() {
         final Path currentPath = Paths.get(localPathRef.get());
-        final List<BreadCrumbFile> tree = new ArrayList<>();
+        final List<BreadCrumbFile> tree = new ArrayList<>(
+                Collections.singleton(toBreadCrumbFile(currentPath.getRoot()))
+        );
         for (Path element : currentPath) {
-            tree.add(new BreadCrumbFile(element.toString(), element.getFileName().toString()));
+            tree.add(toBreadCrumbFile(element));
         }
         return tree;
     }
@@ -118,6 +121,26 @@ public class Model {
     public static void setLocalPathRef(String path) {
         localPathRef.set(path);
         log.info("Set local path ref to [{}]", path);
+    }
+
+
+    /* Private methods */
+    private static void logCreatedNewInstanceOf(Object o) {
+        log.info(NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
+    }
+
+    private static RuntimeException logAndReturnRuntimeException(RuntimeException e) {
+        log.error("Error: ", e);
+        return e;
+    }
+
+    private static BreadCrumbFile toBreadCrumbFile(Path path) {
+        final String pathName = path.getParent() != null ? path.getFileName().toString() : normalizeRootPath(path);
+        return new BreadCrumbFile(path.toString(), pathName);
+    }
+
+    private static String normalizeRootPath(Path root) {
+        return root.toString().replace(":\\", "");
     }
 
     /* Holders */
@@ -209,16 +232,5 @@ public class Model {
             logCreatedNewInstanceOf(instance);
             return instance;
         }
-    }
-
-
-    /* Private methods */
-    private static void logCreatedNewInstanceOf(Object o) {
-        log.info(NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
-    }
-
-    private static RuntimeException logAndReturnRuntimeException(RuntimeException e) {
-        log.error("Error: ", e);
-        return e;
     }
 }
