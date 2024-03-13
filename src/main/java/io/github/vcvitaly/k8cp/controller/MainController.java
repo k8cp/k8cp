@@ -3,18 +3,25 @@ package io.github.vcvitaly.k8cp.controller;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.model.Mock;
+import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.PropertyValueFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.BreadCrumbBar;
 
+@Slf4j
 public class MainController implements Initializable {
     public Button parentLeftBtn;
     public Button rootLeftBtn;
@@ -40,23 +47,26 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        initLeftView();
+        try {
+            initLeftView();
+        } catch (IOOperationException e) {
+            log.error("Could list local files", e);
+            View.getInstance().showErrorModal(e.getMessage());
+        }
         mockRightView();
-    }
-
-    private void mockLeftBreadcrumbBar() {
-        leftBreadcrumbBar.setSelectedCrumb(Mock.leftBreadcrumbItem());
     }
 
     private void mockRightBreadcrumbBar() {
         rightBreadcrumbBar.setSelectedCrumb(Mock.rightBreadcrumbItem());
     }
 
-    private void initLeftView() {
-        mockLeftBreadcrumbBar();
+    private void initLeftView() throws IOOperationException {
+        final TreeItem<BreadCrumbFile> treeItem = View.getInstance().toTreeItem(Model.resolveLocalBreadcrumbTree());
+        leftBreadcrumbBar.setSelectedCrumb(treeItem);
         leftView.setPlaceholder(getNoRowsToDisplayLbl());
         leftView.getColumns().addAll(getTableColumns());
-        leftView.setItems(Mock.leftViewItems());
+        final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(Model.listLocalFiles());
+        leftView.setItems(FXCollections.observableList(fileMangerItems));
     }
 
     private void mockRightView() {

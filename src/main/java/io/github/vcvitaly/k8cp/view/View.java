@@ -1,6 +1,7 @@
 package io.github.vcvitaly.k8cp.view;
 
 import io.github.vcvitaly.k8cp.controller.ErrorController;
+import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.enumeration.FxmlView;
@@ -13,10 +14,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.controlsfx.control.BreadCrumbBar;
 
 @Slf4j
 public class View {
@@ -100,6 +103,10 @@ public class View {
         return fileInfoContainers.stream()
                 .map(this::toFileManagerItem)
                 .toList();
+    }
+
+    public TreeItem<BreadCrumbFile> toTreeItem(List<BreadCrumbFile> breadCrumbFiles) {
+        return BreadCrumbBar.buildTreeModel(breadCrumbFiles.toArray(BreadCrumbFile[]::new));
     }
 
     /* Private methods */
