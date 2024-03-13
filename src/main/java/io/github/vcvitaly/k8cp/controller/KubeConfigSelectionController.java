@@ -32,7 +32,7 @@ public class KubeConfigSelectionController implements Initializable {
         nextBtn.setOnAction(e -> onNext());
         fsChooserBtn.setOnAction(e -> onFileSelection());
         try {
-            final ObservableList<KubeConfigContainer> kubeConfigList = Model.getInstance().getKubeConfigList();
+            final ObservableList<KubeConfigContainer> kubeConfigList = Model.getKubeConfigList();
             if (!kubeConfigList.isEmpty()) {
                 setItemsIfKubeConfigsFound(kubeConfigList);
             } else {
@@ -55,7 +55,7 @@ public class KubeConfigSelectionController implements Initializable {
         final File file = getFileFromFileChooser();
         if (file != null) {
             try {
-                final KubeConfigContainer selection = Model.getInstance().getKubeConfigSelectionDto(file.toPath());
+                final KubeConfigContainer selection = Model.getKubeConfigSelectionDto(file.toPath());
                 setKubeConfigSelection(selection);
                 nextBtn.setDisable(false);
                 chooseFileLbl.setVisible(false);

@@ -44,15 +44,15 @@ public class Model {
 
     private Model() {}
 
-    public ObservableList<KubeConfigContainer> getKubeConfigList() throws IOOperationException, KubeContextExtractionException {
-        final String homePath = HomePathProviderHolder.homePathProvider.provideHomePath();
-        final List<KubeConfigContainer> configChoices = KubeConfigSelectionServiceHolder.kubeConfigSelectionService
+    public static ObservableList<KubeConfigContainer> getKubeConfigList() throws IOOperationException, KubeContextExtractionException {
+        final String homePath = HomePathProviderHolder.instance.provideHomePath();
+        final List<KubeConfigContainer> configChoices = KubeConfigSelectionServiceHolder.instance
                 .getConfigChoices(Paths.get(homePath, Constants.KUBE_FOLDER).toString());
         return FXCollections.observableList(configChoices);
     }
 
-    public KubeConfigContainer getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
-        return KubeConfigSelectionServiceHolder.kubeConfigSelectionService.toKubeConfig(path);
+    public static KubeConfigContainer getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
+        return KubeConfigSelectionServiceHolder.instance.toKubeConfig(path);
     }
 
     public static void setKubeConfigSelection(KubeConfigContainer selection) {
@@ -70,27 +70,19 @@ public class Model {
         log.info("Set kube pod selection to [{}]", selection);
     }
 
-    public static Model getInstance() {
-        return ModelHolder.model;
-    }
-
     public static List<KubeNamespace> getKubeNamespaces() throws KubeApiException {
-        return KubeServiceHolder.kubeService.getNamespaces();
+        return KubeServiceHolder.instance.getNamespaces();
     }
 
     public static List<KubePod> getKubePods() throws KubeApiException {
         if (kubeNamespaceSelectionRef.get() == null) {
             throw new IllegalStateException("Kube namespace has to be selected first");
         }
-        return KubeServiceHolder.kubeService.getPods(kubeNamespaceSelectionRef.get().name());
-    }
-
-    private static class ModelHolder {
-        private static final Model model = new Model();
+        return KubeServiceHolder.instance.getPods(kubeNamespaceSelectionRef.get().name());
     }
 
     private static class KubeClientHolder {
-        private static final KubeClient kubeClient = getInstance();
+        private static final KubeClient instance = getInstance();
 
         private static KubeClient getInstance() {
             final KubeConfigContainer kubeConfigContainer = kubeConfigSelectionRef.get();
@@ -104,7 +96,7 @@ public class Model {
     }
 
     private static class SizeConverterHolder {
-        private static final SizeConverter sizeConverter = getInstance();
+        private static final SizeConverter instance = getInstance();
 
         private static SizeConverter getInstance() {
             final SizeConverter sizeConverter = new SizeConverterImpl();
@@ -114,11 +106,11 @@ public class Model {
     }
 
     private static class KubeServiceHolder {
-        private static final KubeService kubeService = getInstance();
+        private static final KubeService instance = getInstance();
 
         private static KubeService getInstance() {
             final KubeServiceImpl instance = new KubeServiceImpl(
-                    KubeClientHolder.kubeClient, SizeConverterHolder.sizeConverter
+                    KubeClientHolder.instance, SizeConverterHolder.instance
             );
             logCreatedNewInstanceOf(instance);
             return instance;
@@ -126,7 +118,7 @@ public class Model {
     }
 
     private static class LocalFsClientHolder {
-        private static final LocalFsClient localFsClient = getInstance();
+        private static final LocalFsClient instance = getInstance();
 
         private static LocalFsClient getInstance() {
             final LocalFsClientImpl instance = new LocalFsClientImpl();
@@ -136,11 +128,11 @@ public class Model {
     }
 
     private static class LocalFsServiceHolder {
-        private static final LocalFsService localFsService = getInstance();
+        private static final LocalFsService instance = getInstance();
 
         private static LocalFsService getInstance() {
             final LocalFsServiceImpl instance = new LocalFsServiceImpl(
-                    LocalFsClientHolder.localFsClient, SizeConverterHolder.sizeConverter
+                    LocalFsClientHolder.instance, SizeConverterHolder.instance
             );
             logCreatedNewInstanceOf(instance);
             return instance;
@@ -148,7 +140,7 @@ public class Model {
     }
 
     private static class KubeConfigHelperHolder {
-        private static final KubeConfigHelper kubeConfigHelper = getInstance();
+        private static final KubeConfigHelper instance = getInstance();
 
         private static KubeConfigHelper getInstance() {
             final KubeConfigHelper instance = new KubeConfigHelperImpl();
@@ -158,7 +150,7 @@ public class Model {
     }
 
     private static class HomePathProviderHolder {
-        private static final HomePathProvider homePathProvider = getInstance();
+        private static final HomePathProvider instance = getInstance();
 
         private static HomePathProvider getInstance() {
             final HomePathProvider instance = new HomePathProviderImpl();
@@ -168,11 +160,11 @@ public class Model {
     }
 
     public static class KubeConfigSelectionServiceHolder {
-        private static final KubeConfigSelectionService kubeConfigSelectionService = getInstance();
+        private static final KubeConfigSelectionService instance = getInstance();
 
         private static KubeConfigSelectionService getInstance() {
             final KubeConfigSelectionService instance = new KubeConfigSelectionServiceImpl(
-                    LocalFsClientHolder.localFsClient, KubeConfigHelperHolder.kubeConfigHelper
+                    LocalFsClientHolder.instance, KubeConfigHelperHolder.instance
             );
             logCreatedNewInstanceOf(instance);
             return instance;
