@@ -16,6 +16,7 @@ import org.controlsfx.control.BreadCrumbBar;
 
 public class MainController implements Initializable {
     public Button parentLeftBtn;
+    public Button rootLeftBtn;
     public Button homeLeftBtn;
     public Button refreshLeftBtn;
     public Button copyLeftBtn;
@@ -25,6 +26,7 @@ public class MainController implements Initializable {
     public BreadCrumbBar<BreadCrumbFile> leftBreadcrumbBar;
     public TableView<FileManagerItem> leftView;
     public Button parentRightBtn;
+    public Button rootRightBtn;
     public Button homeRightBtn;
     public Button refreshRightBtn;
     public Button copyRightBtn;

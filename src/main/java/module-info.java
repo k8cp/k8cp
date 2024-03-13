@@ -9,7 +9,6 @@ module io.github.vcvitaly.k8cp {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome5;
-    requires org.kordamp.bootstrapfx.core;
 
     requires org.slf4j;
     requires ch.qos.logback.core;

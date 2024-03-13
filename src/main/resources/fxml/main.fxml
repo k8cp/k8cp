@@ -26,6 +26,14 @@
                      <Tooltip text="Parent directory" />
                   </tooltip>
                </Button>
+               <Button fx:id="rootLeftBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="mdral-account_tree" iconSize="17" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Root" />
+                  </tooltip>
+               </Button>
                <Button fx:id="homeLeftBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-home" iconSize="15" />
@@ -90,6 +98,14 @@
                   </graphic>
                   <tooltip>
                      <Tooltip text="Parent directory" />
+                  </tooltip>
+               </Button>
+               <Button fx:id="rootRightBtn" mnemonicParsing="false">
+                  <graphic>
+                     <FontIcon iconLiteral="mdral-account_tree" iconSize="17" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip text="Root" />
                   </tooltip>
                </Button>
                <Button fx:id="homeRightBtn" mnemonicParsing="false">
