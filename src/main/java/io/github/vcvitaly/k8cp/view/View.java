@@ -16,13 +16,13 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ViewFactory {
+public class View {
 
     private static final String MAIN_ICON_PATH = "/images/k8cp_icon.png";
 
     private final AtomicReference<Stage> currentStage;
 
-    private ViewFactory() {
+    private View() {
         currentStage = new AtomicReference<>();
     }
 
@@ -116,7 +116,7 @@ public class ViewFactory {
             stage.setResizable(resizeable);
         }
         stage.show();
-        currentStage.set(stage);
+        setCurrentStage(stage);
         log.info("Shown " + fxmlView);
     }
 
@@ -126,11 +126,15 @@ public class ViewFactory {
         );
     }
 
-    public static ViewFactory getInstance() {
-        return ViewFactoryHolder.viewFactory;
+    private void setCurrentStage(Stage stage) {
+        currentStage.set(stage);
+    }
+
+    public static View getInstance() {
+        return ViewFactoryHolder.view;
     }
 
     private static class ViewFactoryHolder {
-        private static final ViewFactory viewFactory = new ViewFactory();
+        private static final View view = new View();
     }
 }

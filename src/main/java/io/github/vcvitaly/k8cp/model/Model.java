@@ -4,6 +4,7 @@ import io.github.vcvitaly.k8cp.client.KubeClient;
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.KubeClientImpl;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
+import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
@@ -23,14 +24,12 @@ import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
-import io.github.vcvitaly.k8cp.view.ViewFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,8 +38,7 @@ public class Model {
     private static final AtomicReference<KubeConfigContainer> kubeConfigSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
-    @Getter
-    private static final ViewFactory viewFactory = ViewFactory.getInstance();
+    private static final AtomicReference<FileInfoContainer> currentPathRef = new AtomicReference<>();
 
     private Model() {}
 
@@ -55,6 +53,22 @@ public class Model {
         return KubeConfigSelectionServiceHolder.instance.toKubeConfig(path);
     }
 
+    public static List<KubeNamespace> getKubeNamespaces() throws KubeApiException {
+        return KubeServiceHolder.instance.getNamespaces();
+    }
+
+    public static List<KubePod> getKubePods() throws KubeApiException {
+        if (kubeNamespaceSelectionRef.get() == null) {
+            throw logAndReturnRuntimeException(new IllegalStateException("Kube namespace has to be selected first"));
+        }
+        return KubeServiceHolder.instance.getPods(kubeNamespaceSelectionRef.get().name());
+    }
+
+    public static List<FileInfoContainer> listFilesInCurrentlySelectedFolder() {
+        return null;
+    }
+
+    /* Setters */
     public static void setKubeConfigSelection(KubeConfigContainer selection) {
         kubeConfigSelectionRef.set(selection);
         log.info("Set kube config selection to [{}]", selection);
@@ -70,17 +84,7 @@ public class Model {
         log.info("Set kube pod selection to [{}]", selection);
     }
 
-    public static List<KubeNamespace> getKubeNamespaces() throws KubeApiException {
-        return KubeServiceHolder.instance.getNamespaces();
-    }
-
-    public static List<KubePod> getKubePods() throws KubeApiException {
-        if (kubeNamespaceSelectionRef.get() == null) {
-            throw logAndReturnRuntimeException(new IllegalStateException("Kube namespace has to be selected first"));
-        }
-        return KubeServiceHolder.instance.getPods(kubeNamespaceSelectionRef.get().name());
-    }
-
+    /* Holders */
     private static class KubeClientHolder {
         private static final KubeClient instance = getInstance();
 
@@ -171,6 +175,8 @@ public class Model {
         }
     }
 
+
+    /* Private methods */
     private static void logCreatedNewInstanceOf(Object o) {
         log.info(NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
     }

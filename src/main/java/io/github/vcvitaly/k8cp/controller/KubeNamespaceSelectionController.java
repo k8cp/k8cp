@@ -5,6 +5,7 @@ import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
+import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -41,20 +42,20 @@ public class KubeNamespaceSelectionController implements Initializable {
         } catch (KubeApiException e) {
             log.error("Could not get namespaces list", e);
             errorLbl.setText("Could not get namespaces list");
-            Model.getViewFactory().showErrorModal(e.getMessage());
+            View.getInstance().showErrorModal(e.getMessage());
         }
     }
 
     private void onNext() {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
-        Model.getViewFactory().closeStage(selectionStage);
-        Model.getViewFactory().showKubePodSelectionWindow();
+        View.getInstance().closeStage(selectionStage);
+        View.getInstance().showKubePodSelectionWindow();
     }
 
     private void onPrev() {
         final Stage selectionStage = (Stage) prevBtn.getScene().getWindow();
-        Model.getViewFactory().closeStage(selectionStage);
-        Model.getViewFactory().showKubeConfigSelectionWindow();
+        View.getInstance().closeStage(selectionStage);
+        View.getInstance().showKubeConfigSelectionWindow();
     }
 
     private void setKubeNamespaceSelection() {
