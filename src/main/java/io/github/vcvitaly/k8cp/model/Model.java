@@ -76,7 +76,7 @@ public class Model {
 
     public static List<KubePod> getKubePods() throws KubeApiException {
         if (kubeNamespaceSelectionRef.get() == null) {
-            throw new IllegalStateException("Kube namespace has to be selected first");
+            throw logAndReturnRuntimeException(new IllegalStateException("Kube namespace has to be selected first"));
         }
         return KubeServiceHolder.instance.getPods(kubeNamespaceSelectionRef.get().name());
     }
@@ -87,7 +87,7 @@ public class Model {
         private static KubeClient getInstance() {
             final KubeConfigContainer kubeConfigContainer = kubeConfigSelectionRef.get();
             if (kubeConfigContainer == null) {
-                throw new IllegalStateException("Kube config initialization has to be done first");
+                throw logAndReturnRuntimeException(new IllegalStateException("Kube config initialization has to be done first"));
             }
             final KubeClient instance = new KubeClientImpl(kubeConfigContainer);
             logCreatedNewInstanceOf(instance);
@@ -173,5 +173,10 @@ public class Model {
 
     private static void logCreatedNewInstanceOf(Object o) {
         log.info(NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
+    }
+
+    private static RuntimeException logAndReturnRuntimeException(RuntimeException e) {
+        log.error("Error: ", e);
+        return e;
     }
 }
