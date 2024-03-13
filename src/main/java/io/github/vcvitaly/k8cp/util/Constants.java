@@ -1,5 +1,6 @@
 package io.github.vcvitaly.k8cp.util;
 
+import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -13,4 +14,6 @@ public class Constants {
     public static final String DEFAULT_CONFIG_FILE_NAME = "config";
 
     public static final String DEFAULT_NAMESPACE_NAME = "default";
+
+    public static final Class<?> FILE_MANAGER_ITEM_CLAZZ = FileManagerItem.class;
 }

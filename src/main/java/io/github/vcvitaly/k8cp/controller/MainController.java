@@ -2,6 +2,7 @@ package io.github.vcvitaly.k8cp.controller;
 
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
+import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
 import io.github.vcvitaly.k8cp.model.Mock;
 import java.net.URL;
 import java.util.List;
@@ -71,16 +72,16 @@ public class MainController implements Initializable {
 
     private List<TableColumn<FileManagerItem, String>> getTableColumns() {
         return List.of(
-                getTableColumn("Name", "name"),
-                getTableColumn("Size", "size"),
-                getTableColumn("Type", "fileType"),
-                getTableColumn("Changed", "changedAt")
+                getTableColumn(FileManagerColumn.NAME),
+                getTableColumn(FileManagerColumn.SIZE),
+                getTableColumn(FileManagerColumn.TYPE),
+                getTableColumn(FileManagerColumn.CHANGED)
         );
     }
 
-    private TableColumn<FileManagerItem, String> getTableColumn(String colName, String dtoFieldName) {
-        TableColumn<FileManagerItem, String> col = new TableColumn<>(colName);
-        col.setCellValueFactory(new PropertyValueFactory<>(dtoFieldName));
+    private TableColumn<FileManagerItem, String> getTableColumn(FileManagerColumn column) {
+        TableColumn<FileManagerItem, String> col = new TableColumn<>(column.getColName());
+        col.setCellValueFactory(new PropertyValueFactory<>(column.getFileManagerItemFieldName()));
         return col;
     }
 }
