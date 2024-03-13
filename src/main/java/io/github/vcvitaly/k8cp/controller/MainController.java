@@ -40,9 +40,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        mockLeftBreadcrumbBar();
-        mockRightBreadcrumbBar();
-        mockLeftView();
+        initLeftView();
         mockRightView();
     }
 
@@ -54,13 +52,15 @@ public class MainController implements Initializable {
         rightBreadcrumbBar.setSelectedCrumb(Mock.rightBreadcrumbItem());
     }
 
-    private void mockLeftView() {
+    private void initLeftView() {
+        mockLeftBreadcrumbBar();
         leftView.setPlaceholder(getNoRowsToDisplayLbl());
         leftView.getColumns().addAll(getTableColumns());
         leftView.setItems(Mock.leftViewItems());
     }
 
     private void mockRightView() {
+        mockRightBreadcrumbBar();
         rightView.setPlaceholder(getNoRowsToDisplayLbl());
         rightView.getColumns().addAll(getTableColumns());
         rightView.setItems(Mock.rightViewItems());
