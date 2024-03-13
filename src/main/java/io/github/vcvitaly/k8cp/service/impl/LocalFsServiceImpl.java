@@ -7,6 +7,7 @@ import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
+import io.github.vcvitaly.k8cp.util.FileUtil;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,12 +26,14 @@ public class LocalFsServiceImpl implements LocalFsService {
     private final SizeConverter sizeConverter;
 
     @Override
-    public List<FileInfoContainer> listFiles(String path) throws IOOperationException {
-        return listFilesInternal(path);
+    public List<FileInfoContainer> listFiles(String path, boolean showHidden) throws IOOperationException {
+        return listFilesInternal(path, showHidden);
     }
 
-    private List<FileInfoContainer> listFilesInternal(String path) throws IOOperationException {
-        final List<Path> paths = localFsClient.listFiles(path);
+    private List<FileInfoContainer> listFilesInternal(String path, boolean showHidden) throws IOOperationException {
+        final List<Path> paths = localFsClient.listFiles(path).stream()
+                .filter(p -> FileUtil.shouldBeShownBasedOnHiddenFlag(p, showHidden))
+                .toList();
         final List<FileInfoContainer> list = new ArrayList<>();
         for (Path p : paths) {
             final FileInfoContainer fileInfoContainer = toFileDto(p);

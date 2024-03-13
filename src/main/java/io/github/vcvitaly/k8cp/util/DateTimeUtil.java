@@ -12,4 +12,8 @@ public class DateTimeUtil {
     public static LocalDateTime toLocalDate(String isoDate, String isoTime) {
         return LocalDateTime.parse("%s %s".formatted(isoDate, isoTime), LONG_ISO_DATE_FORMATTER);
     }
+
+    public static String toString(LocalDateTime localDateTime) {
+        return LONG_ISO_DATE_FORMATTER.format(localDateTime);
+    }
 }

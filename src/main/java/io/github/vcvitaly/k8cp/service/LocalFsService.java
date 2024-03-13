@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface LocalFsService {
 
-    List<FileInfoContainer> listFiles(String path) throws IOOperationException;
+    List<FileInfoContainer> listFiles(String path, boolean showHidden) throws IOOperationException;
 }

@@ -6,6 +6,7 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.enumeration.FxmlView;
 import io.github.vcvitaly.k8cp.util.Constants;
+import io.github.vcvitaly.k8cp.util.DateTimeUtil;
 import io.github.vcvitaly.k8cp.util.FxmlLoaderUtil;
 import io.github.vcvitaly.k8cp.util.ResourceUtil;
 import java.io.IOException;
@@ -156,8 +157,8 @@ public class View {
                 .name(fileInfoContainer.getName())
                 .size(fileInfoContainer.getSize())
                 .sizeUnit(fileInfoContainer.getSizeUnit())
-                .fileType(fileInfoContainer.getFileType().toString())
-                .changedAt(fileInfoContainer.getChangedAt().toString())
+                .fileType(fileInfoContainer.getFileType())
+                .changedAt(DateTimeUtil.toString(fileInfoContainer.getChangedAt()))
                 .build();
     }
 

@@ -53,6 +53,8 @@ public class MainController implements Initializable {
             log.error("Could list local files", e);
             View.getInstance().showErrorModal(e.getMessage());
         }
+        leftBreadcrumbBar.selectedCrumbProperty()
+                .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
         mockRightView();
     }
 
@@ -61,10 +63,18 @@ public class MainController implements Initializable {
     }
 
     private void initLeftView() throws IOOperationException {
-        final TreeItem<BreadCrumbFile> treeItem = View.getInstance().toTreeItem(Model.resolveLocalBreadcrumbTree());
-        leftBreadcrumbBar.setSelectedCrumb(treeItem);
         leftView.setPlaceholder(getNoRowsToDisplayLbl());
         leftView.getColumns().addAll(getTableColumns());
+        initLeftViewCrumb();
+        initLeftViewItems();
+    }
+
+    private void initLeftViewCrumb() {
+        final TreeItem<BreadCrumbFile> treeItem = View.getInstance().toTreeItem(Model.resolveLocalBreadcrumbTree());
+        leftBreadcrumbBar.setSelectedCrumb(treeItem);
+    }
+
+    private void initLeftViewItems() throws IOOperationException {
         final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(Model.listLocalFiles());
         leftView.setItems(FXCollections.observableList(fileMangerItems));
     }
@@ -93,5 +103,15 @@ public class MainController implements Initializable {
         TableColumn<FileManagerItem, String> col = new TableColumn<>(column.getColName());
         col.setCellValueFactory(new PropertyValueFactory<>(column.getFileManagerItemFieldName()));
         return col;
+    }
+
+    private void onLeftBreadcrumb(BreadCrumbFile selection) {
+        Model.setLocalPathRef(selection.getPath());
+        try {
+            initLeftViewItems();
+        } catch (IOOperationException e) {
+            log.error("Could list local files", e);
+            View.getInstance().showErrorModal(e.getMessage());
+        }
     }
 }

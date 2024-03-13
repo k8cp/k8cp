@@ -28,9 +28,9 @@ import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -78,18 +78,17 @@ public class Model {
     }
 
     public static List<FileInfoContainer> listLocalFiles() throws IOOperationException {
-        return LocalFsServiceHolder.instance.listFiles(localPathRef.get());
+        return LocalFsServiceHolder.instance.listFiles(localPathRef.get(), false);
     }
 
     public static List<BreadCrumbFile> resolveLocalBreadcrumbTree() {
-        final Path currentPath = Paths.get(localPathRef.get());
-        final List<BreadCrumbFile> tree = new ArrayList<>(
-                Collections.singleton(toBreadCrumbFile(currentPath.getRoot()))
-        );
-        for (Path element : currentPath) {
-            tree.add(toBreadCrumbFile(element));
+        Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
+        Path currentPath = Paths.get(localPathRef.get());
+        while (currentPath != null) {
+            reversedTree.add(toBreadCrumbFile(currentPath));
+            currentPath = currentPath.getParent();
         }
-        return tree;
+        return reversedTree.stream().toList().reversed();
     }
 
     public static FileInfoContainer getRemoteParentDirectory() {

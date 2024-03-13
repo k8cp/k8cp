@@ -30,7 +30,7 @@ public class Mock {
         FileManagerItem parentDirDto = FileManagerItem.builder()
                 .path("C:\\Users\\")
                 .name(parentDirName)
-                .fileType(FileType.PARENT_DIRECTORY.toString())
+                .fileType(FileType.PARENT_DIRECTORY)
                 .changedAt("2024-03-10 08:35")
                 .build();
         final String fileName = "file.txt";
@@ -39,7 +39,7 @@ public class Mock {
                 .name(fileName)
                 .size(1)
                 .sizeUnit(FileSizeUnit.KB)
-                .fileType(FileType.FILE.toString())
+                .fileType(FileType.FILE)
                 .changedAt("2024-03-10 08:35")
                 .build();
         final String dirName = "some_dir";
@@ -48,7 +48,7 @@ public class Mock {
                 .name(dirName)
                 .size(4)
                 .sizeUnit(FileSizeUnit.KB)
-                .fileType(FileType.DIRECTORY.toString())
+                .fileType(FileType.DIRECTORY)
                 .changedAt("2024-03-10 08:34")
                 .build();
         return FXCollections.observableArrayList(parentDirDto, dirDto, fileDto);
@@ -59,7 +59,7 @@ public class Mock {
         FileManagerItem parentDirDto = FileManagerItem.builder()
                 .path("/home")
                 .name(parentDirName)
-                .fileType(FileType.PARENT_DIRECTORY.toString())
+                .fileType(FileType.PARENT_DIRECTORY)
                 .changedAt("2024-03-10 08:35")
                 .build();
         final String fileName = "file.txt";
@@ -68,7 +68,7 @@ public class Mock {
                 .name(fileName)
                 .size(1)
                 .sizeUnit(FileSizeUnit.KB)
-                .fileType(FileType.FILE.toString())
+                .fileType(FileType.FILE)
                 .changedAt("2024-03-10 08:35")
                 .build();
         return FXCollections.observableArrayList(parentDirDto, fileDto);
