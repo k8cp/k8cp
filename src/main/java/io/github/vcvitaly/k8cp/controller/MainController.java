@@ -53,8 +53,6 @@ public class MainController implements Initializable {
             log.error("Could list local files", e);
             View.getInstance().showErrorModal(e.getMessage());
         }
-        leftBreadcrumbBar.selectedCrumbProperty()
-                .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
         mockRightView();
     }
 
@@ -67,6 +65,9 @@ public class MainController implements Initializable {
         leftView.getColumns().addAll(getTableColumns());
         initLeftViewCrumb();
         initLeftViewItems();
+        initLeftViewButtons();
+        leftBreadcrumbBar.selectedCrumbProperty()
+                .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
     }
 
     private void initLeftViewCrumb() {
@@ -77,6 +78,10 @@ public class MainController implements Initializable {
     private void initLeftViewItems() throws IOOperationException {
         final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(Model.listLocalFiles());
         leftView.setItems(FXCollections.observableList(fileMangerItems));
+    }
+
+    private void initLeftViewButtons() {
+
     }
 
     private void mockRightView() {
