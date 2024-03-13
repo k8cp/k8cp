@@ -25,7 +25,7 @@ public class LocalFsServiceImpl implements LocalFsService {
     private final SizeConverter sizeConverter;
 
     @Override
-    public List<FileInfoContainer> listFiles(String namespace, String podName, String path) throws IOOperationException {
+    public List<FileInfoContainer> listFiles(String path) throws IOOperationException {
         return listFilesInternal(path);
     }
 
