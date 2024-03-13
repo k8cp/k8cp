@@ -41,14 +41,14 @@ public class KubeConfigSelectionController implements Initializable {
         } catch (IOOperationException | KubeContextExtractionException e) {
             log.error("Could not get kube config list", e);
             setItemsIfNoKubeConfigFound();
-            Model.getInstance().getViewFactory().showErrorModal(e.getMessage());
+            Model.getViewFactory().showErrorModal(e.getMessage());
         }
     }
 
     private void onNext() {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
-        Model.getInstance().getViewFactory().closeStage(selectionStage);
-        Model.getInstance().getViewFactory().showKubeNamespaceSelectionWindow();
+        Model.getViewFactory().closeStage(selectionStage);
+        Model.getViewFactory().showKubeNamespaceSelectionWindow();
     }
 
     private void onFileSelection() {
@@ -63,7 +63,7 @@ public class KubeConfigSelectionController implements Initializable {
                 chooseFromFsLbl.setVisible(false);
                 selectedKubeConfigFileLbl.setText("You selected: " + selection.toString());
             } catch (KubeContextExtractionException ex) {
-                Model.getInstance().getViewFactory().showErrorModal(ex.getMessage());
+                Model.getViewFactory().showErrorModal(ex.getMessage());
             }
         }
     }
@@ -71,7 +71,7 @@ public class KubeConfigSelectionController implements Initializable {
     private File getFileFromFileChooser() {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
-        return fileChooser.showOpenDialog(Model.getInstance().getViewFactory().getCurrentStage());
+        return fileChooser.showOpenDialog(Model.getViewFactory().getCurrentStage());
     }
 
     private void setItemsIfKubeConfigsFound(ObservableList<KubeConfigContainer> kubeConfigList) {

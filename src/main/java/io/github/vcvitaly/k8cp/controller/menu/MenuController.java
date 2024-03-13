@@ -19,6 +19,6 @@ public class MenuController implements Initializable {
     }
 
     private void onAbout() {
-        Model.getInstance().getViewFactory().showAboutModal();
+        Model.getViewFactory().showAboutModal();
     }
 }
