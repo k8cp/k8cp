@@ -1,11 +1,14 @@
 package io.github.vcvitaly.k8cp.view;
 
 import io.github.vcvitaly.k8cp.controller.ErrorController;
+import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
+import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.enumeration.FxmlView;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.FxmlLoaderUtil;
 import io.github.vcvitaly.k8cp.util.ResourceUtil;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -30,6 +33,7 @@ public class View {
         return currentStage.get();
     }
 
+    /* Windows section */
     public void closeStage(Stage stage) {
         stage.close();
     }
@@ -91,6 +95,14 @@ public class View {
         );
     }
 
+    /* Other public methods */
+    public List<FileManagerItem> toFileMangerItems(List<FileInfoContainer> fileInfoContainers) {
+        return fileInfoContainers.stream()
+                .map(this::toFileManagerItem)
+                .toList();
+    }
+
+    /* Private methods */
     private void createStageAndShow(StageCreationParam param) {
         final FxmlView fxmlView = param.getFxmlView();
         final FXMLLoader loader = FxmlLoaderUtil.createFxmlLoader(fxmlView);
@@ -130,6 +142,19 @@ public class View {
         currentStage.set(stage);
     }
 
+
+    private FileManagerItem toFileManagerItem(FileInfoContainer fileInfoContainer) {
+        return FileManagerItem.builder()
+                .path(fileInfoContainer.getPath())
+                .name(fileInfoContainer.getName())
+                .size(fileInfoContainer.getSize())
+                .sizeUnit(fileInfoContainer.getSizeUnit())
+                .fileType(fileInfoContainer.getFileType().toString())
+                .changedAt(fileInfoContainer.getChangedAt().toString())
+                .build();
+    }
+
+    /* Holder section */
     public static View getInstance() {
         return ViewFactoryHolder.view;
     }

@@ -11,8 +11,8 @@ import lombok.Data;
 public class FileInfoContainer {
     private String path;
     private String name;
-    private long sizeBytes;
-    private int size;
+    private Long sizeBytes;
+    private Integer size;
     private FileSizeUnit sizeUnit;
     private FileType fileType;
     private LocalDateTime changedAt;

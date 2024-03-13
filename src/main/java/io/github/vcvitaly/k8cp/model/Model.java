@@ -8,6 +8,7 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
+import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
@@ -38,7 +39,7 @@ public class Model {
     private static final AtomicReference<KubeConfigContainer> kubeConfigSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
-    private static final AtomicReference<FileInfoContainer> currentPathRef = new AtomicReference<>();
+    private static final AtomicReference<String> leftPathRef = new AtomicReference<>(HomePathProviderHolder.instance.provideHomePath());
 
     private Model() {}
 
@@ -64,7 +65,26 @@ public class Model {
         return KubeServiceHolder.instance.getPods(kubeNamespaceSelectionRef.get().name());
     }
 
-    public static List<FileInfoContainer> listFilesInCurrentlySelectedFolder() {
+    public static FileInfoContainer getLocalParentDirectory() {
+        final Path currentPath = Paths.get(leftPathRef.get());
+        return FileInfoContainer.builder()
+                .path(currentPath.getParent().toString())
+                .name(Constants.PARENT_DIR_NAME)
+                .fileType(FileType.PARENT_DIRECTORY)
+                .build();
+    }
+
+    public static List<FileInfoContainer> listLocalFiles() throws IOOperationException {
+        return LocalFsServiceHolder.instance.listFiles(leftPathRef.get());
+    }
+
+    public static FileInfoContainer getRemoteParentDirectory() {
+        // TODO
+        return null;
+    }
+
+    public static List<FileInfoContainer> listRemoteFiles() {
+        // TODO
         return null;
     }
 

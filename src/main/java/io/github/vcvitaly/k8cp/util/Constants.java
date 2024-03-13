@@ -16,4 +16,6 @@ public class Constants {
     public static final String DEFAULT_NAMESPACE_NAME = "default";
 
     public static final Class<?> FILE_MANAGER_ITEM_CLAZZ = FileManagerItem.class;
+
+    public static final String PARENT_DIR_NAME = "..";
 }

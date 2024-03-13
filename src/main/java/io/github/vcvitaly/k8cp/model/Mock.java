@@ -30,8 +30,6 @@ public class Mock {
         FileManagerItem parentDirDto = FileManagerItem.builder()
                 .path("C:\\Users\\")
                 .name(parentDirName)
-                .size("")
-                .sizeUnit("")
                 .fileType(FileType.PARENT_DIRECTORY.toString())
                 .changedAt("2024-03-10 08:35")
                 .build();
@@ -39,8 +37,8 @@ public class Mock {
         FileManagerItem fileDto = FileManagerItem.builder()
                 .path("C:\\Users\\" + fileName)
                 .name(fileName)
-                .size(String.valueOf(1))
-                .sizeUnit(FileSizeUnit.KB.toString())
+                .size(1)
+                .sizeUnit(FileSizeUnit.KB)
                 .fileType(FileType.FILE.toString())
                 .changedAt("2024-03-10 08:35")
                 .build();
@@ -48,8 +46,8 @@ public class Mock {
         FileManagerItem dirDto = FileManagerItem.builder()
                 .path("C:\\Users\\" + dirName)
                 .name(dirName)
-                .size(String.valueOf(4))
-                .sizeUnit(FileSizeUnit.KB.toString())
+                .size(4)
+                .sizeUnit(FileSizeUnit.KB)
                 .fileType(FileType.DIRECTORY.toString())
                 .changedAt("2024-03-10 08:34")
                 .build();
@@ -61,8 +59,6 @@ public class Mock {
         FileManagerItem parentDirDto = FileManagerItem.builder()
                 .path("/home")
                 .name(parentDirName)
-                .size("")
-                .sizeUnit("")
                 .fileType(FileType.PARENT_DIRECTORY.toString())
                 .changedAt("2024-03-10 08:35")
                 .build();
@@ -70,8 +66,8 @@ public class Mock {
         FileManagerItem fileDto = FileManagerItem.builder()
                 .path("/home/user/" + fileName)
                 .name(fileName)
-                .size(String.valueOf(1))
-                .sizeUnit(FileSizeUnit.KB.toString())
+                .size(1)
+                .sizeUnit(FileSizeUnit.KB)
                 .fileType(FileType.FILE.toString())
                 .changedAt("2024-03-10 08:35")
                 .build();
