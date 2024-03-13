@@ -4,6 +4,7 @@ import io.github.vcvitaly.k8cp.client.KubeClient;
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.KubeClientImpl;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
+import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
@@ -27,6 +28,7 @@ import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.collections.FXCollections;
@@ -39,7 +41,7 @@ public class Model {
     private static final AtomicReference<KubeConfigContainer> kubeConfigSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
-    private static final AtomicReference<String> leftPathRef = new AtomicReference<>(HomePathProviderHolder.instance.provideHomePath());
+    private static final AtomicReference<String> localPathRef = new AtomicReference<>(HomePathProviderHolder.instance.provideHomePath());
 
     private Model() {}
 
@@ -66,7 +68,7 @@ public class Model {
     }
 
     public static FileInfoContainer getLocalParentDirectory() {
-        final Path currentPath = Paths.get(leftPathRef.get());
+        final Path currentPath = Paths.get(localPathRef.get());
         return FileInfoContainer.builder()
                 .path(currentPath.getParent().toString())
                 .name(Constants.PARENT_DIR_NAME)
@@ -75,7 +77,16 @@ public class Model {
     }
 
     public static List<FileInfoContainer> listLocalFiles() throws IOOperationException {
-        return LocalFsServiceHolder.instance.listFiles(leftPathRef.get());
+        return LocalFsServiceHolder.instance.listFiles(localPathRef.get());
+    }
+
+    public static List<BreadCrumbFile> resolveLocalBreadcrumbTree() {
+        final Path currentPath = Paths.get(localPathRef.get());
+        final List<BreadCrumbFile> tree = new ArrayList<>();
+        for (Path element : currentPath) {
+            tree.add(new BreadCrumbFile(element.toString(), element.getFileName().toString()));
+        }
+        return tree;
     }
 
     public static FileInfoContainer getRemoteParentDirectory() {
@@ -102,6 +113,11 @@ public class Model {
     public static void setKubePodSelection(KubePod selection) {
         kubePodSelectionRef.set(selection);
         log.info("Set kube pod selection to [{}]", selection);
+    }
+
+    public static void setLocalPathRef(String path) {
+        localPathRef.set(path);
+        log.info("Set local path ref to [{}]", path);
     }
 
     /* Holders */
