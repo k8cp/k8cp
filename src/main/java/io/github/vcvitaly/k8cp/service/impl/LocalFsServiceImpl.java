@@ -7,6 +7,7 @@ import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
+import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.FileUtil;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,7 +32,8 @@ public class LocalFsServiceImpl implements LocalFsService {
     }
 
     private List<FileInfoContainer> listFilesInternal(String path, boolean showHidden) throws IOOperationException {
-        final List<Path> paths = localFsClient.listFiles(path).stream()
+        final List<Path> pathsUnfiltered = listFilesInternal(path);
+        final List<Path> paths = pathsUnfiltered.stream()
                 .filter(p -> FileUtil.shouldBeShownBasedOnHiddenFlag(p, showHidden))
                 .toList();
         final List<FileInfoContainer> list = new ArrayList<>();
@@ -42,6 +44,13 @@ public class LocalFsServiceImpl implements LocalFsService {
         return list;
     }
 
+    private List<Path> listFilesInternal(String path) throws IOOperationException {
+        if (path.equals(Constants.WINDOWS_ROOT)) {
+            return localFsClient.listFilesInWindowsRoot();
+        }
+        return localFsClient.listFiles(path);
+    }
+
     private FileInfoContainer toFileDto(Path path) throws IOOperationException {
         try {
             final long size = Files.size(path);
@@ -49,7 +58,7 @@ public class LocalFsServiceImpl implements LocalFsService {
             final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
             return FileInfoContainer.builder()
                     .path(path.toString())
-                    .name(path.getFileName().toString())
+                    .name(FileUtil.getPathFilename(path))
                     .sizeBytes(size)
                     .size(fileSizeContainer.sizeInUnit())
                     .sizeUnit(fileSizeContainer.unit())

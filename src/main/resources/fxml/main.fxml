@@ -18,7 +18,7 @@
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="300.0">
          <VBox prefHeight="575.0" prefWidth="400.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <HBox prefHeight="60.0" prefWidth="400.0">
-               <Button fx:id="parentLeftBtn" mnemonicParsing="false">
+               <Button fx:id="leftParentBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
                   </graphic>
@@ -26,7 +26,7 @@
                      <Tooltip text="Parent directory" />
                   </tooltip>
                </Button>
-               <Button fx:id="rootLeftBtn" mnemonicParsing="false">
+               <Button fx:id="leftRootBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="mdral-account_tree" iconSize="17" />
                   </graphic>
@@ -34,7 +34,7 @@
                      <Tooltip text="Root" />
                   </tooltip>
                </Button>
-               <Button fx:id="homeLeftBtn" mnemonicParsing="false">
+               <Button fx:id="leftHomeBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-home" iconSize="15" />
                   </graphic>
@@ -42,7 +42,7 @@
                      <Tooltip text="Home" />
                   </tooltip>
                </Button>
-               <Button fx:id="refreshLeftBtn" mnemonicParsing="false">
+               <Button fx:id="leftRefreshBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fa-refresh" iconSize="15" />
                   </graphic>
@@ -50,7 +50,7 @@
                      <Tooltip text="Refresh" />
                   </tooltip>
                </Button>
-               <Button fx:id="copyLeftBtn" mnemonicParsing="false">
+               <Button fx:id="leftCopyBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-copy" iconSize="15" />
                   </graphic>
@@ -58,7 +58,7 @@
                      <Tooltip text="Copy" />
                   </tooltip>
                </Button>
-               <Button fx:id="moveLeftBtn" mnemonicParsing="false">
+               <Button fx:id="leftMoveBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-arrow-alt-circle-right" iconSize="15" />
                   </graphic>
@@ -66,7 +66,7 @@
                      <Tooltip text="Move" />
                   </tooltip>
                </Button>
-               <Button fx:id="deleteLeftBtn" mnemonicParsing="false">
+               <Button fx:id="leftDeleteBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-trash" iconSize="15" />
                   </graphic>
@@ -74,7 +74,7 @@
                      <Tooltip text="Delete" />
                   </tooltip>
                </Button>
-               <Button fx:id="renameLeftBtn" mnemonicParsing="false">
+               <Button fx:id="leftRenameBtn" mnemonicParsing="false">
                   <graphic>
                      <FontIcon iconLiteral="fas-edit" iconSize="15" />
                   </graphic>

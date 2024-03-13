@@ -18,4 +18,11 @@ public class Constants {
     public static final Class<?> FILE_MANAGER_ITEM_CLAZZ = FileManagerItem.class;
 
     public static final String PARENT_DIR_NAME = "..";
+
+    public static final String UNIX_ROOT = "/";
+
+    // PC stands for personal computer
+    public static final String WINDOWS_ROOT = "PC";
+
+    public static final String WINDOWS_DRIVE_LETTER_SUFFIX = ":\\";
 }

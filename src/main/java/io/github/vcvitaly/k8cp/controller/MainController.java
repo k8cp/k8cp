@@ -23,14 +23,14 @@ import org.controlsfx.control.BreadCrumbBar;
 
 @Slf4j
 public class MainController implements Initializable {
-    public Button parentLeftBtn;
-    public Button rootLeftBtn;
-    public Button homeLeftBtn;
-    public Button refreshLeftBtn;
-    public Button copyLeftBtn;
-    public Button moveLeftBtn;
-    public Button deleteLeftBtn;
-    public Button renameLeftBtn;
+    public Button leftParentBtn;
+    public Button leftRootBtn;
+    public Button leftHomeBtn;
+    public Button leftRefreshBtn;
+    public Button leftCopyBtn;
+    public Button leftMoveBtn;
+    public Button leftDeleteBtn;
+    public Button leftRenameBtn;
     public BreadCrumbBar<BreadCrumbFile> leftBreadcrumbBar;
     public TableView<FileManagerItem> leftView;
     public Button parentRightBtn;
@@ -75,13 +75,44 @@ public class MainController implements Initializable {
         leftBreadcrumbBar.setSelectedCrumb(treeItem);
     }
 
-    private void initLeftViewItems() throws IOOperationException {
-        final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(Model.listLocalFiles());
-        leftView.setItems(FXCollections.observableList(fileMangerItems));
+    private void initLeftViewItems() {
+        try {
+            final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(Model.listLocalFiles());
+            leftView.setItems(FXCollections.observableList(fileMangerItems));
+        } catch (IOOperationException e) {
+            log.error("Could list local files", e);
+            View.getInstance().showErrorModal(e.getMessage());
+        }
     }
 
     private void initLeftViewButtons() {
+        leftParentBtn.setOnAction(e -> onLeftParentBtn());
+        leftHomeBtn.setOnAction(e -> onLeftHomeBtn());
+        leftRootBtn.setOnAction(e -> onLeftRootBtn());
+        leftRefreshBtn.setOnAction(e -> onLeftRefreshBtn());
+    }
 
+    private void onLeftParentBtn() {
+        Model.setLocalPathRefToParent();
+        initLeftViewCrumb();
+        initLeftViewItems();
+    }
+
+    private void onLeftHomeBtn() {
+        Model.setLocalPathRefToHome();
+        initLeftViewCrumb();
+        initLeftViewItems();
+    }
+
+    private void onLeftRootBtn() {
+        Model.setLocalPathRefToRoot();
+        initLeftViewCrumb();
+        initLeftViewItems();
+    }
+
+    private void onLeftRefreshBtn() {
+        initLeftViewCrumb();
+        initLeftViewItems();
     }
 
     private void mockRightView() {
@@ -112,11 +143,6 @@ public class MainController implements Initializable {
 
     private void onLeftBreadcrumb(BreadCrumbFile selection) {
         Model.setLocalPathRef(selection.getPath());
-        try {
-            initLeftViewItems();
-        } catch (IOOperationException e) {
-            log.error("Could list local files", e);
-            View.getInstance().showErrorModal(e.getMessage());
-        }
+        initLeftViewItems();
     }
 }

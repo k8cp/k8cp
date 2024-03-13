@@ -10,22 +10,26 @@ import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
+import io.github.vcvitaly.k8cp.enumeration.OsFamily;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
-import io.github.vcvitaly.k8cp.service.HomePathProvider;
 import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
 import io.github.vcvitaly.k8cp.service.KubeConfigSelectionService;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
+import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
+import io.github.vcvitaly.k8cp.service.PathProvider;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
-import io.github.vcvitaly.k8cp.service.impl.HomePathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigHelperImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigSelectionServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
+import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
+import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
+import io.github.vcvitaly.k8cp.util.FileUtil;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -42,12 +46,12 @@ public class Model {
     private static final AtomicReference<KubeConfigContainer> kubeConfigSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
-    private static final AtomicReference<String> localPathRef = new AtomicReference<>(HomePathProviderHolder.instance.provideHomePath());
+    private static final AtomicReference<String> localPathRef = new AtomicReference<>(PathProviderHolder.instance.provideLocalHomePath());
 
     private Model() {}
 
     public static ObservableList<KubeConfigContainer> getKubeConfigList() throws IOOperationException, KubeContextExtractionException {
-        final String homePath = HomePathProviderHolder.instance.provideHomePath();
+        final String homePath = PathProviderHolder.instance.provideLocalHomePath();
         final List<KubeConfigContainer> configChoices = KubeConfigSelectionServiceHolder.instance
                 .getConfigChoices(Paths.get(homePath, Constants.KUBE_FOLDER).toString());
         return FXCollections.observableList(configChoices);
@@ -69,9 +73,9 @@ public class Model {
     }
 
     public static FileInfoContainer getLocalParentDirectory() {
-        final Path currentPath = Paths.get(localPathRef.get());
+        final String parentPath = getLocalParentPath();
         return FileInfoContainer.builder()
-                .path(currentPath.getParent().toString())
+                .path(parentPath)
                 .name(Constants.PARENT_DIR_NAME)
                 .fileType(FileType.PARENT_DIRECTORY)
                 .build();
@@ -82,11 +86,14 @@ public class Model {
     }
 
     public static List<BreadCrumbFile> resolveLocalBreadcrumbTree() {
-        Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
         Path currentPath = Paths.get(localPathRef.get());
+        Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
         while (currentPath != null) {
             reversedTree.add(toBreadCrumbFile(currentPath));
             currentPath = currentPath.getParent();
+        }
+        if (LocalOsFamilyDetectorHolder.instance.detectOsFamily() == OsFamily.WINDOWS) {
+            reversedTree.add(new BreadCrumbFile(Constants.WINDOWS_ROOT, Constants.WINDOWS_ROOT));
         }
         return reversedTree.stream().toList().reversed();
     }
@@ -122,6 +129,23 @@ public class Model {
         log.info("Set local path ref to [{}]", path);
     }
 
+    public static void setLocalPathRefToParent() {
+        final String parent = getLocalParentPath();
+        localPathRef.set(parent);
+        log.info("Set local path ref to parent [{}]", parent);
+    }
+
+    public static void setLocalPathRefToHome() {
+        final String homePath = PathProviderHolder.instance.provideLocalHomePath();
+        localPathRef.set(homePath);
+        log.info("Set local path ref to home path [{}]", homePath);
+    }
+
+    public static void setLocalPathRefToRoot() {
+        final String rootPath = PathProviderHolder.instance.provideLocalRootPath();
+        localPathRef.set(rootPath);
+        log.info("Set local path ref to root path [{}]", rootPath);
+    }
 
     /* Private methods */
     private static void logCreatedNewInstanceOf(Object o) {
@@ -134,12 +158,12 @@ public class Model {
     }
 
     private static BreadCrumbFile toBreadCrumbFile(Path path) {
-        final String pathName = path.getParent() != null ? path.getFileName().toString() : normalizeRootPath(path);
+        final String pathName = FileUtil.getPathFilename(path);
         return new BreadCrumbFile(path.toString(), pathName);
     }
 
-    private static String normalizeRootPath(Path root) {
-        return root.toString().replace(":\\", "");
+    private static String getLocalParentPath() {
+        return Paths.get(localPathRef.get()).getParent().toString();
     }
 
     /* Holders */
@@ -211,11 +235,11 @@ public class Model {
         }
     }
 
-    private static class HomePathProviderHolder {
-        private static final HomePathProvider instance = getInstance();
+    private static class PathProviderHolder {
+        private static final PathProvider instance = getInstance();
 
-        private static HomePathProvider getInstance() {
-            final HomePathProvider instance = new HomePathProviderImpl();
+        private static PathProvider getInstance() {
+            final PathProvider instance = new PathProviderImpl(LocalOsFamilyDetectorHolder.instance);
             logCreatedNewInstanceOf(instance);
             return instance;
         }
@@ -228,6 +252,16 @@ public class Model {
             final KubeConfigSelectionService instance = new KubeConfigSelectionServiceImpl(
                     LocalFsClientHolder.instance, KubeConfigHelperHolder.instance
             );
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class LocalOsFamilyDetectorHolder {
+        private static final LocalOsFamilyDetector instance = getInstance();
+
+        private static LocalOsFamilyDetector getInstance() {
+            final LocalOsFamilyDetector instance = new LocalOsFamilyDetectorImpl();
             logCreatedNewInstanceOf(instance);
             return instance;
         }
