@@ -8,6 +8,7 @@ import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.model.Mock;
 import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.util.FileUtil;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
@@ -170,9 +171,12 @@ public class MainController implements Initializable {
 
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
-        Model.setLocalPathRef(root.path());
-        initLeftViewCrumb();
-        initLeftViewItems();
+        final String rootPath = root.path();
+        if (!FileUtil.isInTheSameRoot(rootPath, Model.getLocalPathRef())) {
+            Model.setLocalPathRef(rootPath);
+            initLeftViewCrumb();
+            initLeftViewItems();
+        }
     }
 
     private void initLocalTableSelectionAction() {

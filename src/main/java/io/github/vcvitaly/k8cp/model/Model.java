@@ -179,6 +179,10 @@ public class Model {
         }
     }
 
+    public static synchronized String getLocalPathRef() {
+        return localPathRef.get();
+    }
+
     /* Private methods */
     private static void logCreatedNewInstanceOf(Object o) {
         log.info(NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
@@ -209,10 +213,6 @@ public class Model {
             return true;
         }
         return false;
-    }
-
-    private static synchronized String getLocalPathRef() {
-        return localPathRef.get();
     }
 
     /* Holders */
