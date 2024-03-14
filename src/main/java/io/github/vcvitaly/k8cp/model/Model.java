@@ -30,7 +30,8 @@ import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
 import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
-import io.github.vcvitaly.k8cp.util.FileUtil;
+import io.github.vcvitaly.k8cp.util.LocalFileUtil;
+import io.github.vcvitaly.k8cp.util.UnixPathUtil;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class Model {
     private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
     private static final AtomicReference<String> localPathRef = new AtomicReference<>(PathProviderHolder.instance.provideLocalHomePath());
+    private static final AtomicReference<String> remotePathRef = new AtomicReference<>(PathProviderHolder.instance.provideRemoteRootPath());
 
     private Model() {}
 
@@ -77,19 +79,15 @@ public class Model {
 
     public static FileInfoContainer getLocalParentDirectory() {
         final String parentPath = getLocalParentPath();
-        return FileInfoContainer.builder()
-                .path(parentPath)
-                .name(Constants.PARENT_DIR_NAME)
-                .fileType(FileType.PARENT_DIRECTORY)
-                .build();
+        return getParentDirectory(parentPath);
     }
 
     public static List<FileInfoContainer> listLocalFiles() throws IOOperationException {
-        final String localPath = getLocalPathRef();
+        final String path = getLocalPathRef();
         final List<FileInfoContainer> files = new ArrayList<>(
-                LocalFsServiceHolder.instance.listFiles(localPath, false)
+                LocalFsServiceHolder.instance.listFiles(path, false)
         );
-        if (!FileUtil.isRoot(Paths.get(localPath))) {
+        if (!LocalFileUtil.isRoot(Paths.get(path))) {
             files.add(getLocalParentDirectory());
         }
         files.sort(Comparator.naturalOrder());
@@ -120,19 +118,45 @@ public class Model {
     public static RootInfoContainer getMainRoot() {
         final OsFamily osFamily = LocalOsFamilyDetectorHolder.instance.detectOsFamily();
         return switch (osFamily) {
-            case WINDOWS -> new RootInfoContainer(Constants.WINDOWS_ROOT, FileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT)));
+            case WINDOWS -> new RootInfoContainer(
+                    Constants.WINDOWS_ROOT,
+                    LocalFileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT))
+            );
             case LINUX, MACOS -> new RootInfoContainer(Constants.UNIX_ROOT, Constants.UNIX_ROOT);
         };
     }
 
     public static FileInfoContainer getRemoteParentDirectory() {
-        // TODO
-        return null;
+        final String parentPath = getRemoteParentPath();
+        return getParentDirectory(parentPath);
     }
 
-    public static List<FileInfoContainer> listRemoteFiles() {
-        // TODO
-        return null;
+    public static List<FileInfoContainer> listRemoteFiles() throws IOOperationException {
+        final String path = getRemotePathRef();
+        final List<FileInfoContainer> files = new ArrayList<>(
+                KubeServiceHolder.instance.listFiles(
+                        kubeNamespaceSelectionRef.get().name(),
+                        kubePodSelectionRef.get().name(),
+                        path,
+                        false
+                )
+        );
+        if (!UnixPathUtil.isRoot(path)) {
+            files.add(getRemoteParentDirectory());
+        }
+        files.sort(Comparator.naturalOrder());
+        return files;
+    }
+
+    public static List<BreadCrumbFile> resolveRemoteBreadcrumbTree() {
+        String currentPath = getRemotePathRef();
+        final List<BreadCrumbFile> reversedTree = new LinkedList<>();
+        while (!UnixPathUtil.isRoot(currentPath)) {
+            reversedTree.add(toBreadCrumbFile(currentPath));
+            currentPath = UnixPathUtil.getParentPath(currentPath);
+        }
+        reversedTree.add(toBreadCrumbFile(currentPath));
+        return reversedTree.reversed();
     }
 
     /* Setters */
@@ -183,6 +207,10 @@ public class Model {
         return localPathRef.get();
     }
 
+    public static synchronized String getRemotePathRef() {
+        return remotePathRef.get();
+    }
+
     /* Private methods */
     private static void logCreatedNewInstanceOf(Object o) {
         log.info(NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
@@ -193,14 +221,18 @@ public class Model {
         return e;
     }
 
-    private static BreadCrumbFile toBreadCrumbFile(Path path) {
-        final String pathName = FileUtil.getPathFilename(path);
-        return new BreadCrumbFile(path.toString(), pathName);
+    private static BreadCrumbFile toBreadCrumbFile(Path localPath) {
+        final String pathName = LocalFileUtil.getPathFilename(localPath);
+        return new BreadCrumbFile(localPath.toString(), pathName);
+    }
+
+    private static BreadCrumbFile toBreadCrumbFile(String remotePath) {
+        return new BreadCrumbFile(remotePath, UnixPathUtil.getFilename(remotePath));
     }
 
     private static String getLocalParentPath() {
         final Path path = Paths.get(getLocalPathRef());
-        if (FileUtil.isRoot(path)) {
+        if (LocalFileUtil.isRoot(path)) {
             return path.toString();
         }
         return path.getParent().toString();
@@ -213,6 +245,19 @@ public class Model {
             return true;
         }
         return false;
+    }
+
+    private static FileInfoContainer getParentDirectory(String parentPath) {
+        return FileInfoContainer.builder()
+                .path(parentPath)
+                .name(Constants.PARENT_DIR_NAME)
+                .fileType(FileType.PARENT_DIRECTORY)
+                .build();
+    }
+
+    private static String getRemoteParentPath() {
+        final String curPath = getRemotePathRef();
+        return UnixPathUtil.getParentPath(curPath);
     }
 
     /* Holders */

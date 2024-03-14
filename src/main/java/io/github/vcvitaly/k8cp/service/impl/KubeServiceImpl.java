@@ -12,6 +12,7 @@ import io.github.vcvitaly.k8cp.exception.KubeExecException;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
+import io.github.vcvitaly.k8cp.util.StringUtil;
 import io.github.vcvitaly.k8cp.util.UnixPathUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class KubeServiceImpl implements KubeService {
         final String time = parts[6];
         final String nameRaw = parts[7];
         final String fullPath = UnixPathUtil.concatPaths(path, nameRaw);
-        final String name = UnixPathUtil.stripEndingSlashFromPath(nameRaw);
+        final String name = StringUtil.stripEndingSlash(nameRaw);
         final FileSizeContainer fileSizeContainer = sizeConverter.toFileSizeDto(size);
         return FileInfoContainer.builder()
                 .path(fullPath)
