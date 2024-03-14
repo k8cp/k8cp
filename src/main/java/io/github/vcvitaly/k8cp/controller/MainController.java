@@ -24,6 +24,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.BreadCrumbBar;
 
@@ -74,11 +75,11 @@ public class MainController implements Initializable {
         initLeftViewItems();
         initLeftViewButtons();
         initLocalRootSelector();
-        initLocalTableSelectionAction();
+        initLocalViewSelectionAction();
+        initLocalViewKeyPressed();
         leftBreadcrumbBar.selectedCrumbProperty()
                 .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
     }
-
     private void initLeftViewCrumb() {
         final TreeItem<BreadCrumbFile> treeItem = View.getInstance().toTreeItem(Model.resolveLocalBreadcrumbTree());
         leftBreadcrumbBar.setSelectedCrumb(treeItem);
@@ -179,26 +180,38 @@ public class MainController implements Initializable {
         }
     }
 
-    private void initLocalTableSelectionAction() {
+    private void initLocalViewSelectionAction() {
         leftView.setRowFactory(tv -> {
             final TableRow<FileManagerItem> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 2 && !row.isEmpty()) {
-                    final FileManagerItem item = row.getItem();
-                    final FileType fileType = FileType.ofValueName(item.getFileType());
-                    if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
-                        Model.setLocalPathRef(item.getPath());
-                        initLeftViewCrumb();
-                        initLeftViewItems();
-                    } else if (fileType == FileType.FILE) {
-                        final String fileItemInfo = View.getInstance().toFileItemInfo(item);
-                        View.getInstance().showFileInfoModal(fileItemInfo);
-                    } else {
-                        throw new IllegalArgumentException("Unsupported file type " + fileType);
-                    }
+                    handleLeftViewSelectionAction(row.getItem());
                 }
             });
             return row;
+        });
+    }
+
+    private void handleLeftViewSelectionAction(FileManagerItem item) {
+        final FileType fileType = FileType.ofValueName(item.getFileType());
+        if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
+            Model.setLocalPathRef(item.getPath());
+            initLeftViewCrumb();
+            initLeftViewItems();
+        } else if (fileType == FileType.FILE) {
+            final String fileItemInfo = View.getInstance().toFileItemInfo(item);
+            View.getInstance().showFileInfoModal(fileItemInfo);
+        } else {
+            throw new IllegalArgumentException("Unsupported file type " + fileType);
+        }
+    }
+
+    private void initLocalViewKeyPressed() {
+        leftView.setOnKeyPressed(e -> {
+            if (!leftView.getSelectionModel().isEmpty() && e.getCode() == KeyCode.ENTER) {
+                handleLeftViewSelectionAction(leftView.getSelectionModel().getSelectedItem());
+                e.consume();
+            }
         });
     }
 }
