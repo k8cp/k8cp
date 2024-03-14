@@ -29,8 +29,12 @@ module io.github.vcvitaly.k8cp {
     exports io.github.vcvitaly.k8cp;
     exports io.github.vcvitaly.k8cp.controller;
     exports io.github.vcvitaly.k8cp.controller.menu;
+    exports io.github.vcvitaly.k8cp.controller.pane;
+    exports io.github.vcvitaly.k8cp.controller.init;
     exports io.github.vcvitaly.k8cp.domain;
     exports io.github.vcvitaly.k8cp.enumeration;
     opens io.github.vcvitaly.k8cp.controller to javafx.fxml;
     opens io.github.vcvitaly.k8cp.controller.menu to javafx.fxml;
+    opens io.github.vcvitaly.k8cp.controller.init to javafx.fxml;
+    opens io.github.vcvitaly.k8cp.controller.pane to javafx.fxml;
 }

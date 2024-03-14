@@ -8,7 +8,7 @@
 
 <VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
       stylesheets="@../styles/configChoice.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="io.github.vcvitaly.k8cp.controller.KubePodSelectionController">
+      fx:controller="io.github.vcvitaly.k8cp.controller.init.KubePodSelectionController">
    <VBox alignment="CENTER" prefHeight="300.0" prefWidth="600.0" styleClass="config-choice-container">
       <Label fx:id="choosePodLbl" text="Choose a kube pod:" />
       <ChoiceBox fx:id="podSelector" prefWidth="150.0" />
