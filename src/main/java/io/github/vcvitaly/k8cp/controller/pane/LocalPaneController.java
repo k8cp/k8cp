@@ -6,7 +6,7 @@ import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.model.Model;
-import io.github.vcvitaly.k8cp.util.FileUtil;
+import io.github.vcvitaly.k8cp.util.LocalFileUtil;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
@@ -165,7 +165,7 @@ public class LocalPaneController extends PaneController {
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
         final String rootPath = root.path();
-        if (!FileUtil.isInTheSameRoot(rootPath, Model.getLocalPathRef())) {
+        if (!LocalFileUtil.isInTheSameRoot(rootPath, Model.getLocalPathRef())) {
             Model.setLocalPathRef(rootPath);
             initViewCrumb();
             initViewItems();
