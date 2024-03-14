@@ -1,6 +1,8 @@
 package io.github.vcvitaly.k8cp.util;
 
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import lombok.experimental.UtilityClass;
 
@@ -18,5 +20,9 @@ public class DateTimeUtil {
             return "";
         }
         return LONG_ISO_DATE_FORMATTER.format(localDateTime);
+    }
+
+    public static LocalDateTime toLocalDateTime(FileTime fileTime) {
+        return fileTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 }

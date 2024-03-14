@@ -22,7 +22,7 @@ public class PathProviderImpl implements PathProvider {
         final OsFamily osFamily = localOsFamilyDetector.detectOsFamily();
         return switch (osFamily) {
             case WINDOWS -> Constants.WINDOWS_ROOT;
-            case UNIX -> Constants.UNIX_ROOT;
+            case LINUX, MACOS -> Constants.UNIX_ROOT;
         };
     }
 }

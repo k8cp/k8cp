@@ -9,7 +9,9 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
+import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
+import io.github.vcvitaly.k8cp.enumeration.OsFamily;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
@@ -103,6 +105,24 @@ public class Model {
             currentPath = currentPath.getParent();
         }
         return reversedTree.stream().toList().reversed();
+    }
+
+    public static List<RootInfoContainer> listLocalRoots() throws IOOperationException {
+        final OsFamily osFamily = LocalOsFamilyDetectorHolder.instance.detectOsFamily();
+        LocalFsService fsService = LocalFsServiceHolder.instance;
+        return switch (osFamily) {
+            case WINDOWS -> fsService.listWindowsRoots();
+            case LINUX -> fsService.listLinuxRoots();
+            case MACOS -> fsService.listMacosRoots();
+        };
+    }
+
+    public static RootInfoContainer getMainRoot() {
+        final OsFamily osFamily = LocalOsFamilyDetectorHolder.instance.detectOsFamily();
+        return switch (osFamily) {
+            case WINDOWS -> new RootInfoContainer(Constants.WINDOWS_ROOT, FileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT)));
+            case LINUX, MACOS -> new RootInfoContainer(Constants.UNIX_ROOT, Constants.UNIX_ROOT);
+        };
     }
 
     public static FileInfoContainer getRemoteParentDirectory() {

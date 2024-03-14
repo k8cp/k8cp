@@ -1,0 +1,5 @@
+.control-row-box {
+    -fx-alignment: center_left;
+    -fx-spacing: 3;
+    -fx-padding: 2;
+}

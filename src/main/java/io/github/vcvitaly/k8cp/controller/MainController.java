@@ -2,10 +2,12 @@ package io.github.vcvitaly.k8cp.controller;
 
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
+import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.model.Mock;
 import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -31,6 +34,7 @@ public class MainController implements Initializable {
     public Button leftMoveBtn;
     public Button leftDeleteBtn;
     public Button leftRenameBtn;
+    public ChoiceBox<RootInfoContainer> localRootSelector;
     public BreadCrumbBar<BreadCrumbFile> leftBreadcrumbBar;
     public TableView<FileManagerItem> leftView;
     public Button parentRightBtn;
@@ -49,8 +53,8 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             initLeftView();
-        } catch (IOOperationException e) {
-            log.error("Could list local files", e);
+        } catch (Exception e) {
+            log.error("Could not init left view", e);
             View.getInstance().showErrorModal(e.getMessage());
         }
         mockRightView();
@@ -66,6 +70,7 @@ public class MainController implements Initializable {
         initLeftViewCrumb();
         initLeftViewItems();
         initLeftViewButtons();
+        initLocalRootSelector();
         leftBreadcrumbBar.selectedCrumbProperty()
                 .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
     }
@@ -92,20 +97,34 @@ public class MainController implements Initializable {
         leftRefreshBtn.setOnAction(e -> onLeftRefreshBtn());
     }
 
+    private void initLocalRootSelector() throws IOOperationException {
+        final List<RootInfoContainer> roots = Model.listLocalRoots();
+        localRootSelector.setItems(FXCollections.observableList(roots));
+        localRootSelector.setValue(ItemSelectionUtil.getSelectionItem(roots, rootInfoContainer -> true));
+        localRootSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                onLocalRootSelection();
+            }
+        });
+    }
+
     private void onLeftParentBtn() {
         Model.setLocalPathRefToParent();
+        localRootSelector.setValue(Model.getMainRoot());
         initLeftViewCrumb();
         initLeftViewItems();
     }
 
     private void onLeftHomeBtn() {
         Model.setLocalPathRefToHome();
+        localRootSelector.setValue(Model.getMainRoot());
         initLeftViewCrumb();
         initLeftViewItems();
     }
 
     private void onLeftRootBtn() {
         Model.setLocalPathRefToRoot();
+        localRootSelector.setValue(Model.getMainRoot());
         initLeftViewCrumb();
         initLeftViewItems();
     }
@@ -143,6 +162,13 @@ public class MainController implements Initializable {
 
     private void onLeftBreadcrumb(BreadCrumbFile selection) {
         Model.setLocalPathRef(selection.getPath());
+        initLeftViewItems();
+    }
+
+    private void onLocalRootSelection() {
+        final RootInfoContainer root = localRootSelector.getValue();
+        Model.setLocalPathRef(root.path());
+        initLeftViewCrumb();
         initLeftViewItems();
     }
 }
