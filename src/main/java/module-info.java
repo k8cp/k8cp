@@ -9,7 +9,6 @@ module io.github.vcvitaly.k8cp {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome5;
-    requires org.kordamp.bootstrapfx.core;
 
     requires org.slf4j;
     requires ch.qos.logback.core;
@@ -31,6 +30,7 @@ module io.github.vcvitaly.k8cp {
     exports io.github.vcvitaly.k8cp.controller;
     exports io.github.vcvitaly.k8cp.controller.menu;
     exports io.github.vcvitaly.k8cp.domain;
+    exports io.github.vcvitaly.k8cp.enumeration;
     opens io.github.vcvitaly.k8cp.controller to javafx.fxml;
     opens io.github.vcvitaly.k8cp.controller.menu to javafx.fxml;
 }

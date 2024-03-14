@@ -8,8 +8,6 @@
 <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <Label text="k8cp version 0.0.1" />
    <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-      <image>
-         <Image url="@../images/k8cp_icon.png" />
-      </image>
+      <Image url="@../images/k8cp_icon.png"/>
    </ImageView>
 </VBox>

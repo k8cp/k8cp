@@ -10,7 +10,8 @@ public enum FxmlView {
     KUBE_CONFIG_SELECTION("/fxml/kubeConfigSelection.fxml"),
     KUBE_NAMESPACE_SELECTION("/fxml/kubeNamespaceSelection.fxml"),
     KUBE_POD_SELECTION("/fxml/kubePodSelection.fxml"),
-    ERROR("/fxml/error.fxml");
+    ERROR("/fxml/error.fxml"),
+    FILE_INFO("/fxml/aboutFile.fxml");
 
     @Getter
     private final String resourcePath;

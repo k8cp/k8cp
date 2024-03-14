@@ -4,70 +4,138 @@ import io.github.vcvitaly.k8cp.client.KubeClient;
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.KubeClientImpl;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
+import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
+import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
+import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
+import io.github.vcvitaly.k8cp.enumeration.FileType;
+import io.github.vcvitaly.k8cp.enumeration.OsFamily;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
-import io.github.vcvitaly.k8cp.service.HomePathProvider;
 import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
 import io.github.vcvitaly.k8cp.service.KubeConfigSelectionService;
 import io.github.vcvitaly.k8cp.service.KubeService;
+import io.github.vcvitaly.k8cp.service.LocalFsService;
+import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
+import io.github.vcvitaly.k8cp.service.PathProvider;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
-import io.github.vcvitaly.k8cp.service.impl.HomePathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigHelperImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigSelectionServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
+import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
+import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
+import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
-import io.github.vcvitaly.k8cp.view.ViewFactory;
+import io.github.vcvitaly.k8cp.util.FileUtil;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Model {
+    private static final String NEW_INSTANCE_OF_MSG = "Created a new instance of %s";
     private static final AtomicReference<KubeConfigContainer> kubeConfigSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
-    private static final String NEW_INSTANCE_OF_MSG = "Created a new instance of %s";
+    private static final AtomicReference<String> localPathRef = new AtomicReference<>(PathProviderHolder.instance.provideLocalHomePath());
 
-    @Getter
-    @Setter
-    private String podName;
-    @Getter
-    private final ViewFactory viewFactory;
-    private final LocalFsClient localFsClient;
-    private final KubeConfigHelper kubeConfigHelper;
-    private final HomePathProvider homePathProvider;
-    private final KubeConfigSelectionService kubeConfigSelectionService;
+    private Model() {}
 
-    private Model() {
-        viewFactory = ViewFactory.getInstance();
-        localFsClient = new LocalFsClientImpl();
-        kubeConfigHelper = new KubeConfigHelperImpl();
-        homePathProvider = new HomePathProviderImpl();
-        kubeConfigSelectionService = new KubeConfigSelectionServiceImpl(localFsClient, kubeConfigHelper);
-    }
-
-    public ObservableList<KubeConfigContainer> getKubeConfigList() throws IOOperationException, KubeContextExtractionException {
-        final String homePath = homePathProvider.provideHomePath();
-        final List<KubeConfigContainer> configChoices = kubeConfigSelectionService
+    public static ObservableList<KubeConfigContainer> getKubeConfigList() throws IOOperationException, KubeContextExtractionException {
+        final String homePath = PathProviderHolder.instance.provideLocalHomePath();
+        final List<KubeConfigContainer> configChoices = KubeConfigSelectionServiceHolder.instance
                 .getConfigChoices(Paths.get(homePath, Constants.KUBE_FOLDER).toString());
         return FXCollections.observableList(configChoices);
     }
 
-    public KubeConfigContainer getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
-        return kubeConfigSelectionService.toKubeConfig(path);
+    public static KubeConfigContainer getKubeConfigSelectionDto(Path path) throws KubeContextExtractionException {
+        return KubeConfigSelectionServiceHolder.instance.toKubeConfig(path);
     }
 
+    public static List<KubeNamespace> getKubeNamespaces() throws KubeApiException {
+        return KubeServiceHolder.instance.getNamespaces();
+    }
+
+    public static List<KubePod> getKubePods() throws KubeApiException {
+        if (kubeNamespaceSelectionRef.get() == null) {
+            throw logAndReturnRuntimeException(new IllegalStateException("Kube namespace has to be selected first"));
+        }
+        return KubeServiceHolder.instance.getPods(kubeNamespaceSelectionRef.get().name());
+    }
+
+    public static FileInfoContainer getLocalParentDirectory() {
+        final String parentPath = getLocalParentPath();
+        return FileInfoContainer.builder()
+                .path(parentPath)
+                .name(Constants.PARENT_DIR_NAME)
+                .fileType(FileType.PARENT_DIRECTORY)
+                .build();
+    }
+
+    public static List<FileInfoContainer> listLocalFiles() throws IOOperationException {
+        final String localPath = getLocalPathRef();
+        final List<FileInfoContainer> files = new ArrayList<>(
+                LocalFsServiceHolder.instance.listFiles(localPath, false)
+        );
+        if (!FileUtil.isRoot(Paths.get(localPath))) {
+            files.add(getLocalParentDirectory());
+        }
+        files.sort(Comparator.naturalOrder());
+        return files;
+    }
+
+    public static List<BreadCrumbFile> resolveLocalBreadcrumbTree() {
+        final String currentPathStr = getLocalPathRef();
+        Path currentPath = Paths.get(currentPathStr);
+        final Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
+        while (currentPath != null) {
+            reversedTree.add(toBreadCrumbFile(currentPath));
+            currentPath = currentPath.getParent();
+        }
+        return reversedTree.stream().toList().reversed();
+    }
+
+    public static List<RootInfoContainer> listLocalRoots() throws IOOperationException {
+        final OsFamily osFamily = LocalOsFamilyDetectorHolder.instance.detectOsFamily();
+        LocalFsService fsService = LocalFsServiceHolder.instance;
+        return switch (osFamily) {
+            case WINDOWS -> fsService.listWindowsRoots();
+            case LINUX -> fsService.listLinuxRoots();
+            case MACOS -> fsService.listMacosRoots();
+        };
+    }
+
+    public static RootInfoContainer getMainRoot() {
+        final OsFamily osFamily = LocalOsFamilyDetectorHolder.instance.detectOsFamily();
+        return switch (osFamily) {
+            case WINDOWS -> new RootInfoContainer(Constants.WINDOWS_ROOT, FileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT)));
+            case LINUX, MACOS -> new RootInfoContainer(Constants.UNIX_ROOT, Constants.UNIX_ROOT);
+        };
+    }
+
+    public static FileInfoContainer getRemoteParentDirectory() {
+        // TODO
+        return null;
+    }
+
+    public static List<FileInfoContainer> listRemoteFiles() {
+        // TODO
+        return null;
+    }
+
+    /* Setters */
     public static void setKubeConfigSelection(KubeConfigContainer selection) {
         kubeConfigSelectionRef.set(selection);
         log.info("Set kube config selection to [{}]", selection);
@@ -83,32 +151,78 @@ public class Model {
         log.info("Set kube pod selection to [{}]", selection);
     }
 
-    public static Model getInstance() {
-        return ModelHolder.model;
-    }
-
-    public static List<KubeNamespace> getKubeNamespaces() throws KubeApiException {
-        return KubeServiceHolder.kubeService.getNamespaces();
-    }
-
-    public static List<KubePod> getKubePods() throws KubeApiException {
-        if (kubeNamespaceSelectionRef.get() == null) {
-            throw new IllegalStateException("Kube namespace has to be selected first");
+    public static void setLocalPathRef(String path) {
+        if (compareAndSetLocalPathRef(path)) {
+            log.info("Set local path ref to [{}]", path);
         }
-        return KubeServiceHolder.kubeService.getPods(kubeNamespaceSelectionRef.get().name());
     }
 
-    private static class ModelHolder {
-        private static final Model model = new Model();
+    public static void setLocalPathRefToParent() {
+        final String parent = getLocalParentPath();
+        if (compareAndSetLocalPathRef(parent)) {
+            log.info("Set local path ref to parent [{}]", parent);
+        }
+
     }
 
+    public static void setLocalPathRefToHome() {
+        final String homePath = PathProviderHolder.instance.provideLocalHomePath();
+        if (compareAndSetLocalPathRef(homePath)) {
+            log.info("Set local path ref to home path [{}]", homePath);
+        }
+    }
+
+    public static void setLocalPathRefToRoot() {
+        final String rootPath = PathProviderHolder.instance.provideLocalRootPath();
+        if (compareAndSetLocalPathRef(rootPath)) {
+            log.info("Set local path ref to root path [{}]", rootPath);
+        }
+    }
+
+    public static synchronized String getLocalPathRef() {
+        return localPathRef.get();
+    }
+
+    /* Private methods */
+    private static void logCreatedNewInstanceOf(Object o) {
+        log.info(NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
+    }
+
+    private static RuntimeException logAndReturnRuntimeException(RuntimeException e) {
+        log.error("Error: ", e);
+        return e;
+    }
+
+    private static BreadCrumbFile toBreadCrumbFile(Path path) {
+        final String pathName = FileUtil.getPathFilename(path);
+        return new BreadCrumbFile(path.toString(), pathName);
+    }
+
+    private static String getLocalParentPath() {
+        final Path path = Paths.get(getLocalPathRef());
+        if (FileUtil.isRoot(path)) {
+            return path.toString();
+        }
+        return path.getParent().toString();
+    }
+
+    private static synchronized boolean compareAndSetLocalPathRef(String path) {
+        final String curPath = localPathRef.get();
+        if (!path.equals(curPath)) {
+            localPathRef.set(path);
+            return true;
+        }
+        return false;
+    }
+
+    /* Holders */
     private static class KubeClientHolder {
-        private static final KubeClient kubeClient = getInstance();
+        private static final KubeClient instance = getInstance();
 
         private static KubeClient getInstance() {
             final KubeConfigContainer kubeConfigContainer = kubeConfigSelectionRef.get();
             if (kubeConfigContainer == null) {
-                throw new IllegalStateException("Kube config initialization has to be done first");
+                throw logAndReturnRuntimeException(new IllegalStateException("Kube config initialization has to be done first"));
             }
             final KubeClient instance = new KubeClientImpl(kubeConfigContainer);
             logCreatedNewInstanceOf(instance);
@@ -116,19 +230,89 @@ public class Model {
         }
     }
 
-    private static class KubeServiceHolder {
-        private static final KubeService kubeService = getInstance();
+    private static class SizeConverterHolder {
+        private static final SizeConverter instance = getInstance();
 
-        private static KubeService getInstance() {
+        private static SizeConverter getInstance() {
             final SizeConverter sizeConverter = new SizeConverterImpl();
             logCreatedNewInstanceOf(sizeConverter);
-            final KubeServiceImpl instance = new KubeServiceImpl(KubeClientHolder.kubeClient, sizeConverter);
+            return sizeConverter;
+        }
+    }
+
+    private static class KubeServiceHolder {
+        private static final KubeService instance = getInstance();
+
+        private static KubeService getInstance() {
+            final KubeServiceImpl instance = new KubeServiceImpl(
+                    KubeClientHolder.instance, SizeConverterHolder.instance
+            );
             logCreatedNewInstanceOf(instance);
             return instance;
         }
     }
 
-    private static void logCreatedNewInstanceOf(Object o) {
-        log.info(NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
+    private static class LocalFsClientHolder {
+        private static final LocalFsClient instance = getInstance();
+
+        private static LocalFsClient getInstance() {
+            final LocalFsClientImpl instance = new LocalFsClientImpl();
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class LocalFsServiceHolder {
+        private static final LocalFsService instance = getInstance();
+
+        private static LocalFsService getInstance() {
+            final LocalFsServiceImpl instance = new LocalFsServiceImpl(
+                    LocalFsClientHolder.instance, SizeConverterHolder.instance
+            );
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class KubeConfigHelperHolder {
+        private static final KubeConfigHelper instance = getInstance();
+
+        private static KubeConfigHelper getInstance() {
+            final KubeConfigHelper instance = new KubeConfigHelperImpl();
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class PathProviderHolder {
+        private static final PathProvider instance = getInstance();
+
+        private static PathProvider getInstance() {
+            final PathProvider instance = new PathProviderImpl(LocalOsFamilyDetectorHolder.instance);
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    public static class KubeConfigSelectionServiceHolder {
+        private static final KubeConfigSelectionService instance = getInstance();
+
+        private static KubeConfigSelectionService getInstance() {
+            final KubeConfigSelectionService instance = new KubeConfigSelectionServiceImpl(
+                    LocalFsClientHolder.instance, KubeConfigHelperHolder.instance
+            );
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class LocalOsFamilyDetectorHolder {
+        private static final LocalOsFamilyDetector instance = getInstance();
+
+        private static LocalOsFamilyDetector getInstance() {
+            final LocalOsFamilyDetector instance = new LocalOsFamilyDetectorImpl();
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
     }
 }

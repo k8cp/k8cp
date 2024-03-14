@@ -4,6 +4,7 @@ import io.github.vcvitaly.k8cp.domain.KubePod;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
+import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -47,20 +48,20 @@ public class KubePodSelectionController implements Initializable {
         } catch (KubeApiException e) {
             log.error("Could not get pod list", e);
             errorLbl.setText("Could not get pod list");
-            Model.getInstance().getViewFactory().showErrorModal(e.getMessage());
+            View.getInstance().showErrorModal(e.getMessage());
         }
     }
 
     private void onNext() {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
-        Model.getInstance().getViewFactory().closeStage(selectionStage);
-        Model.getInstance().getViewFactory().showMainWindow();
+        View.getInstance().closeStage(selectionStage);
+        View.getInstance().showMainWindow();
     }
 
     private void onPrev() {
         final Stage selectionStage = (Stage) prevBtn.getScene().getWindow();
-        Model.getInstance().getViewFactory().closeStage(selectionStage);
-        Model.getInstance().getViewFactory().showKubeNamespaceSelectionWindow();
+        View.getInstance().closeStage(selectionStage);
+        View.getInstance().showKubeNamespaceSelectionWindow();
     }
 
     private void setKubePodSelection() {

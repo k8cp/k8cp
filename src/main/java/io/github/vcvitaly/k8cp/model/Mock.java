@@ -30,27 +30,25 @@ public class Mock {
         FileManagerItem parentDirDto = FileManagerItem.builder()
                 .path("C:\\Users\\")
                 .name(parentDirName)
-                .size("")
-                .sizeUnit("")
-                .fileType(FileType.PARENT_DIRECTORY.toString())
+                .fileType(FileType.PARENT_DIRECTORY)
                 .changedAt("2024-03-10 08:35")
                 .build();
         final String fileName = "file.txt";
         FileManagerItem fileDto = FileManagerItem.builder()
                 .path("C:\\Users\\" + fileName)
                 .name(fileName)
-                .size(String.valueOf(1))
-                .sizeUnit(FileSizeUnit.KB.toString())
-                .fileType(FileType.FILE.toString())
+                .size(1)
+                .sizeUnit(FileSizeUnit.KB)
+                .fileType(FileType.FILE)
                 .changedAt("2024-03-10 08:35")
                 .build();
         final String dirName = "some_dir";
         FileManagerItem dirDto = FileManagerItem.builder()
                 .path("C:\\Users\\" + dirName)
                 .name(dirName)
-                .size(String.valueOf(4))
-                .sizeUnit(FileSizeUnit.KB.toString())
-                .fileType(FileType.DIRECTORY.toString())
+                .size(4)
+                .sizeUnit(FileSizeUnit.KB)
+                .fileType(FileType.DIRECTORY)
                 .changedAt("2024-03-10 08:34")
                 .build();
         return FXCollections.observableArrayList(parentDirDto, dirDto, fileDto);
@@ -61,18 +59,16 @@ public class Mock {
         FileManagerItem parentDirDto = FileManagerItem.builder()
                 .path("/home")
                 .name(parentDirName)
-                .size("")
-                .sizeUnit("")
-                .fileType(FileType.PARENT_DIRECTORY.toString())
+                .fileType(FileType.PARENT_DIRECTORY)
                 .changedAt("2024-03-10 08:35")
                 .build();
         final String fileName = "file.txt";
         FileManagerItem fileDto = FileManagerItem.builder()
                 .path("/home/user/" + fileName)
                 .name(fileName)
-                .size(String.valueOf(1))
-                .sizeUnit(FileSizeUnit.KB.toString())
-                .fileType(FileType.FILE.toString())
+                .size(1)
+                .sizeUnit(FileSizeUnit.KB)
+                .fileType(FileType.FILE)
                 .changedAt("2024-03-10 08:35")
                 .build();
         return FXCollections.observableArrayList(parentDirDto, fileDto);
