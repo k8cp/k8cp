@@ -42,7 +42,7 @@ public class LocalPaneController extends PaneController {
             initView();
             initLocalRootSelector();
         } catch (Exception e) {
-            log.error("Could not init left view", e);
+            log.error("Could not init the local view", e);
             View.getInstance().showErrorModal(e.getMessage());
         }
     }
@@ -64,7 +64,7 @@ public class LocalPaneController extends PaneController {
             final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(Model.listLocalFiles());
             leftView.setItems(FXCollections.observableList(fileMangerItems));
         } catch (IOOperationException e) {
-            log.error("Could list local files", e);
+            log.error("Could not list the local files", e);
             View.getInstance().showErrorModal(e.getMessage());
         }
     }
