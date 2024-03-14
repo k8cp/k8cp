@@ -1,5 +1,6 @@
 package io.github.vcvitaly.k8cp.enumeration;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,5 +17,12 @@ public enum FileType {
     @Override
     public String toString() {
         return valueName;
+    }
+
+    public static FileType ofValueName(String valueName) {
+        return Arrays.stream(values())
+                .filter(v -> v.getValueName().equals(valueName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown value name: " + valueName));
     }
 }

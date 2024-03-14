@@ -9,6 +9,8 @@ public class Constants {
 
     public static final String ERROR_TITLE_SUFFIX = "Error";
 
+    public static final String FILE_INFO_TITLE_SUFFIX = "file info";
+
     public static final String KUBE_FOLDER = ".kube";
 
     public static final String DEFAULT_CONFIG_FILE_NAME = "config";

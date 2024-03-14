@@ -1,6 +1,7 @@
 package io.github.vcvitaly.k8cp.view;
 
 import io.github.vcvitaly.k8cp.controller.ErrorController;
+import io.github.vcvitaly.k8cp.controller.FileInfoController;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
@@ -65,7 +66,7 @@ public class View {
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.ERROR)
                         .modality(Modality.APPLICATION_MODAL)
-                        .title("%s %s".formatted(Constants.TITLE, Constants.ERROR_TITLE_SUFFIX))
+                        .title("%s - %s".formatted(Constants.TITLE, Constants.ERROR_TITLE_SUFFIX))
                         .controller(new ErrorController(errorMsg))
                         .resizeable(false)
                         .build()
@@ -99,6 +100,18 @@ public class View {
         );
     }
 
+    public void showFileInfoModal(String fileInfo) {
+        createStageAndShow(
+                StageCreationParam.builder()
+                        .fxmlView(FxmlView.FILE_INFO)
+                        .modality(Modality.APPLICATION_MODAL)
+                        .title("%s - %s".formatted(Constants.TITLE, Constants.FILE_INFO_TITLE_SUFFIX))
+                        .controller(new FileInfoController(fileInfo))
+                        .resizeable(false)
+                        .build()
+        );
+    }
+
     /* Other public methods */
     public List<FileManagerItem> toFileMangerItems(List<FileInfoContainer> fileInfoContainers) {
         return fileInfoContainers.stream()
@@ -108,6 +121,22 @@ public class View {
 
     public TreeItem<BreadCrumbFile> toTreeItem(List<BreadCrumbFile> breadCrumbFiles) {
         return BreadCrumbBar.buildTreeModel(breadCrumbFiles.toArray(BreadCrumbFile[]::new));
+    }
+
+    public String toFileItemInfo(FileManagerItem fileManagerItem) {
+        return """
+                Name: %s
+                Path: %s
+                Size: %s
+                Type: %s
+                Changed: %s
+                """.formatted(
+                fileManagerItem.getName(),
+                fileManagerItem.getPath(),
+                fileManagerItem.getSize(),
+                fileManagerItem.getFileType(),
+                fileManagerItem.getChangedAt()
+        );
     }
 
     /* Private methods */

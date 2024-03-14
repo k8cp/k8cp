@@ -4,6 +4,7 @@ import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
+import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.model.Mock;
 import io.github.vcvitaly.k8cp.model.Model;
@@ -18,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -71,6 +73,7 @@ public class MainController implements Initializable {
         initLeftViewItems();
         initLeftViewButtons();
         initLocalRootSelector();
+        initLocalTableSelectionAction();
         leftBreadcrumbBar.selectedCrumbProperty()
                 .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
     }
@@ -170,5 +173,28 @@ public class MainController implements Initializable {
         Model.setLocalPathRef(root.path());
         initLeftViewCrumb();
         initLeftViewItems();
+    }
+
+    private void initLocalTableSelectionAction() {
+        leftView.setRowFactory(tv -> {
+            final TableRow<FileManagerItem> row = new TableRow<>();
+            row.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2 && !row.isEmpty()) {
+                    final FileManagerItem item = row.getItem();
+                    final FileType fileType = FileType.ofValueName(item.getFileType());
+                    if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
+                        Model.setLocalPathRef(item.getPath());
+                        initLeftViewCrumb();
+                        initLeftViewItems();
+                    }
+                    if (fileType == FileType.FILE) {
+                        final String fileItemInfo = View.getInstance().toFileItemInfo(item);
+                        View.getInstance().showFileInfoModal(fileItemInfo);
+                    }
+                    throw new IllegalArgumentException("Unsupported file type " + fileType);
+                }
+            });
+            return row;
+        });
     }
 }
