@@ -35,34 +35,31 @@ public class LocalPaneController extends PaneController {
     public ChoiceBox<RootInfoContainer> localRootSelector;
     public BreadCrumbBar<BreadCrumbFile> leftBreadcrumbBar;
     public TableView<FileManagerItem> leftView;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            initLeftView();
+            initView();
+            initLocalRootSelector();
         } catch (Exception e) {
             log.error("Could not init left view", e);
             View.getInstance().showErrorModal(e.getMessage());
         }
     }
 
-    private void initLeftView() throws IOOperationException {
-        leftView.setPlaceholder(getNoRowsToDisplayLbl());
-        leftView.getColumns().addAll(getTableColumns());
-        initLeftViewCrumb();
-        initLeftViewItems();
-        initLeftViewButtons();
-        initLocalRootSelector();
-        initLocalViewMouseSelection();
-        initLocalViewEnterKeySelection();
-        leftBreadcrumbBar.selectedCrumbProperty()
-                .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
+    @Override
+    protected TableView<FileManagerItem> getView() {
+        return leftView;
     }
-    private void initLeftViewCrumb() {
+
+    @Override
+    protected void initViewCrumb() {
         final TreeItem<BreadCrumbFile> treeItem = View.getInstance().toTreeItem(Model.resolveLocalBreadcrumbTree());
         leftBreadcrumbBar.setSelectedCrumb(treeItem);
     }
 
-    private void initLeftViewItems() {
+    @Override
+    protected void initViewItems() {
         try {
             final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(Model.listLocalFiles());
             leftView.setItems(FXCollections.observableList(fileMangerItems));
@@ -72,11 +69,55 @@ public class LocalPaneController extends PaneController {
         }
     }
 
-    private void initLeftViewButtons() {
+    @Override
+    protected void initViewButtons() {
         leftParentBtn.setOnAction(e -> onLeftParentBtn());
         leftHomeBtn.setOnAction(e -> onLeftHomeBtn());
         leftRootBtn.setOnAction(e -> onLeftRootBtn());
         leftRefreshBtn.setOnAction(e -> onLeftRefreshBtn());
+    }
+
+    @Override
+    protected void initViewMouseSelection() {
+        leftView.setRowFactory(tv -> {
+            final TableRow<FileManagerItem> row = new TableRow<>();
+            row.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2 && !row.isEmpty()) {
+                    handleLeftViewSelectionAction(row.getItem());
+                }
+            });
+            return row;
+        });
+    }
+
+    private void handleLeftViewSelectionAction(FileManagerItem item) {
+        final FileType fileType = FileType.ofValueName(item.getFileType());
+        if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
+            Model.setLocalPathRef(item.getPath());
+            initViewCrumb();
+            initViewItems();
+        } else if (fileType == FileType.FILE) {
+            final String fileItemInfo = View.getInstance().toFileItemInfo(item);
+            View.getInstance().showFileInfoModal(fileItemInfo);
+        } else {
+            throw new IllegalArgumentException("Unsupported file type " + fileType);
+        }
+    }
+
+    @Override
+    protected void initViewEnterKeySelection() {
+        leftView.setOnKeyPressed(e -> {
+            if (!leftView.getSelectionModel().isEmpty() && e.getCode() == KeyCode.ENTER) {
+                handleLeftViewSelectionAction(leftView.getSelectionModel().getSelectedItem());
+                e.consume();
+            }
+        });
+    }
+
+    @Override
+    protected void initBreadCrumbListener() {
+        leftBreadcrumbBar.selectedCrumbProperty()
+                .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
     }
 
     private void initLocalRootSelector() throws IOOperationException {
@@ -93,32 +134,32 @@ public class LocalPaneController extends PaneController {
     private void onLeftParentBtn() {
         Model.setLocalPathRefToParent();
         localRootSelector.setValue(Model.getMainRoot());
-        initLeftViewCrumb();
-        initLeftViewItems();
+        initViewCrumb();
+        initViewItems();
     }
 
     private void onLeftHomeBtn() {
         Model.setLocalPathRefToHome();
         localRootSelector.setValue(Model.getMainRoot());
-        initLeftViewCrumb();
-        initLeftViewItems();
+        initViewCrumb();
+        initViewItems();
     }
 
     private void onLeftRootBtn() {
         Model.setLocalPathRefToRoot();
         localRootSelector.setValue(Model.getMainRoot());
-        initLeftViewCrumb();
-        initLeftViewItems();
+        initViewCrumb();
+        initViewItems();
     }
 
     private void onLeftRefreshBtn() {
-        initLeftViewCrumb();
-        initLeftViewItems();
+        initViewCrumb();
+        initViewItems();
     }
 
     private void onLeftBreadcrumb(BreadCrumbFile selection) {
         Model.setLocalPathRef(selection.getPath());
-        initLeftViewItems();
+        initViewItems();
     }
 
     private void onLocalRootSelection() {
@@ -126,43 +167,8 @@ public class LocalPaneController extends PaneController {
         final String rootPath = root.path();
         if (!FileUtil.isInTheSameRoot(rootPath, Model.getLocalPathRef())) {
             Model.setLocalPathRef(rootPath);
-            initLeftViewCrumb();
-            initLeftViewItems();
+            initViewCrumb();
+            initViewItems();
         }
-    }
-
-    private void initLocalViewMouseSelection() {
-        leftView.setRowFactory(tv -> {
-            final TableRow<FileManagerItem> row = new TableRow<>();
-            row.setOnMouseClicked(e -> {
-                if (e.getClickCount() == 2 && !row.isEmpty()) {
-                    handleLeftViewSelectionAction(row.getItem());
-                }
-            });
-            return row;
-        });
-    }
-
-    private void handleLeftViewSelectionAction(FileManagerItem item) {
-        final FileType fileType = FileType.ofValueName(item.getFileType());
-        if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
-            Model.setLocalPathRef(item.getPath());
-            initLeftViewCrumb();
-            initLeftViewItems();
-        } else if (fileType == FileType.FILE) {
-            final String fileItemInfo = View.getInstance().toFileItemInfo(item);
-            View.getInstance().showFileInfoModal(fileItemInfo);
-        } else {
-            throw new IllegalArgumentException("Unsupported file type " + fileType);
-        }
-    }
-
-    private void initLocalViewEnterKeySelection() {
-        leftView.setOnKeyPressed(e -> {
-            if (!leftView.getSelectionModel().isEmpty() && e.getCode() == KeyCode.ENTER) {
-                handleLeftViewSelectionAction(leftView.getSelectionModel().getSelectedItem());
-                e.consume();
-            }
-        });
     }
 }

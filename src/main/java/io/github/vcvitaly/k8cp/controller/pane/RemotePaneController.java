@@ -26,6 +26,41 @@ public class RemotePaneController extends PaneController {
         mockRightView();
     }
 
+    @Override
+    protected TableView<FileManagerItem> getView() {
+        return rightView;
+    }
+
+    @Override
+    protected void initViewCrumb() {
+
+    }
+
+    @Override
+    protected void initViewItems() {
+
+    }
+
+    @Override
+    protected void initViewButtons() {
+
+    }
+
+    @Override
+    protected void initViewMouseSelection() {
+
+    }
+
+    @Override
+    protected void initViewEnterKeySelection() {
+
+    }
+
+    @Override
+    protected void initBreadCrumbListener() {
+
+    }
+
     private void mockRightView() {
         mockRightBreadcrumbBar();
         rightView.setPlaceholder(getNoRowsToDisplayLbl());

@@ -2,10 +2,12 @@ package io.github.vcvitaly.k8cp.controller.pane;
 
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import java.util.List;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 public abstract class PaneController implements Initializable {
@@ -29,4 +31,29 @@ public abstract class PaneController implements Initializable {
         col.setCellValueFactory(new PropertyValueFactory<>(column.getFileManagerItemFieldName()));
         return col;
     }
+
+    protected abstract TableView<FileManagerItem> getView();
+
+    protected void initView() throws IOOperationException {
+        getView().setPlaceholder(getNoRowsToDisplayLbl());
+        getView().getColumns().addAll(getTableColumns());
+        initViewCrumb();
+        initViewItems();
+        initViewButtons();
+        initViewMouseSelection();
+        initViewEnterKeySelection();
+        initBreadCrumbListener();
+    }
+
+    protected abstract void initViewCrumb();
+
+    protected abstract void initViewItems();
+
+    protected abstract void initViewButtons();
+
+    protected abstract void initViewMouseSelection();
+
+    protected abstract void initViewEnterKeySelection();
+
+    protected abstract void initBreadCrumbListener();
 }
