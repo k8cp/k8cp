@@ -23,6 +23,7 @@ public class KubeServiceImpl implements KubeService {
 
     private static final List<String> LS_PARTS = List.of("ls", "--time-style=long-iso", "-l");
     private static final String DIRECTORY_MODIFIER = "d";
+    private static final String SYMLINK_MODIFIER = "l";
 
     private final KubeClient kubeClient;
     private final SizeConverter sizeConverter;
@@ -78,6 +79,9 @@ public class KubeServiceImpl implements KubeService {
     private FileType getType(String attrs) {
         if (attrs.startsWith(DIRECTORY_MODIFIER)) {
             return FileType.DIRECTORY;
+        }
+        if (attrs.startsWith(SYMLINK_MODIFIER)) {
+            return FileType.SYMLINK;
         }
         return FileType.FILE;
     }
