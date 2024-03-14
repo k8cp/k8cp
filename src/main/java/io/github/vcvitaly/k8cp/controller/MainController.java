@@ -75,8 +75,8 @@ public class MainController implements Initializable {
         initLeftViewItems();
         initLeftViewButtons();
         initLocalRootSelector();
-        initLocalViewSelectionAction();
-        initLocalViewKeyPressed();
+        initLocalViewMouseSelection();
+        initLocalViewEnterKeySelection();
         leftBreadcrumbBar.selectedCrumbProperty()
                 .addListener((observable, oldValue, newValue) -> onLeftBreadcrumb(newValue.getValue()));
     }
@@ -180,7 +180,7 @@ public class MainController implements Initializable {
         }
     }
 
-    private void initLocalViewSelectionAction() {
+    private void initLocalViewMouseSelection() {
         leftView.setRowFactory(tv -> {
             final TableRow<FileManagerItem> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -206,7 +206,7 @@ public class MainController implements Initializable {
         }
     }
 
-    private void initLocalViewKeyPressed() {
+    private void initLocalViewEnterKeySelection() {
         leftView.setOnKeyPressed(e -> {
             if (!leftView.getSelectionModel().isEmpty() && e.getCode() == KeyCode.ENTER) {
                 handleLeftViewSelectionAction(leftView.getSelectionModel().getSelectedItem());
