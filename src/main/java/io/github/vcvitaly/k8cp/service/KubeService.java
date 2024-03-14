@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface KubeService {
 
-    List<FileInfoContainer> listFiles(String namespace, String podName, String path) throws IOOperationException;
+    List<FileInfoContainer> listFiles(String namespace, String podName, String path, boolean showHidden) throws IOOperationException;
 
     List<KubeNamespace> getNamespaces() throws KubeApiException;
 

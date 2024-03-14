@@ -27,7 +27,7 @@ public class KubeServiceImpl implements KubeService {
     private final SizeConverter sizeConverter;
 
     @Override
-    public List<FileInfoContainer> listFiles(String namespace, String podName, String path) throws IOOperationException {
+    public List<FileInfoContainer> listFiles(String namespace, String podName, String path, boolean showHidden) throws IOOperationException {
         final ArrayList<String> partsList = new ArrayList<>(LS_PARTS);
         partsList.add("'%s'".formatted(path));
         final String[] cmdParts  = partsList.toArray(String[]::new);
@@ -35,6 +35,7 @@ public class KubeServiceImpl implements KubeService {
             final List<String> lines = kubeClient.execAndReturnOut(namespace, podName, cmdParts);
             return lines.stream()
                     .map(line -> toFileInfoContainer(path, line))
+                    .filter(container -> showBeShownBasedOnHiddenFlag(container, showHidden))
                     .toList();
         } catch (KubeExecException e) {
             throw new IOOperationException("Could not get a list of files at [%s@%s]".formatted(podName, path), e);
@@ -77,5 +78,12 @@ public class KubeServiceImpl implements KubeService {
             return FileType.DIRECTORY;
         }
         return FileType.FILE;
+    }
+
+    private boolean showBeShownBasedOnHiddenFlag(FileInfoContainer fileInfoContainer, boolean showHidden) {
+        if (showHidden) {
+            return true;
+        }
+        return !fileInfoContainer.getName().startsWith(".");
     }
 }
