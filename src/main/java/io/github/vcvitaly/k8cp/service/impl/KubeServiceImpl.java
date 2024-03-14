@@ -30,11 +30,12 @@ public class KubeServiceImpl implements KubeService {
     @Override
     public List<FileInfoContainer> listFiles(String namespace, String podName, String path, boolean showHidden) throws IOOperationException {
         final ArrayList<String> partsList = new ArrayList<>(LS_PARTS);
-        partsList.add("'%s'".formatted(path));
+        partsList.add(path);
         final String[] cmdParts  = partsList.toArray(String[]::new);
         try {
             final List<String> lines = kubeClient.execAndReturnOut(namespace, podName, cmdParts);
             return lines.stream()
+                    .filter(line -> !line.startsWith("total"))
                     .map(line -> toFileInfoContainer(path, line))
                     .filter(container -> showBeShownBasedOnHiddenFlag(container, showHidden))
                     .toList();

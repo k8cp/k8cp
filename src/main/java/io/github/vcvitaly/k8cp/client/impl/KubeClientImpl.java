@@ -113,6 +113,10 @@ public class KubeClientImpl implements KubeClient {
 
         proc.destroy();
 
+        if (!ref.errLines.isEmpty()) {
+            log.error("Err output: {}", ref.errLines);
+        }
+
         final int exitValue = proc.exitValue();
         if (exitValue != 0) {
             log.error("Exit code: " + exitValue);
