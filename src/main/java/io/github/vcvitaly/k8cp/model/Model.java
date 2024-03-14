@@ -10,7 +10,6 @@ import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
-import io.github.vcvitaly.k8cp.enumeration.OsFamily;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
@@ -32,6 +31,8 @@ import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.FileUtil;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -82,18 +83,24 @@ public class Model {
     }
 
     public static List<FileInfoContainer> listLocalFiles() throws IOOperationException {
-        return LocalFsServiceHolder.instance.listFiles(localPathRef.get(), false);
+        final String localPath = getLocalPathRef();
+        final List<FileInfoContainer> files = new ArrayList<>(
+                LocalFsServiceHolder.instance.listFiles(localPath, false)
+        );
+        if (!FileUtil.isRoot(Paths.get(localPath))) {
+            files.add(getLocalParentDirectory());
+        }
+        files.sort(Comparator.naturalOrder());
+        return files;
     }
 
     public static List<BreadCrumbFile> resolveLocalBreadcrumbTree() {
-        Path currentPath = Paths.get(localPathRef.get());
-        Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
+        final String currentPathStr = getLocalPathRef();
+        Path currentPath = Paths.get(currentPathStr);
+        final Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
         while (currentPath != null) {
             reversedTree.add(toBreadCrumbFile(currentPath));
             currentPath = currentPath.getParent();
-        }
-        if (LocalOsFamilyDetectorHolder.instance.detectOsFamily() == OsFamily.WINDOWS) {
-            reversedTree.add(new BreadCrumbFile(Constants.WINDOWS_ROOT, Constants.WINDOWS_ROOT));
         }
         return reversedTree.stream().toList().reversed();
     }
@@ -125,26 +132,31 @@ public class Model {
     }
 
     public static void setLocalPathRef(String path) {
-        localPathRef.set(path);
-        log.info("Set local path ref to [{}]", path);
+        if (compareAndSetLocalPathRef(path)) {
+            log.info("Set local path ref to [{}]", path);
+        }
     }
 
     public static void setLocalPathRefToParent() {
         final String parent = getLocalParentPath();
-        localPathRef.set(parent);
-        log.info("Set local path ref to parent [{}]", parent);
+        if (compareAndSetLocalPathRef(parent)) {
+            log.info("Set local path ref to parent [{}]", parent);
+        }
+
     }
 
     public static void setLocalPathRefToHome() {
         final String homePath = PathProviderHolder.instance.provideLocalHomePath();
-        localPathRef.set(homePath);
-        log.info("Set local path ref to home path [{}]", homePath);
+        if (compareAndSetLocalPathRef(homePath)) {
+            log.info("Set local path ref to home path [{}]", homePath);
+        }
     }
 
     public static void setLocalPathRefToRoot() {
         final String rootPath = PathProviderHolder.instance.provideLocalRootPath();
-        localPathRef.set(rootPath);
-        log.info("Set local path ref to root path [{}]", rootPath);
+        if (compareAndSetLocalPathRef(rootPath)) {
+            log.info("Set local path ref to root path [{}]", rootPath);
+        }
     }
 
     /* Private methods */
@@ -163,7 +175,24 @@ public class Model {
     }
 
     private static String getLocalParentPath() {
-        return Paths.get(localPathRef.get()).getParent().toString();
+        final Path path = Paths.get(getLocalPathRef());
+        if (FileUtil.isRoot(path)) {
+            return path.toString();
+        }
+        return path.getParent().toString();
+    }
+
+    private static synchronized boolean compareAndSetLocalPathRef(String path) {
+        final String curPath = localPathRef.get();
+        if (!path.equals(curPath)) {
+            localPathRef.set(path);
+            return true;
+        }
+        return false;
+    }
+
+    private static synchronized String getLocalPathRef() {
+        return localPathRef.get();
     }
 
     /* Holders */

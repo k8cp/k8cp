@@ -45,9 +45,6 @@ public class LocalFsServiceImpl implements LocalFsService {
     }
 
     private List<Path> listFilesInternal(String path) throws IOOperationException {
-        if (path.equals(Constants.WINDOWS_ROOT)) {
-            return localFsClient.listFilesInWindowsRoot();
-        }
         return localFsClient.listFiles(path);
     }
 

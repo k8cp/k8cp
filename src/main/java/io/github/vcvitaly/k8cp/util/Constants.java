@@ -22,7 +22,7 @@ public class Constants {
     public static final String UNIX_ROOT = "/";
 
     // PC stands for personal computer
-    public static final String WINDOWS_ROOT = "PC";
+    public static final String WINDOWS_ROOT = "C:\\";
 
     public static final String WINDOWS_DRIVE_LETTER_SUFFIX = ":\\";
 }
