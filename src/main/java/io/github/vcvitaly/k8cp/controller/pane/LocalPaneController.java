@@ -21,6 +21,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.input.KeyCode;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.BreadCrumbBar;
+import org.slf4j.Logger;
 
 @Slf4j
 public class LocalPaneController extends PaneController {
@@ -53,6 +54,11 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
+    protected Logger getLog() {
+        return log;
+    }
+
+    @Override
     protected void initViewCrumb() {
         final TreeItem<BreadCrumbFile> treeItem = View.getInstance().toTreeItem(Model.resolveLocalBreadcrumbTree());
         leftBreadcrumbBar.setSelectedCrumb(treeItem);
@@ -60,13 +66,7 @@ public class LocalPaneController extends PaneController {
 
     @Override
     protected void initViewItems() {
-        try {
-            final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(Model.listLocalFiles());
-            leftView.setItems(FXCollections.observableList(fileMangerItems));
-        } catch (IOOperationException e) {
-            log.error("Could not list the local files", e);
-            View.getInstance().showErrorModal(e.getMessage());
-        }
+        initViewItems(Model::listLocalFiles, "local");
     }
 
     @Override

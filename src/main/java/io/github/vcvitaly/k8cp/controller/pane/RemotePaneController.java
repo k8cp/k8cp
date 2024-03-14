@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.BreadCrumbBar;
+import org.slf4j.Logger;
 
 @Slf4j
 public class RemotePaneController extends PaneController {
@@ -40,13 +41,18 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
+    protected Logger getLog() {
+        return log;
+    }
+
+    @Override
     protected void initViewCrumb() {
 
     }
 
     @Override
     protected void initViewItems() {
-
+        initViewItems(null, null);
     }
 
     @Override

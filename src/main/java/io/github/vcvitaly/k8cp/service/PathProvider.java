@@ -5,4 +5,6 @@ public interface PathProvider {
     String provideLocalHomePath();
 
     String provideLocalRootPath();
+
+    String provideRemoteRootPath();
 }
