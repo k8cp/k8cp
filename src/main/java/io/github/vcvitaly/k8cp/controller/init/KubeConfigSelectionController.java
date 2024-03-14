@@ -1,4 +1,4 @@
-package io.github.vcvitaly.k8cp.controller;
+package io.github.vcvitaly.k8cp.controller.init;
 
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;

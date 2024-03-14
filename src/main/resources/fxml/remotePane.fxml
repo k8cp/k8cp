@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.BreadCrumbBar?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="io.github.vcvitaly.k8cp.controller.pane.RemotePaneController"
+            prefHeight="575.0" prefWidth="400.0">
+    <VBox prefHeight="575.0" prefWidth="400.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <VBox prefHeight="60.0" prefWidth="400.0">
+            <HBox prefHeight="30.0" prefWidth="400.0" styleClass="control-row-box">
+                <Button fx:id="parentRightBtn" mnemonicParsing="false">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-folder-open" iconSize="15" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Parent directory" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="rootRightBtn" mnemonicParsing="false">
+                    <graphic>
+                        <FontIcon iconLiteral="mdral-account_tree" iconSize="15" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Root" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="homeRightBtn" mnemonicParsing="false">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-home" iconSize="15" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Home" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="refreshRightBtn" mnemonicParsing="false">
+                    <graphic>
+                        <FontIcon iconLiteral="fa-refresh" iconSize="15" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Refresh" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="copyRightBtn" mnemonicParsing="false">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-copy" iconSize="15" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Copy" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="moveRightBtn" mnemonicParsing="false">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-arrow-alt-circle-left" iconSize="15" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Move" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="deleteRightBtn" mnemonicParsing="false">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-trash" iconSize="15" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Delete" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="renameRightBtn" mnemonicParsing="false">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-edit" iconSize="15" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Rename" />
+                    </tooltip>
+                </Button>
+            </HBox>
+            <HBox prefHeight="30.0" prefWidth="400.0" styleClass="control-row-box" />
+        </VBox>
+        <HBox prefHeight="25.0" prefWidth="400.0" styleClass="breadcrumb-container" stylesheets="@../styles/innerContainer.css">
+            <BreadCrumbBar fx:id="rightBreadcrumbBar" prefHeight="25.0" />
+        </HBox>
+        <TableView fx:id="rightView" prefHeight="490.0" prefWidth="400.0" />
+    </VBox>
+</AnchorPane>
