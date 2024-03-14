@@ -3,6 +3,7 @@ package io.github.vcvitaly.k8cp.controller.pane;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.model.Mock;
+import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -41,18 +42,23 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
+    protected BreadCrumbBar<BreadCrumbFile> getBreadcrumbBar() {
+        return rightBreadcrumbBar;
+    }
+
+    @Override
     protected Logger getLog() {
         return log;
     }
 
     @Override
     protected void initViewCrumb() {
-
+        initViewCrumb(Model.resolveRemoteBreadcrumbTree());
     }
 
     @Override
     protected void initViewItems() {
-        initViewItems(null, null);
+        initViewItems(Model::listRemoteFiles, "remote");
     }
 
     @Override

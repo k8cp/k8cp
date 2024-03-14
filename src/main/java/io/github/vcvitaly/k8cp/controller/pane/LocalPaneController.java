@@ -17,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TreeItem;
 import javafx.scene.input.KeyCode;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.BreadCrumbBar;
@@ -54,14 +53,18 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
+    protected BreadCrumbBar<BreadCrumbFile> getBreadcrumbBar() {
+        return leftBreadcrumbBar;
+    }
+
+    @Override
     protected Logger getLog() {
         return log;
     }
 
     @Override
     protected void initViewCrumb() {
-        final TreeItem<BreadCrumbFile> treeItem = View.getInstance().toTreeItem(Model.resolveLocalBreadcrumbTree());
-        leftBreadcrumbBar.setSelectedCrumb(treeItem);
+        initViewCrumb(Model.resolveLocalBreadcrumbTree());
     }
 
     @Override
