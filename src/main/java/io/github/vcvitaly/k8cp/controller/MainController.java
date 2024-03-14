@@ -190,12 +190,12 @@ public class MainController implements Initializable {
                         Model.setLocalPathRef(item.getPath());
                         initLeftViewCrumb();
                         initLeftViewItems();
-                    }
-                    if (fileType == FileType.FILE) {
+                    } else if (fileType == FileType.FILE) {
                         final String fileItemInfo = View.getInstance().toFileItemInfo(item);
                         View.getInstance().showFileInfoModal(fileItemInfo);
+                    } else {
+                        throw new IllegalArgumentException("Unsupported file type " + fileType);
                     }
-                    throw new IllegalArgumentException("Unsupported file type " + fileType);
                 }
             });
             return row;
