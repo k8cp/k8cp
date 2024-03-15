@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class KubeServiceImpl implements KubeService {
 
     private static final List<String> LS_PARTS = List.of("ls", "--time-style=long-iso", "-l");
-    private static final List<String> ECHO_HOME_PARTS = List.of("echo", "$HOME");
+    private static final List<String> ECHO_HOME_PARTS = List.of("sh", "-c", "echo $HOME");
     private static final String DIRECTORY_MODIFIER = "d";
     private static final String SYMLINK_MODIFIER = "l";
 
