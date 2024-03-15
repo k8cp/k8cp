@@ -11,6 +11,7 @@ import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeExecException;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
+import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
 import io.github.vcvitaly.k8cp.util.StringUtil;
 import io.github.vcvitaly.k8cp.util.UnixPathUtil;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class KubeServiceImpl implements KubeService {
 
     private static final List<String> LS_PARTS = List.of("ls", "--time-style=long-iso", "-l");
+    private static final List<String> ECHO_HOME_PARTS = List.of("echo", "$HOME");
     private static final String DIRECTORY_MODIFIER = "d";
     private static final String SYMLINK_MODIFIER = "l";
 
@@ -53,6 +55,20 @@ public class KubeServiceImpl implements KubeService {
     @Override
     public List<KubePod> getPods(String namespace) throws KubeApiException {
         return kubeClient.getPods(namespace);
+    }
+
+    @Override
+    public String getHomeDir(String namespace, String podName) throws IOOperationException {
+        final String[] cmdParts  = ECHO_HOME_PARTS.toArray(String[]::new);
+        try {
+            final List<String> lines = kubeClient.execAndReturnOut(namespace, podName, cmdParts);
+            if (!lines.isEmpty()) {
+                return lines.getFirst();
+            }
+            return Constants.UNIX_ROOT;
+        } catch (KubeExecException e) {
+            throw new IOOperationException("Could not get the home dir for [%s]".formatted(podName), e);
+        }
     }
 
     private FileInfoContainer toFileInfoContainer(String path, String lsLine) {

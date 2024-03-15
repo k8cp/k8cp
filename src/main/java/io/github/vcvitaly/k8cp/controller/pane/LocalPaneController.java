@@ -175,7 +175,7 @@ public class LocalPaneController extends PaneController {
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
         final String rootPath = root.path();
-        if (!LocalFileUtil.isInTheSameRoot(rootPath, Model.getLocalPathRef())) {
+        if (!LocalFileUtil.isInTheSameRoot(rootPath, Model.getLocalPath())) {
             Model.setLocalPathRef(rootPath);
             initViewCrumb();
             initViewItems();

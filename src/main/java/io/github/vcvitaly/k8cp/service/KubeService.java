@@ -14,4 +14,6 @@ public interface KubeService {
     List<KubeNamespace> getNamespaces() throws KubeApiException;
 
     List<KubePod> getPods(String namespace) throws KubeApiException;
+
+    String getHomeDir(String namespace, String podName) throws IOOperationException;
 }
