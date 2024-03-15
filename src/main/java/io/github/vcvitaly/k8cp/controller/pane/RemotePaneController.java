@@ -8,6 +8,7 @@ import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +74,11 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
+    protected Consumer<String> getPathRefSettingConsumer() {
+        return Model::setRemotePathRef;
+    }
+
+    @Override
     protected void initViewCrumb() {
         initViewCrumb(Model.resolveRemoteBreadcrumbTree());
     }
@@ -80,16 +86,6 @@ public class RemotePaneController extends PaneController {
     @Override
     protected void initViewItems() {
         initViewItems(Model::listRemoteFiles, "remote");
-    }
-
-    @Override
-    protected void initViewMouseSelection() {
-
-    }
-
-    @Override
-    protected void initViewEnterKeySelection() {
-
     }
 
     @Override

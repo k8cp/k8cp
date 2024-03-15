@@ -205,6 +205,12 @@ public class Model {
         }
     }
 
+    public static void setRemotePathRef(String path) {
+        if (compareAndSetRemotePathRef(path)) {
+            log.info("Set remote path ref to [{}]", path);
+        }
+    }
+
     public static void setRemotePathRefToParent() {
         final String parent = getRemoteParentPath();
         if (compareAndSetRemotePathRef(parent)) {
