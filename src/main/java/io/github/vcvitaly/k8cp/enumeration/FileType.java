@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum FileType {
-    FILE("File", 3),
+    FILE("File", 4),
+    SYMLINK("Symlink", 3),
     DIRECTORY("Directory", 2),
     PARENT_DIRECTORY("Parent directory", 1);
 

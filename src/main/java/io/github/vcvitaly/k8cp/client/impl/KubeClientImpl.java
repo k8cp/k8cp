@@ -113,6 +113,10 @@ public class KubeClientImpl implements KubeClient {
 
         proc.destroy();
 
+        if (!ref.errLines.isEmpty()) {
+            log.error("Err output: {}", ref.errLines);
+        }
+
         final int exitValue = proc.exitValue();
         if (exitValue != 0) {
             log.error("Exit code: " + exitValue);
@@ -135,11 +139,16 @@ public class KubeClientImpl implements KubeClient {
 
         int i = 0;
 
+        boolean readingInProgress = false;
         while (true) {
             if (br.ready()) {
                 String line = br.readLine();
                 out.add(line);
+                readingInProgress = true;
             } else {
+                if (readingInProgress) {
+                    break;
+                }
                 Thread.sleep(1);
                 i++;
                 if (i >= WAIT_TIMEOUT_MS) {

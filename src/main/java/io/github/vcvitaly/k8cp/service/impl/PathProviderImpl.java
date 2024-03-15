@@ -25,4 +25,9 @@ public class PathProviderImpl implements PathProvider {
             case LINUX, MACOS -> Constants.UNIX_ROOT;
         };
     }
+
+    @Override
+    public String provideRemoteRootPath() {
+        return Constants.UNIX_ROOT;
+    }
 }

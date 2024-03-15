@@ -30,7 +30,8 @@ import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
 import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
-import io.github.vcvitaly.k8cp.util.FileUtil;
+import io.github.vcvitaly.k8cp.util.LocalFileUtil;
+import io.github.vcvitaly.k8cp.util.UnixPathUtil;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -49,7 +51,10 @@ public class Model {
     private static final AtomicReference<KubeConfigContainer> kubeConfigSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
+    @Getter
     private static final AtomicReference<String> localPathRef = new AtomicReference<>(PathProviderHolder.instance.provideLocalHomePath());
+    @Getter
+    private static final AtomicReference<String> remotePathRef = new AtomicReference<>(PathProviderHolder.instance.provideRemoteRootPath());
 
     private Model() {}
 
@@ -77,19 +82,15 @@ public class Model {
 
     public static FileInfoContainer getLocalParentDirectory() {
         final String parentPath = getLocalParentPath();
-        return FileInfoContainer.builder()
-                .path(parentPath)
-                .name(Constants.PARENT_DIR_NAME)
-                .fileType(FileType.PARENT_DIRECTORY)
-                .build();
+        return getParentDirectory(parentPath);
     }
 
     public static List<FileInfoContainer> listLocalFiles() throws IOOperationException {
-        final String localPath = getLocalPathRef();
+        final String path = getLocalPath();
         final List<FileInfoContainer> files = new ArrayList<>(
-                LocalFsServiceHolder.instance.listFiles(localPath, false)
+                LocalFsServiceHolder.instance.listFiles(path, false)
         );
-        if (!FileUtil.isRoot(Paths.get(localPath))) {
+        if (!LocalFileUtil.isRoot(Paths.get(path))) {
             files.add(getLocalParentDirectory());
         }
         files.sort(Comparator.naturalOrder());
@@ -97,7 +98,7 @@ public class Model {
     }
 
     public static List<BreadCrumbFile> resolveLocalBreadcrumbTree() {
-        final String currentPathStr = getLocalPathRef();
+        final String currentPathStr = getLocalPath();
         Path currentPath = Paths.get(currentPathStr);
         final Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
         while (currentPath != null) {
@@ -120,19 +121,45 @@ public class Model {
     public static RootInfoContainer getMainRoot() {
         final OsFamily osFamily = LocalOsFamilyDetectorHolder.instance.detectOsFamily();
         return switch (osFamily) {
-            case WINDOWS -> new RootInfoContainer(Constants.WINDOWS_ROOT, FileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT)));
+            case WINDOWS -> new RootInfoContainer(
+                    Constants.WINDOWS_ROOT,
+                    LocalFileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT))
+            );
             case LINUX, MACOS -> new RootInfoContainer(Constants.UNIX_ROOT, Constants.UNIX_ROOT);
         };
     }
 
     public static FileInfoContainer getRemoteParentDirectory() {
-        // TODO
-        return null;
+        final String parentPath = getRemoteParentPath();
+        return getParentDirectory(parentPath);
     }
 
-    public static List<FileInfoContainer> listRemoteFiles() {
-        // TODO
-        return null;
+    public static List<FileInfoContainer> listRemoteFiles() throws IOOperationException {
+        final String path = getRemotePath();
+        final List<FileInfoContainer> files = new ArrayList<>(
+                KubeServiceHolder.instance.listFiles(
+                        kubeNamespaceSelectionRef.get().name(),
+                        kubePodSelectionRef.get().name(),
+                        path,
+                        false
+                )
+        );
+        if (!UnixPathUtil.isRoot(path)) {
+            files.add(getRemoteParentDirectory());
+        }
+        files.sort(Comparator.naturalOrder());
+        return files;
+    }
+
+    public static List<BreadCrumbFile> resolveRemoteBreadcrumbTree() {
+        String currentPath = getRemotePath();
+        final List<BreadCrumbFile> reversedTree = new LinkedList<>();
+        while (!UnixPathUtil.isRoot(currentPath)) {
+            reversedTree.add(toBreadCrumbFile(currentPath));
+            currentPath = UnixPathUtil.getParentPath(currentPath);
+        }
+        reversedTree.add(toBreadCrumbFile(currentPath));
+        return reversedTree.reversed();
     }
 
     /* Setters */
@@ -162,25 +189,59 @@ public class Model {
         if (compareAndSetLocalPathRef(parent)) {
             log.info("Set local path ref to parent [{}]", parent);
         }
-
     }
 
     public static void setLocalPathRefToHome() {
-        final String homePath = PathProviderHolder.instance.provideLocalHomePath();
-        if (compareAndSetLocalPathRef(homePath)) {
-            log.info("Set local path ref to home path [{}]", homePath);
+        final String home = PathProviderHolder.instance.provideLocalHomePath();
+        if (compareAndSetLocalPathRef(home)) {
+            log.info("Set local path ref to home path [{}]", home);
         }
     }
 
     public static void setLocalPathRefToRoot() {
-        final String rootPath = PathProviderHolder.instance.provideLocalRootPath();
-        if (compareAndSetLocalPathRef(rootPath)) {
-            log.info("Set local path ref to root path [{}]", rootPath);
+        final String root = PathProviderHolder.instance.provideLocalRootPath();
+        if (compareAndSetLocalPathRef(root)) {
+            log.info("Set local path ref to root path [{}]", root);
         }
     }
 
-    public static synchronized String getLocalPathRef() {
+    public static void setRemotePathRef(String path) {
+        if (compareAndSetRemotePathRef(path)) {
+            log.info("Set remote path ref to [{}]", path);
+        }
+    }
+
+    public static void setRemotePathRefToParent() {
+        final String parent = getRemoteParentPath();
+        if (compareAndSetRemotePathRef(parent)) {
+            log.info("Set remote path ref to parent [{}]", parent);
+        }
+    }
+
+    public static void setRemotePathRefToHome() throws IOOperationException {
+        final String home = KubeServiceHolder.instance.getHomeDir(
+                kubeNamespaceSelectionRef.get().name(),
+                kubePodSelectionRef.get().name()
+        );
+        if (compareAndSetRemotePathRef(home)) {
+            log.info("Set remote path ref to home path [{}]", home);
+        }
+    }
+
+    public static void setRemotePathRefToRoot() {
+        final String rootPath = PathProviderHolder.instance.provideRemoteRootPath();
+        if (compareAndSetRemotePathRef(rootPath)) {
+            log.info("Set remote path ref to root path [{}]", rootPath);
+        }
+    }
+
+    /* Getters */
+    public static synchronized String getLocalPath() {
         return localPathRef.get();
+    }
+
+    public static synchronized String getRemotePath() {
+        return remotePathRef.get();
     }
 
     /* Private methods */
@@ -193,26 +254,51 @@ public class Model {
         return e;
     }
 
-    private static BreadCrumbFile toBreadCrumbFile(Path path) {
-        final String pathName = FileUtil.getPathFilename(path);
-        return new BreadCrumbFile(path.toString(), pathName);
+    private static BreadCrumbFile toBreadCrumbFile(Path localPath) {
+        final String pathName = LocalFileUtil.getPathFilename(localPath);
+        return new BreadCrumbFile(localPath.toString(), pathName);
+    }
+
+    private static BreadCrumbFile toBreadCrumbFile(String remotePath) {
+        return new BreadCrumbFile(remotePath, UnixPathUtil.getFilename(remotePath));
     }
 
     private static String getLocalParentPath() {
-        final Path path = Paths.get(getLocalPathRef());
-        if (FileUtil.isRoot(path)) {
+        final Path path = Paths.get(getLocalPath());
+        if (LocalFileUtil.isRoot(path)) {
             return path.toString();
         }
         return path.getParent().toString();
     }
 
     private static synchronized boolean compareAndSetLocalPathRef(String path) {
-        final String curPath = localPathRef.get();
-        if (!path.equals(curPath)) {
-            localPathRef.set(path);
+        return compareAndSetRef(getLocalPathRef(), path);
+    }
+
+    private static synchronized boolean compareAndSetRemotePathRef(String path) {
+        return compareAndSetRef(getRemotePathRef(), path);
+    }
+
+    private static <T> boolean compareAndSetRef(AtomicReference<T> ref, T t) {
+        final T cur = ref.get();
+        if (!t.equals(cur)) {
+            ref.set(t);
             return true;
         }
         return false;
+    }
+
+    private static FileInfoContainer getParentDirectory(String parentPath) {
+        return FileInfoContainer.builder()
+                .path(parentPath)
+                .name(Constants.PARENT_DIR_NAME)
+                .fileType(FileType.PARENT_DIRECTORY)
+                .build();
+    }
+
+    private static String getRemoteParentPath() {
+        final String curPath = getRemotePath();
+        return UnixPathUtil.getParentPath(curPath);
     }
 
     /* Holders */

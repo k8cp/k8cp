@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class FileUtil {
+public class LocalFileUtil {
 
     public static boolean shouldBeShownBasedOnHiddenFlag(Path p, boolean showHidden) {
         if (showHidden) {

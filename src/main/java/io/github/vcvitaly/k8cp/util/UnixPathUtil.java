@@ -5,14 +5,32 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class UnixPathUtil {
 
-    public static String stripEndingSlashFromPath(String path) {
-        if (path.endsWith("/")) {
-            return path.substring(0, path.length() - 1);
-        }
-        return path;
+    public static String concatPaths(String path, String fileName) {
+        return "%s/%s".formatted(StringUtil.stripEndingSlash(path), StringUtil.stripEndingSlash(fileName));
     }
 
-    public static String concatPaths(String path, String fileName) {
-        return "%s/%s".formatted(stripEndingSlashFromPath(path), stripEndingSlashFromPath(fileName));
+    public static boolean isRoot(String path) {
+        return path.equals(Constants.UNIX_ROOT);
+    }
+
+    public static String getParentPath(String path) {
+        if (isRoot(path)) {
+            return path;
+        }
+        path = StringUtil.stripEndingSlash(path);
+        final int lastIndexOfFwSlash = path.lastIndexOf('/');
+        if (lastIndexOfFwSlash == 0) {
+            return Constants.UNIX_ROOT;
+        }
+        return path.substring(0, lastIndexOfFwSlash);
+    }
+
+    public static String getFilename(String path) {
+        if (isRoot(path)) {
+            return path;
+        }
+        path = StringUtil.stripEndingSlash(path);
+        final int lastIndexOfFwSlash = path.lastIndexOf('/');
+        return StringUtil.stripBeginningSlash(path.substring(lastIndexOfFwSlash));
     }
 }

@@ -11,6 +11,12 @@ public class App extends Application {
         View.getInstance().showKubeConfigSelectionWindow();
     }
 
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        System.exit(0);
+    }
+
     public static void main(String[] args) {
         launch();
     }
