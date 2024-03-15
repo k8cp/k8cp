@@ -1,6 +1,7 @@
 package io.github.vcvitaly.k8cp.controller.pane;
 
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
+import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
@@ -37,6 +38,7 @@ public class LocalPaneController extends PaneController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
+            resolveFilesAndBreadcrumbs();
             initView();
             initLocalRootSelector();
         } catch (Exception e) {
@@ -87,12 +89,14 @@ public class LocalPaneController extends PaneController {
 
     @Override
     protected void initViewCrumb() {
-        initViewCrumb(Model.resolveLocalBreadcrumbTree());
+        final List<BreadCrumbFile> localBreadcrumbTree = Model.getLocalBreadcrumbTree();
+        initViewCrumb(localBreadcrumbTree);
     }
 
     @Override
     protected void initViewItems() {
-        initViewItems(Model::listLocalFiles, "local");
+        final List<FileInfoContainer> localFiles = Model.getLocalFiles();
+        initViewItems(localFiles);
     }
 
     private void initLocalRootSelector() throws IOOperationException {
@@ -108,23 +112,40 @@ public class LocalPaneController extends PaneController {
 
     @Override
     protected void onParentBtn() {
-        Model.setLocalPathRefToParent();
-        localRootSelector.setValue(Model.getMainRoot());
-        onRefreshBtn();
+        onNavigationBtn(() -> {
+            Model.setLocalPathRefToParent();
+            resolveFilesAndBreadcrumbs();
+        });
     }
 
     @Override
     protected void onHomeBtn() {
-        Model.setLocalPathRefToHome();
+        onNavigationBtn(() -> {
+            Model.setLocalPathRefToHome();
+            resolveFilesAndBreadcrumbs();
+        });
         localRootSelector.setValue(Model.getMainRoot());
-        onRefreshBtn();
     }
 
     @Override
     protected void onRootBtn() {
-        Model.setLocalPathRefToRoot();
+        onNavigationBtn(() -> {
+            Model.setLocalPathRefToRoot();
+            resolveFilesAndBreadcrumbs();
+        });
         localRootSelector.setValue(Model.getMainRoot());
-        onRefreshBtn();
+    }
+
+    @Override
+    protected void resolveFilesAndBreadcrumbs() throws IOOperationException {
+        Model.resolveLocalBreadcrumbTree();
+        Model.resolveLocalFiles();
+    }
+
+    @Override
+    protected void onBreadcrumb(Consumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
+        pathRefSettingConsumer.accept(selection.getPath());
+        executeLongRunningAction(Model::resolveLocalFiles, this::handleError, this::initViewItems);
     }
 
     private void onLocalRootSelection() {
@@ -132,8 +153,7 @@ public class LocalPaneController extends PaneController {
         final String rootPath = root.path();
         if (!LocalFileUtil.isInTheSameRoot(rootPath, Model.getLocalPath())) {
             Model.setLocalPathRef(rootPath);
-            initViewCrumb();
-            initViewItems();
+            executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
         }
     }
 }

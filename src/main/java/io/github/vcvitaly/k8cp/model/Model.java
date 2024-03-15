@@ -55,6 +55,10 @@ public class Model {
     private static final AtomicReference<String> localPathRef = new AtomicReference<>(PathProviderHolder.instance.provideLocalHomePath());
     @Getter
     private static final AtomicReference<String> remotePathRef = new AtomicReference<>(PathProviderHolder.instance.provideRemoteRootPath());
+    private static final AtomicReference<List<BreadCrumbFile>> localBreadcrumbTree = new AtomicReference<>();
+    private static final AtomicReference<List<BreadCrumbFile>> remoteBreadcrumbTree = new AtomicReference<>();
+    private static final AtomicReference<List<FileInfoContainer>> localFiles = new AtomicReference<>();
+    private static final AtomicReference<List<FileInfoContainer>> remoteFiles = new AtomicReference<>();
 
     private Model() {}
 
@@ -85,27 +89,30 @@ public class Model {
         return getParentDirectory(parentPath);
     }
 
-    public static List<FileInfoContainer> listLocalFiles() throws IOOperationException {
-        final String path = getLocalPath();
+    public static void resolveLocalFiles() throws IOOperationException {
+        final String currentPath = getLocalPath();
         final List<FileInfoContainer> files = new ArrayList<>(
-                LocalFsServiceHolder.instance.listFiles(path, false)
+                LocalFsServiceHolder.instance.listFiles(currentPath, false)
         );
-        if (!LocalFileUtil.isRoot(Paths.get(path))) {
+        if (!LocalFileUtil.isRoot(Paths.get(currentPath))) {
             files.add(getLocalParentDirectory());
         }
         files.sort(Comparator.naturalOrder());
-        return files;
+        localFiles.set(files);
+        log.info("Resolved local files for [%s]".formatted(currentPath));
     }
 
-    public static List<BreadCrumbFile> resolveLocalBreadcrumbTree() {
+    public static void resolveLocalBreadcrumbTree() {
         final String currentPathStr = getLocalPath();
-        Path currentPath = Paths.get(currentPathStr);
+        Path tmpPath = Paths.get(currentPathStr);
         final Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
-        while (currentPath != null) {
-            reversedTree.add(toBreadCrumbFile(currentPath));
-            currentPath = currentPath.getParent();
+        while (tmpPath != null) {
+            reversedTree.add(toBreadCrumbFile(tmpPath));
+            tmpPath = tmpPath.getParent();
         }
-        return reversedTree.stream().toList().reversed();
+        final List<BreadCrumbFile> tree = reversedTree.stream().toList().reversed();
+        localBreadcrumbTree.set(tree);
+        log.info("Resolved local breadcrumb tree for [%s] to [%s]".formatted(currentPathStr, tree));
     }
 
     public static List<RootInfoContainer> listLocalRoots() throws IOOperationException {
@@ -134,32 +141,36 @@ public class Model {
         return getParentDirectory(parentPath);
     }
 
-    public static List<FileInfoContainer> listRemoteFiles() throws IOOperationException {
-        final String path = getRemotePath();
+    public static void resolveRemoteFiles() throws IOOperationException {
+        final String currentPath = getRemotePath();
         final List<FileInfoContainer> files = new ArrayList<>(
                 KubeServiceHolder.instance.listFiles(
                         kubeNamespaceSelectionRef.get().name(),
                         kubePodSelectionRef.get().name(),
-                        path,
+                        currentPath,
                         false
                 )
         );
-        if (!UnixPathUtil.isRoot(path)) {
+        if (!UnixPathUtil.isRoot(currentPath)) {
             files.add(getRemoteParentDirectory());
         }
         files.sort(Comparator.naturalOrder());
-        return files;
+        remoteFiles.set(files);
+        log.info("Resolved remote files for [%s]".formatted(currentPath));
     }
 
-    public static List<BreadCrumbFile> resolveRemoteBreadcrumbTree() {
-        String currentPath = getRemotePath();
+    public static void resolveRemoteBreadcrumbTree() {
+        final String currentPath = getRemotePath();
+        String tmpPath = currentPath;
         final List<BreadCrumbFile> reversedTree = new LinkedList<>();
-        while (!UnixPathUtil.isRoot(currentPath)) {
-            reversedTree.add(toBreadCrumbFile(currentPath));
-            currentPath = UnixPathUtil.getParentPath(currentPath);
+        while (!UnixPathUtil.isRoot(tmpPath)) {
+            reversedTree.add(toBreadCrumbFile(tmpPath));
+            tmpPath = UnixPathUtil.getParentPath(tmpPath);
         }
-        reversedTree.add(toBreadCrumbFile(currentPath));
-        return reversedTree.reversed();
+        reversedTree.add(toBreadCrumbFile(tmpPath));
+        final List<BreadCrumbFile> tree = reversedTree.reversed();
+        remoteBreadcrumbTree.set(tree);
+        log.info("Resolved remote breadcrumb tree for [%s] to [%s]".formatted(currentPath, tree));
     }
 
     /* Setters */
@@ -211,11 +222,13 @@ public class Model {
         }
     }
 
-    public static void setRemotePathRefToParent() {
+    public static boolean setRemotePathRefToParent() {
         final String parent = getRemoteParentPath();
-        if (compareAndSetRemotePathRef(parent)) {
+        final boolean comparedAndSet = compareAndSetRemotePathRef(parent);
+        if (comparedAndSet) {
             log.info("Set remote path ref to parent [{}]", parent);
         }
+        return comparedAndSet;
     }
 
     public static void setRemotePathRefToHome() throws IOOperationException {
@@ -242,6 +255,23 @@ public class Model {
 
     public static synchronized String getRemotePath() {
         return remotePathRef.get();
+    }
+
+    // TODO should it be synchronized?
+    public static List<BreadCrumbFile> getRemoteBreadcrumbTree() {
+        return remoteBreadcrumbTree.get();
+    }
+
+    public static List<FileInfoContainer> getRemoteFiles() {
+        return remoteFiles.get();
+    }
+
+    public static List<BreadCrumbFile> getLocalBreadcrumbTree() {
+        return localBreadcrumbTree.get();
+    }
+
+    public static List<FileInfoContainer> getLocalFiles() {
+        return localFiles.get();
     }
 
     /* Private methods */

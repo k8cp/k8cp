@@ -1,12 +1,13 @@
 package io.github.vcvitaly.k8cp.controller.pane;
 
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
+import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
-import io.github.vcvitaly.k8cp.model.Mock;
 import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import javafx.scene.control.Button;
@@ -31,6 +32,7 @@ public class RemotePaneController extends PaneController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
+            resolveFilesAndBreadcrumbs();
             initView();
         } catch (Exception e) {
             log.error("Could not init the remote view", e);
@@ -80,45 +82,50 @@ public class RemotePaneController extends PaneController {
 
     @Override
     protected void initViewCrumb() {
-        initViewCrumb(Model.resolveRemoteBreadcrumbTree());
+        final List<BreadCrumbFile> remoteBreadcrumbTree = Model.getRemoteBreadcrumbTree();
+        initViewCrumb(remoteBreadcrumbTree);
     }
 
     @Override
     protected void initViewItems() {
-        initViewItems(Model::listRemoteFiles, "remote");
+        final List<FileInfoContainer> remoteFiles = Model.getRemoteFiles();
+        initViewItems(remoteFiles);
     }
 
     @Override
     protected void onParentBtn() {
-        Model.setRemotePathRefToParent();
-        onRefreshBtn();
+        onNavigationBtn(() -> {
+            if (Model.setRemotePathRefToParent()) {
+                resolveFilesAndBreadcrumbs();
+            }
+        });
     }
 
     @Override
     protected void onHomeBtn() {
-        try {
+        onNavigationBtn(() -> {
             Model.setRemotePathRefToHome();
-            onRefreshBtn();
-        } catch (IOOperationException e) {
-            log.error("Could not set the remote path to home", e);
-            View.getInstance().showErrorModal(e.getMessage());
-        }
+            resolveFilesAndBreadcrumbs();
+        });
     }
 
     @Override
     protected void onRootBtn() {
-        Model.setRemotePathRefToRoot();
-        onRefreshBtn();
+        onNavigationBtn(() -> {
+            Model.setRemotePathRefToRoot();
+            resolveFilesAndBreadcrumbs();
+        });
     }
 
-    private void mockRightView() {
-        mockRightBreadcrumbBar();
-        rightView.setPlaceholder(getNoRowsToDisplayLbl());
-        rightView.getColumns().addAll(getTableColumns());
-        rightView.setItems(Mock.rightViewItems());
+    @Override
+    protected void resolveFilesAndBreadcrumbs() throws IOOperationException {
+        Model.resolveRemoteBreadcrumbTree();
+        Model.resolveRemoteFiles();
     }
 
-    private void mockRightBreadcrumbBar() {
-        rightBreadcrumbBar.setSelectedCrumb(Mock.rightBreadcrumbItem());
+    @Override
+    protected void onBreadcrumb(Consumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
+        pathRefSettingConsumer.accept(selection.getPath());
+        executeLongRunningAction(Model::resolveRemoteFiles, this::handleError, this::initViewItems);
     }
 }

@@ -5,12 +5,15 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
-import io.github.vcvitaly.k8cp.util.ThrowingSupplier;
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
+import io.github.vcvitaly.k8cp.util.ThrowingRunnable;
 import io.github.vcvitaly.k8cp.view.View;
 import java.util.List;
 import java.util.function.Consumer;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -63,8 +66,7 @@ public abstract class PaneController implements Initializable {
     protected void initView() {
         getView().setPlaceholder(getNoRowsToDisplayLbl());
         getView().getColumns().addAll(getTableColumns());
-        initViewCrumb();
-        initViewItems();
+        refreshCrumbAndItems();
         initViewButtons();
         initViewMouseSelection(getPathRefSettingConsumer());
         initViewEnterKeySelection(getPathRefSettingConsumer());
@@ -80,14 +82,9 @@ public abstract class PaneController implements Initializable {
 
     protected abstract void initViewItems();
 
-    protected void initViewItems(ThrowingSupplier<List<FileInfoContainer>> supplier, String viewType) {
-        try {
-            final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(supplier.get());
-            getView().setItems(FXCollections.observableList(fileMangerItems));
-        } catch (Exception e) {
-            getLog().error("Could not list the %s files".formatted(viewType), e);
-            View.getInstance().showErrorModal(e.getMessage());
-        }
+    protected void initViewItems(List<FileInfoContainer> files) {
+        final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(files);
+        getView().setItems(FXCollections.observableList(fileMangerItems));
     }
 
     protected void initViewButtons() {
@@ -98,22 +95,16 @@ public abstract class PaneController implements Initializable {
     }
 
     protected void onRefreshBtn() {
+        onNavigationBtn(this::resolveFilesAndBreadcrumbs);
+    }
+
+    protected void refreshCrumbAndItems() {
         initViewCrumb();
         initViewItems();
     }
 
     protected void handleViewSelectionAction(Consumer<String> pathRefSettingConsumer, FileManagerItem item) {
-        final FileType fileType = FileType.ofValueName(item.getFileType());
-        if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
-            pathRefSettingConsumer.accept(item.getPath());
-            initViewCrumb();
-            initViewItems();
-        } else if (fileType == FileType.FILE) {
-            final String fileItemInfo = View.getInstance().toFileItemInfo(item);
-            View.getInstance().showFileInfoModal(fileItemInfo);
-        } else {
-            throw new IllegalArgumentException("Unsupported file type " + fileType);
-        }
+        handleViewSelectionActionInternal(pathRefSettingConsumer, item);
     }
 
     protected void initViewEnterKeySelection(Consumer<String> pathRefSettingConsumer) {
@@ -142,9 +133,35 @@ public abstract class PaneController implements Initializable {
                 .addListener((observable, oldValue, newValue) -> onBreadcrumb(getPathRefSettingConsumer(), newValue.getValue()));
     }
 
-    protected void onBreadcrumb(Consumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
-        pathRefSettingConsumer.accept(selection.getPath());
-        initViewItems();
+    protected abstract void onBreadcrumb(Consumer<String> pathRefSettingConsumer, BreadCrumbFile selection);
+
+    protected void setCursorWait() {
+        setCursor(Cursor.WAIT);
+    }
+
+    protected void setCursorDefault() {
+        setCursor(Cursor.DEFAULT);
+    }
+
+    protected void executeLongRunningAction(
+            ThrowingRunnable r, Consumer<Throwable> exceptionHandler, Runnable onSuccessRunnable) {
+        setCursorWait();
+        final Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                r.run();
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> {
+            onSuccessRunnable.run();
+            setCursorDefault();
+        });
+        task.setOnFailed(e -> {
+            setCursorDefault();
+            exceptionHandler.accept(task.getException());
+        });
+        Thread.ofVirtual().start(task);
     }
 
     protected abstract void onParentBtn();
@@ -152,4 +169,34 @@ public abstract class PaneController implements Initializable {
     protected abstract void onHomeBtn();
 
     protected abstract void onRootBtn();
+
+    protected abstract void resolveFilesAndBreadcrumbs() throws IOOperationException;
+
+    private void setCursor(Cursor cursor) {
+        View.getInstance().getCurrentStage().getScene().setCursor(cursor);
+    }
+
+    protected void handleError(Throwable t) {
+        getLog().error("Error: ", t);
+        View.getInstance().showErrorModal(t.getMessage());
+    }
+
+    protected void onNavigationBtn(ThrowingRunnable longRunningRunnable) {
+        executeLongRunningAction(
+                longRunningRunnable, this::handleError, this::refreshCrumbAndItems
+        );
+    }
+
+    private void handleViewSelectionActionInternal(Consumer<String> pathRefSettingConsumer, FileManagerItem item) {
+        final FileType fileType = FileType.ofValueName(item.getFileType());
+        if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
+            pathRefSettingConsumer.accept(item.getPath());
+            executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
+        } else if (fileType == FileType.FILE || fileType == FileType.SYMLINK) {
+            final String fileItemInfo = View.getInstance().toFileItemInfo(item);
+            View.getInstance().showFileInfoModal(fileItemInfo);
+        } else {
+            throw new IllegalArgumentException("Unsupported file type " + fileType);
+        }
+    }
 }
