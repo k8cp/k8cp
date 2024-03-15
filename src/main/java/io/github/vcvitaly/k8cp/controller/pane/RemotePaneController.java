@@ -89,11 +89,6 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected void initBreadCrumbListener() {
-
-    }
-
-    @Override
     protected void onParentBtn() {
         Model.setRemotePathRefToParent();
         onRefreshBtn();
