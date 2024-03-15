@@ -58,6 +58,26 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
+    protected Button getParentBtn() {
+        return leftParentBtn;
+    }
+
+    @Override
+    protected Button getRootBtn() {
+        return leftRootBtn;
+    }
+
+    @Override
+    protected Button getHomeBtn() {
+        return leftHomeBtn;
+    }
+
+    @Override
+    protected Button getRefreshBtn() {
+        return leftRefreshBtn;
+    }
+
+    @Override
     protected Logger getLog() {
         return log;
     }
@@ -70,14 +90,6 @@ public class LocalPaneController extends PaneController {
     @Override
     protected void initViewItems() {
         initViewItems(Model::listLocalFiles, "local");
-    }
-
-    @Override
-    protected void initViewButtons() {
-        leftParentBtn.setOnAction(e -> onLeftParentBtn());
-        leftHomeBtn.setOnAction(e -> onLeftHomeBtn());
-        leftRootBtn.setOnAction(e -> onLeftRootBtn());
-        leftRefreshBtn.setOnAction(e -> onLeftRefreshBtn());
     }
 
     @Override
@@ -134,28 +146,32 @@ public class LocalPaneController extends PaneController {
         });
     }
 
-    private void onLeftParentBtn() {
+    @Override
+    protected void onParentBtn() {
         Model.setLocalPathRefToParent();
         localRootSelector.setValue(Model.getMainRoot());
         initViewCrumb();
         initViewItems();
     }
 
-    private void onLeftHomeBtn() {
+    @Override
+    protected void onHomeBtn() {
         Model.setLocalPathRefToHome();
         localRootSelector.setValue(Model.getMainRoot());
         initViewCrumb();
         initViewItems();
     }
 
-    private void onLeftRootBtn() {
+    @Override
+    protected void onRootBtn() {
         Model.setLocalPathRefToRoot();
         localRootSelector.setValue(Model.getMainRoot());
         initViewCrumb();
         initViewItems();
     }
 
-    private void onLeftRefreshBtn() {
+    @Override
+    protected void onRefreshBtn() {
         initViewCrumb();
         initViewItems();
     }

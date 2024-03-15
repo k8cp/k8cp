@@ -15,14 +15,14 @@ import org.slf4j.Logger;
 
 @Slf4j
 public class RemotePaneController extends PaneController {
-    public Button parentRightBtn;
-    public Button rootRightBtn;
-    public Button homeRightBtn;
-    public Button refreshRightBtn;
-    public Button copyRightBtn;
-    public Button moveRightBtn;
-    public Button deleteRightBtn;
-    public Button renameRightBtn;
+    public Button rightParentBtn;
+    public Button rightRootBtn;
+    public Button rightHomeBtn;
+    public Button rightRefreshBtn;
+    public Button rightCopyBtn;
+    public Button rightMoveBtn;
+    public Button rightDeleteBtn;
+    public Button rightRenameBtn;
     public BreadCrumbBar<BreadCrumbFile> rightBreadcrumbBar;
     public TableView<FileManagerItem> rightView;
 
@@ -47,6 +47,26 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
+    protected Button getParentBtn() {
+        return rightParentBtn;
+    }
+
+    @Override
+    protected Button getRootBtn() {
+        return rightRootBtn;
+    }
+
+    @Override
+    protected Button getHomeBtn() {
+        return rightHomeBtn;
+    }
+
+    @Override
+    protected Button getRefreshBtn() {
+        return rightRefreshBtn;
+    }
+
+    @Override
     protected Logger getLog() {
         return log;
     }
@@ -62,11 +82,6 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected void initViewButtons() {
-
-    }
-
-    @Override
     protected void initViewMouseSelection() {
 
     }
@@ -78,6 +93,26 @@ public class RemotePaneController extends PaneController {
 
     @Override
     protected void initBreadCrumbListener() {
+
+    }
+
+    @Override
+    protected void onParentBtn() {
+
+    }
+
+    @Override
+    protected void onHomeBtn() {
+
+    }
+
+    @Override
+    protected void onRootBtn() {
+
+    }
+
+    @Override
+    protected void onRefreshBtn() {
 
     }
 

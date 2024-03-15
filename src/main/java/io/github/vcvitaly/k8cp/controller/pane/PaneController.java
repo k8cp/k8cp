@@ -9,6 +9,7 @@ import io.github.vcvitaly.k8cp.view.View;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -43,6 +44,16 @@ public abstract class PaneController implements Initializable {
 
     protected abstract BreadCrumbBar<BreadCrumbFile> getBreadcrumbBar();
 
+    protected abstract Button getParentBtn();
+
+    protected abstract Button getRootBtn();
+
+    protected abstract Button getHomeBtn();
+
+    protected abstract Button getRefreshBtn();
+
+    protected abstract Logger getLog();
+
     protected void initView() {
         getView().setPlaceholder(getNoRowsToDisplayLbl());
         getView().getColumns().addAll(getTableColumns());
@@ -73,7 +84,12 @@ public abstract class PaneController implements Initializable {
         }
     }
 
-    protected abstract void initViewButtons();
+    protected void initViewButtons() {
+        getParentBtn().setOnAction(e -> onParentBtn());
+        getRootBtn().setOnAction(e -> onRootBtn());
+        getHomeBtn().setOnAction(e -> onHomeBtn());
+        getRefreshBtn().setOnAction(e -> onRefreshBtn());
+    }
 
     protected abstract void initViewMouseSelection();
 
@@ -81,5 +97,11 @@ public abstract class PaneController implements Initializable {
 
     protected abstract void initBreadCrumbListener();
 
-    protected abstract Logger getLog();
+    protected abstract void onParentBtn();
+
+    protected abstract void onHomeBtn();
+
+    protected abstract void onRootBtn();
+
+    protected abstract void onRefreshBtn();
 }
