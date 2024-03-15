@@ -6,6 +6,7 @@ import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
+import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
 import io.github.vcvitaly.k8cp.util.ThrowingRunnable;
 import io.github.vcvitaly.k8cp.view.View;
 import java.util.List;
@@ -61,7 +62,7 @@ public abstract class PaneController implements Initializable {
 
     protected abstract Logger getLog();
 
-    protected abstract Consumer<String> getPathRefSettingConsumer();
+    protected abstract BoolStatusReturningConsumer<String> getPathRefSettingConsumer();
 
     protected void initView() {
         getView().setPlaceholder(getNoRowsToDisplayLbl());
@@ -103,11 +104,11 @@ public abstract class PaneController implements Initializable {
         initViewItems();
     }
 
-    protected void handleViewSelectionAction(Consumer<String> pathRefSettingConsumer, FileManagerItem item) {
+    protected void handleViewSelectionAction(BoolStatusReturningConsumer<String> pathRefSettingConsumer, FileManagerItem item) {
         handleViewSelectionActionInternal(pathRefSettingConsumer, item);
     }
 
-    protected void initViewEnterKeySelection(Consumer<String> pathRefSettingConsumer) {
+    protected void initViewEnterKeySelection(BoolStatusReturningConsumer<String> pathRefSettingConsumer) {
         getView().setOnKeyPressed(e -> {
             if (!getView().getSelectionModel().isEmpty() && e.getCode() == KeyCode.ENTER) {
                 handleViewSelectionAction(pathRefSettingConsumer, getView().getSelectionModel().getSelectedItem());
@@ -116,7 +117,7 @@ public abstract class PaneController implements Initializable {
         });
     }
 
-    protected void initViewMouseSelection(Consumer<String> pathRefSettingConsumer) {
+    protected void initViewMouseSelection(BoolStatusReturningConsumer<String> pathRefSettingConsumer) {
         getView().setRowFactory(tv -> {
             final TableRow<FileManagerItem> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -133,7 +134,7 @@ public abstract class PaneController implements Initializable {
                 .addListener((observable, oldValue, newValue) -> onBreadcrumb(getPathRefSettingConsumer(), newValue.getValue()));
     }
 
-    protected abstract void onBreadcrumb(Consumer<String> pathRefSettingConsumer, BreadCrumbFile selection);
+    protected abstract void onBreadcrumb(BoolStatusReturningConsumer<String> pathRefSettingConsumer, BreadCrumbFile selection);
 
     protected void setCursorWait() {
         setCursor(Cursor.WAIT);
@@ -164,6 +165,16 @@ public abstract class PaneController implements Initializable {
         Thread.ofVirtual().start(task);
     }
 
+    protected void onBreadcrumbInternal(
+            BoolStatusReturningConsumer<String> pathRefSettingConsumer,
+            BreadCrumbFile selection,
+            ThrowingRunnable fileResolvingRunnable
+    ) {
+        if (pathRefSettingConsumer.accept(selection.getPath())) {
+            executeLongRunningAction(fileResolvingRunnable, this::handleError, this::initViewItems);
+        }
+    }
+
     protected abstract void onParentBtn();
 
     protected abstract void onHomeBtn();
@@ -187,11 +198,12 @@ public abstract class PaneController implements Initializable {
         );
     }
 
-    private void handleViewSelectionActionInternal(Consumer<String> pathRefSettingConsumer, FileManagerItem item) {
+    private void handleViewSelectionActionInternal(BoolStatusReturningConsumer<String> pathRefSettingConsumer, FileManagerItem item) {
         final FileType fileType = FileType.ofValueName(item.getFileType());
         if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
-            pathRefSettingConsumer.accept(item.getPath());
-            executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
+            if (pathRefSettingConsumer.accept(item.getPath())) {
+                executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
+            }
         } else if (fileType == FileType.FILE || fileType == FileType.SYMLINK) {
             final String fileItemInfo = View.getInstance().toFileItemInfo(item);
             View.getInstance().showFileInfoModal(fileItemInfo);

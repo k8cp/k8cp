@@ -189,10 +189,12 @@ public class Model {
         log.info("Set kube pod selection to [{}]", selection);
     }
 
-    public static void setLocalPathRef(String path) {
-        if (compareAndSetLocalPathRef(path)) {
+    public static boolean setLocalPathRef(String path) {
+        final boolean comparedAndSet = compareAndSetLocalPathRef(path);
+        if (comparedAndSet) {
             log.info("Set local path ref to [{}]", path);
         }
+        return comparedAndSet;
     }
 
     public static void setLocalPathRefToParent() {
@@ -216,10 +218,12 @@ public class Model {
         }
     }
 
-    public static void setRemotePathRef(String path) {
-        if (compareAndSetRemotePathRef(path)) {
+    public static boolean setRemotePathRef(String path) {
+        final boolean comparedAndSet = compareAndSetRemotePathRef(path);
+        if (comparedAndSet) {
             log.info("Set remote path ref to [{}]", path);
         }
+        return comparedAndSet;
     }
 
     public static boolean setRemotePathRefToParent() {

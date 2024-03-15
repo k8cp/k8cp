@@ -5,11 +5,11 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
 import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +76,7 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected Consumer<String> getPathRefSettingConsumer() {
+    protected BoolStatusReturningConsumer<String> getPathRefSettingConsumer() {
         return Model::setRemotePathRef;
     }
 
@@ -124,8 +124,7 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected void onBreadcrumb(Consumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
-        pathRefSettingConsumer.accept(selection.getPath());
-        executeLongRunningAction(Model::resolveRemoteFiles, this::handleError, this::initViewItems);
+    protected void onBreadcrumb(BoolStatusReturningConsumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
+        onBreadcrumbInternal(pathRefSettingConsumer, selection, Model::resolveRemoteFiles);
     }
 }
