@@ -91,6 +91,11 @@ public abstract class PaneController implements Initializable {
         getRefreshBtn().setOnAction(e -> onRefreshBtn());
     }
 
+    protected void onRefreshBtn() {
+        initViewCrumb();
+        initViewItems();
+    }
+
     protected abstract void initViewMouseSelection();
 
     protected abstract void initViewEnterKeySelection();
@@ -102,6 +107,4 @@ public abstract class PaneController implements Initializable {
     protected abstract void onHomeBtn();
 
     protected abstract void onRootBtn();
-
-    protected abstract void onRefreshBtn();
 }

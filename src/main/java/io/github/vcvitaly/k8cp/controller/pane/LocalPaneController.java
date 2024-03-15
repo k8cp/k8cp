@@ -150,30 +150,21 @@ public class LocalPaneController extends PaneController {
     protected void onParentBtn() {
         Model.setLocalPathRefToParent();
         localRootSelector.setValue(Model.getMainRoot());
-        initViewCrumb();
-        initViewItems();
+        onRefreshBtn();
     }
 
     @Override
     protected void onHomeBtn() {
         Model.setLocalPathRefToHome();
         localRootSelector.setValue(Model.getMainRoot());
-        initViewCrumb();
-        initViewItems();
+        onRefreshBtn();
     }
 
     @Override
     protected void onRootBtn() {
         Model.setLocalPathRefToRoot();
         localRootSelector.setValue(Model.getMainRoot());
-        initViewCrumb();
-        initViewItems();
-    }
-
-    @Override
-    protected void onRefreshBtn() {
-        initViewCrumb();
-        initViewItems();
+        onRefreshBtn();
     }
 
     private void onLeftBreadcrumb(BreadCrumbFile selection) {

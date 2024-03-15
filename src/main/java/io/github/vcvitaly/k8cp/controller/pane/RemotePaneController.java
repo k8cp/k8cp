@@ -111,11 +111,6 @@ public class RemotePaneController extends PaneController {
 
     }
 
-    @Override
-    protected void onRefreshBtn() {
-
-    }
-
     private void mockRightView() {
         mockRightBreadcrumbBar();
         rightView.setPlaceholder(getNoRowsToDisplayLbl());
