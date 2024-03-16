@@ -1,0 +1,169 @@
+package io.github.vcvitaly.k8cp.factory;
+
+import io.github.vcvitaly.k8cp.client.KubeClient;
+import io.github.vcvitaly.k8cp.client.LocalFsClient;
+import io.github.vcvitaly.k8cp.client.impl.KubeClientImpl;
+import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
+import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
+import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
+import io.github.vcvitaly.k8cp.service.KubeConfigSelectionService;
+import io.github.vcvitaly.k8cp.service.KubeService;
+import io.github.vcvitaly.k8cp.service.LocalFsService;
+import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
+import io.github.vcvitaly.k8cp.service.PathProvider;
+import io.github.vcvitaly.k8cp.service.SizeConverter;
+import io.github.vcvitaly.k8cp.service.impl.KubeConfigHelperImpl;
+import io.github.vcvitaly.k8cp.service.impl.KubeConfigSelectionServiceImpl;
+import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
+import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
+import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
+import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
+import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
+import io.github.vcvitaly.k8cp.util.Constants;
+import java.util.concurrent.atomic.AtomicReference;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+
+@UtilityClass
+@Slf4j
+public class ServiceLocator {
+
+    private static AtomicReference<Model> modelRef = new AtomicReference<>(ModelHolder.instance);
+
+    private static void logCreatedNewInstanceOf(Object o) {
+        log.info(Constants.NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
+    }
+
+    private static RuntimeException logAndReturnRuntimeException(RuntimeException e) {
+        log.error("Error: ", e);
+        return e;
+    }
+
+    /* Getters and setters */
+    public static Model getModel() {
+        return modelRef.get();
+    }
+
+    public static void setModel(Model model) {
+        modelRef.set(model);
+    }
+
+    private static class KubeClientHolder {
+        private static final KubeClient instance = createInstance();
+
+        private static KubeClient createInstance() {
+            final KubeConfigContainer kubeConfigContainer = Context.kubeConfigSelectionRef.get();
+            if (kubeConfigContainer == null) {
+                throw logAndReturnRuntimeException(new IllegalStateException("Kube config initialization has to be done first"));
+            }
+            final KubeClient instance = new KubeClientImpl(kubeConfigContainer);
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class SizeConverterHolder {
+        private static final SizeConverter instance = createInstance();
+
+        private static SizeConverter createInstance() {
+            final SizeConverter sizeConverter = new SizeConverterImpl();
+            logCreatedNewInstanceOf(sizeConverter);
+            return sizeConverter;
+        }
+    }
+
+    private static class KubeServiceHolder {
+        private static final KubeService instance = createInstance();
+
+        private static KubeService createInstance() {
+            final KubeServiceImpl instance = new KubeServiceImpl(
+                    KubeClientHolder.instance, SizeConverterHolder.instance
+            );
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+
+        private static KubeService getInstance() {
+            return instance;
+        }
+    }
+
+    private static class LocalFsClientHolder {
+        private static final LocalFsClient instance = createInstance();
+
+        private static LocalFsClient createInstance() {
+            final LocalFsClientImpl instance = new LocalFsClientImpl();
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class LocalFsServiceHolder {
+        private static final LocalFsService instance = createInstance();
+
+        private static LocalFsService createInstance() {
+            final LocalFsServiceImpl instance = new LocalFsServiceImpl(
+                    LocalFsClientHolder.instance, SizeConverterHolder.instance
+            );
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class KubeConfigHelperHolder {
+        private static final KubeConfigHelper instance = createInstance();
+
+        private static KubeConfigHelper createInstance() {
+            final KubeConfigHelper instance = new KubeConfigHelperImpl();
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class PathProviderHolder {
+        private static final PathProvider instance = createInstance();
+
+        private static PathProvider createInstance() {
+            final PathProvider instance = new PathProviderImpl(LocalOsFamilyDetectorHolder.instance);
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    public static class KubeConfigSelectionServiceHolder {
+        private static final KubeConfigSelectionService instance = createInstance();
+
+        private static KubeConfigSelectionService createInstance() {
+            final KubeConfigSelectionService instance = new KubeConfigSelectionServiceImpl(
+                    LocalFsClientHolder.instance, KubeConfigHelperHolder.instance
+            );
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class LocalOsFamilyDetectorHolder {
+        private static final LocalOsFamilyDetector instance = createInstance();
+
+        private static LocalOsFamilyDetector createInstance() {
+            final LocalOsFamilyDetector instance = new LocalOsFamilyDetectorImpl();
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class ModelHolder {
+        private static final Model instance = createInstance();
+
+        private static Model createInstance() {
+            return Model.builder()
+                    .kubeServiceSupplier(() -> KubeServiceHolder.instance)
+                    .localFsService(LocalFsServiceHolder.instance)
+                    .kubeConfigSelectionService(KubeConfigSelectionServiceHolder.instance)
+                    .pathProvider(PathProviderHolder.instance)
+                    .localOsFamilyDetector(LocalOsFamilyDetectorHolder.instance)
+                    .build();
+        }
+    }
+}

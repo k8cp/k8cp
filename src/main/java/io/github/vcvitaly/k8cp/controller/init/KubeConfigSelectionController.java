@@ -3,7 +3,7 @@ package io.github.vcvitaly.k8cp.controller.init;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
-import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.factory.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import io.github.vcvitaly.k8cp.view.View;
@@ -33,7 +33,7 @@ public class KubeConfigSelectionController implements Initializable {
         nextBtn.setOnAction(e -> onNext());
         fsChooserBtn.setOnAction(e -> onFileSelection());
         try {
-            final ObservableList<KubeConfigContainer> kubeConfigList = Model.getKubeConfigList();
+            final ObservableList<KubeConfigContainer> kubeConfigList = ServiceLocator.getModel().getKubeConfigList();
             if (!kubeConfigList.isEmpty()) {
                 setItemsIfKubeConfigsFound(kubeConfigList);
             } else {
@@ -56,7 +56,7 @@ public class KubeConfigSelectionController implements Initializable {
         final File file = getFileFromFileChooser();
         if (file != null) {
             try {
-                final KubeConfigContainer selection = Model.getKubeConfigSelectionDto(file.toPath());
+                final KubeConfigContainer selection = ServiceLocator.getModel().getKubeConfigSelectionDto(file.toPath());
                 setKubeConfigSelection(selection);
                 nextBtn.setDisable(false);
                 chooseFileLbl.setVisible(false);
@@ -102,6 +102,6 @@ public class KubeConfigSelectionController implements Initializable {
     }
 
     private void setKubeConfigSelection(KubeConfigContainer selection) {
-        Model.setKubeConfigSelection(selection);
+        ServiceLocator.getModel().setKubeConfigSelection(selection);
     }
 }

@@ -5,6 +5,7 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
+import io.github.vcvitaly.k8cp.factory.ServiceLocator;
 import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
 import io.github.vcvitaly.k8cp.util.LocalFileUtil;
@@ -84,23 +85,23 @@ public class LocalPaneController extends PaneController {
 
     @Override
     protected BoolStatusReturningConsumer<String> getPathRefSettingConsumer() {
-        return Model::setLocalPathRef;
+        return ServiceLocator.getModel()::setLocalPathRef;
     }
 
     @Override
     protected void initViewCrumb() {
-        final List<BreadCrumbFile> localBreadcrumbTree = Model.getLocalBreadcrumbTree();
+        final List<BreadCrumbFile> localBreadcrumbTree = ServiceLocator.getModel().getLocalBreadcrumbTree();
         initViewCrumb(localBreadcrumbTree);
     }
 
     @Override
     protected void initViewItems() {
-        final List<FileInfoContainer> localFiles = Model.getLocalFiles();
+        final List<FileInfoContainer> localFiles = ServiceLocator.getModel().getLocalFiles();
         initViewItems(localFiles);
     }
 
     private void initLocalRootSelector() throws IOOperationException {
-        final List<RootInfoContainer> roots = Model.listLocalRoots();
+        final List<RootInfoContainer> roots = ServiceLocator.getModel().listLocalRoots();
         localRootSelector.setItems(FXCollections.observableList(roots));
         localRootSelector.setValue(ItemSelectionUtil.getSelectionItem(roots, rootInfoContainer -> true));
         localRootSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -113,7 +114,7 @@ public class LocalPaneController extends PaneController {
     @Override
     protected void onParentBtn() {
         onNavigationBtn(() -> {
-            Model.setLocalPathRefToParent();
+            ServiceLocator.getModel().setLocalPathRefToParent();
             resolveFilesAndBreadcrumbs();
         });
     }
@@ -121,37 +122,37 @@ public class LocalPaneController extends PaneController {
     @Override
     protected void onHomeBtn() {
         onNavigationBtn(() -> {
-            Model.setLocalPathRefToHome();
+            ServiceLocator.getModel().setLocalPathRefToHome();
             resolveFilesAndBreadcrumbs();
         });
-        localRootSelector.setValue(Model.getMainRoot());
+        localRootSelector.setValue(ServiceLocator.getModel().getMainRoot());
     }
 
     @Override
     protected void onRootBtn() {
         onNavigationBtn(() -> {
-            Model.setLocalPathRefToRoot();
+            ServiceLocator.getModel().setLocalPathRefToRoot();
             resolveFilesAndBreadcrumbs();
         });
-        localRootSelector.setValue(Model.getMainRoot());
+        localRootSelector.setValue(ServiceLocator.getModel().getMainRoot());
     }
 
     @Override
     protected void resolveFilesAndBreadcrumbs() throws IOOperationException {
-        Model.resolveLocalBreadcrumbTree();
-        Model.resolveLocalFiles();
+        ServiceLocator.getModel().resolveLocalBreadcrumbTree();
+        ServiceLocator.getModel().resolveLocalFiles();
     }
 
     @Override
     protected void onBreadcrumb(BoolStatusReturningConsumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
-        onBreadcrumbInternal(pathRefSettingConsumer, selection, Model::resolveLocalFiles);
+        onBreadcrumbInternal(pathRefSettingConsumer, selection, ServiceLocator.getModel()::resolveLocalFiles);
     }
 
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
         final String rootPath = root.path();
-        if (!LocalFileUtil.isInTheSameRoot(rootPath, Model.getLocalPath())) {
-            if (Model.setLocalPathRef(rootPath)) {
+        if (!LocalFileUtil.isInTheSameRoot(rootPath, ServiceLocator.getModel().getLocalPath())) {
+            if (ServiceLocator.getModel().setLocalPathRef(rootPath)) {
                 executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
             }
         }

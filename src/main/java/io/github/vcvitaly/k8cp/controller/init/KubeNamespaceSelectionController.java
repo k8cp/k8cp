@@ -2,7 +2,7 @@ package io.github.vcvitaly.k8cp.controller.init;
 
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
-import io.github.vcvitaly.k8cp.model.Model;
+import io.github.vcvitaly.k8cp.factory.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import io.github.vcvitaly.k8cp.view.View;
@@ -29,7 +29,7 @@ public class KubeNamespaceSelectionController implements Initializable {
         prevBtn.setOnAction(e -> onPrev());
         nextBtn.setOnAction(e -> onNext());
         try {
-            final List<KubeNamespace> namespaces = Model.getKubeNamespaces();
+            final List<KubeNamespace> namespaces = ServiceLocator.getModel().getKubeNamespaces();
             namespaceSelector.setItems(FXCollections.observableList(namespaces));
             final KubeNamespace selectedItem = ItemSelectionUtil.getSelectionItem(
                     namespaces,
@@ -64,6 +64,6 @@ public class KubeNamespaceSelectionController implements Initializable {
     }
 
     private void setKubeNamespaceSelection(KubeNamespace selection) {
-        Model.setKubeNamespaceSelection(selection);
+        ServiceLocator.getModel().setKubeNamespaceSelection(selection);
     }
 }
