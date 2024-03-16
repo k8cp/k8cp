@@ -68,6 +68,9 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.11.0'
     testImplementation "org.assertj:assertj-core:3.25.1"
     testImplementation "org.testfx:testfx-junit5:4.0.18"
+
+    // https://mvnrepository.com/artifact/org.zeroturnaround/zt-zip
+    testImplementation 'org.zeroturnaround:zt-zip:1.17'
 }
 
 test {
