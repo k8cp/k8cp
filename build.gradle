@@ -71,6 +71,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.zeroturnaround/zt-zip
     testImplementation 'org.zeroturnaround:zt-zip:1.17'
+    // https://mvnrepository.com/artifact/org.testfx/testfx-core
+    testImplementation 'org.testfx:testfx-core:4.0.18'
 }
 
 test {
