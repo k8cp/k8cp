@@ -4,12 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class BreadCrumbFile {
-    private String path;
-    private String name;
+public record BreadCrumbFile(PathRefreshEvent event, String name) {
 
     @Override
     public String toString() {
