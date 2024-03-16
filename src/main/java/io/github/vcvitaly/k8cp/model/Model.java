@@ -9,9 +9,11 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
+import io.github.vcvitaly.k8cp.domain.PathRefreshEvent;
 import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.enumeration.OsFamily;
+import io.github.vcvitaly.k8cp.enumeration.PathRefreshEventSource;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
@@ -40,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiPredicate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Getter;
@@ -52,9 +55,13 @@ public class Model {
     private static final AtomicReference<KubeNamespace> kubeNamespaceSelectionRef = new AtomicReference<>();
     private static final AtomicReference<KubePod> kubePodSelectionRef = new AtomicReference<>();
     @Getter
-    private static final AtomicReference<String> localPathRef = new AtomicReference<>(PathProviderHolder.instance.provideLocalHomePath());
+    private static final AtomicReference<PathRefreshEvent> localPathEventRef = new AtomicReference<>(
+            PathRefreshEvent.of(PathRefreshEventSource.LOCAL_INIT, PathProviderHolder.instance.provideLocalHomePath())
+    );
     @Getter
-    private static final AtomicReference<String> remotePathRef = new AtomicReference<>(PathProviderHolder.instance.provideRemoteRootPath());
+    private static final AtomicReference<PathRefreshEvent> remotePathEventRef = new AtomicReference<>(
+            PathRefreshEvent.of(PathRefreshEventSource.REMOTE_INIT, PathProviderHolder.instance.provideRemoteRootPath())
+    );
     private static final AtomicReference<List<BreadCrumbFile>> localBreadcrumbTree = new AtomicReference<>();
     private static final AtomicReference<List<BreadCrumbFile>> remoteBreadcrumbTree = new AtomicReference<>();
     private static final AtomicReference<List<FileInfoContainer>> localFiles = new AtomicReference<>();
@@ -90,7 +97,8 @@ public class Model {
     }
 
     public static void resolveLocalFiles() throws IOOperationException {
-        final String currentPath = getLocalPath();
+        final PathRefreshEvent localPathEvent = getLocalPathEvent();
+        final String currentPath = localPathEvent.data().path();
         final List<FileInfoContainer> files = new ArrayList<>(
                 LocalFsServiceHolder.instance.listFiles(currentPath, false)
         );
@@ -99,11 +107,12 @@ public class Model {
         }
         files.sort(Comparator.naturalOrder());
         localFiles.set(files);
-        log.info("Resolved local files for [%s]".formatted(currentPath));
+        logInfoWithEvent(localPathEvent, "resolved the local files for [%s]".formatted(currentPath));
     }
 
     public static void resolveLocalBreadcrumbTree() {
-        final String currentPathStr = getLocalPath();
+        final PathRefreshEvent localPathEvent = getLocalPathEvent();
+        final String currentPathStr = localPathEvent.data().path();
         Path tmpPath = Paths.get(currentPathStr);
         final Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
         while (tmpPath != null) {
@@ -112,7 +121,7 @@ public class Model {
         }
         final List<BreadCrumbFile> tree = reversedTree.stream().toList().reversed();
         localBreadcrumbTree.set(tree);
-        log.info("Resolved local breadcrumb tree for [%s] to [%s]".formatted(currentPathStr, tree));
+        logInfoWithEvent(localPathEvent, "resolved the local breadcrumb tree for [%s] to [%s]".formatted(currentPathStr, tree));
     }
 
     public static List<RootInfoContainer> listLocalRoots() throws IOOperationException {
@@ -142,7 +151,8 @@ public class Model {
     }
 
     public static void resolveRemoteFiles() throws IOOperationException {
-        final String currentPath = getRemotePath();
+        final PathRefreshEvent remotePathEvent = getRemotePathEvent();
+        final String currentPath = remotePathEvent.data().path();
         final List<FileInfoContainer> files = new ArrayList<>(
                 KubeServiceHolder.instance.listFiles(
                         kubeNamespaceSelectionRef.get().name(),
@@ -156,11 +166,12 @@ public class Model {
         }
         files.sort(Comparator.naturalOrder());
         remoteFiles.set(files);
-        log.info("Resolved remote files for [%s]".formatted(currentPath));
+        logInfoWithEvent(remotePathEvent, "resolved the remote files for [%s]".formatted(currentPath));
     }
 
     public static void resolveRemoteBreadcrumbTree() {
-        final String currentPath = getRemotePath();
+        final PathRefreshEvent remotePathEvent = getRemotePathEvent();
+        final String currentPath = remotePathEvent.data().path();
         String tmpPath = currentPath;
         final List<BreadCrumbFile> reversedTree = new LinkedList<>();
         while (!UnixPathUtil.isRoot(tmpPath)) {
@@ -170,7 +181,7 @@ public class Model {
         reversedTree.add(toBreadCrumbFile(tmpPath));
         final List<BreadCrumbFile> tree = reversedTree.reversed();
         remoteBreadcrumbTree.set(tree);
-        log.info("Resolved remote breadcrumb tree for [%s] to [%s]".formatted(currentPath, tree));
+        logInfoWithEvent(remotePathEvent, "resolved the remote breadcrumb tree for [%s] to [%s]".formatted(currentPath, tree));
     }
 
     /* Setters */
@@ -189,76 +200,70 @@ public class Model {
         log.info("Set kube pod selection to [{}]", selection);
     }
 
-    public static boolean setLocalPathRef(String path) {
-        final boolean comparedAndSet = compareAndSetLocalPathRef(path);
+    public static boolean setLocalPathEventRef(PathRefreshEvent event) {
+        final boolean comparedAndSet = compareAndSetLocalPathEventRef(event);
         if (comparedAndSet) {
-            log.info("Set local path ref to [{}]", path);
+            log.info("Set local path event ref to [{}]", event);
         }
         return comparedAndSet;
     }
 
-    public static void setLocalPathRefToParent() {
+    public static boolean setLocalPathRefToParent(PathRefreshEventSource source) {
         final String parent = getLocalParentPath();
-        if (compareAndSetLocalPathRef(parent)) {
-            log.info("Set local path ref to parent [{}]", parent);
-        }
+        return setLocalPathEventRef(PathRefreshEvent.of(source, parent));
     }
 
-    public static void setLocalPathRefToHome() {
+    public static boolean setLocalPathRefToHome(PathRefreshEventSource source) {
         final String home = PathProviderHolder.instance.provideLocalHomePath();
-        if (compareAndSetLocalPathRef(home)) {
-            log.info("Set local path ref to home path [{}]", home);
-        }
+        return setLocalPathEventRef(PathRefreshEvent.of(source, home));
     }
 
-    public static void setLocalPathRefToRoot() {
+    public static boolean setLocalPathRefToRoot(PathRefreshEventSource source) {
         final String root = PathProviderHolder.instance.provideLocalRootPath();
-        if (compareAndSetLocalPathRef(root)) {
-            log.info("Set local path ref to root path [{}]", root);
-        }
+        return setLocalPathEventRef(PathRefreshEvent.of(source, root));
     }
 
-    public static boolean setRemotePathRef(String path) {
-        final boolean comparedAndSet = compareAndSetRemotePathRef(path);
+    public static boolean setRemotePathEventRef(PathRefreshEvent event) {
+        final boolean comparedAndSet = compareAndSetRemotePathEventRef(event);
         if (comparedAndSet) {
-            log.info("Set remote path ref to [{}]", path);
+            log.info("Set remote path event ref to [{}]", event);
         }
         return comparedAndSet;
     }
 
-    public static boolean setRemotePathRefToParent() {
+    public static boolean setRemotePathRefToParent(PathRefreshEventSource source) {
         final String parent = getRemoteParentPath();
-        final boolean comparedAndSet = compareAndSetRemotePathRef(parent);
-        if (comparedAndSet) {
-            log.info("Set remote path ref to parent [{}]", parent);
-        }
-        return comparedAndSet;
+        return setRemotePathEventRef(PathRefreshEvent.of(source, parent));
     }
 
-    public static void setRemotePathRefToHome() throws IOOperationException {
+    public static boolean setRemotePathRefToHome(PathRefreshEventSource source) throws IOOperationException {
         final String home = KubeServiceHolder.instance.getHomeDir(
                 kubeNamespaceSelectionRef.get().name(),
                 kubePodSelectionRef.get().name()
         );
-        if (compareAndSetRemotePathRef(home)) {
-            log.info("Set remote path ref to home path [{}]", home);
-        }
+        return setRemotePathEventRef(PathRefreshEvent.of(source, home));
     }
 
-    public static void setRemotePathRefToRoot() {
+    public static boolean setRemotePathRefToRoot(PathRefreshEventSource source) {
         final String rootPath = PathProviderHolder.instance.provideRemoteRootPath();
-        if (compareAndSetRemotePathRef(rootPath)) {
-            log.info("Set remote path ref to root path [{}]", rootPath);
-        }
+        return setRemotePathEventRef(PathRefreshEvent.of(source, rootPath));
     }
 
     /* Getters */
     public static synchronized String getLocalPath() {
-        return localPathRef.get();
+        return localPathEventRef.get().data().path();
     }
 
     public static synchronized String getRemotePath() {
-        return remotePathRef.get();
+        return remotePathEventRef.get().data().path();
+    }
+
+    public static PathRefreshEvent getLocalPathEvent() {
+        return localPathEventRef.get();
+    }
+
+    public static synchronized PathRefreshEvent getRemotePathEvent() {
+        return remotePathEventRef.get();
     }
 
     // TODO should it be synchronized?
@@ -305,17 +310,17 @@ public class Model {
         return path.getParent().toString();
     }
 
-    private static synchronized boolean compareAndSetLocalPathRef(String path) {
-        return compareAndSetRef(getLocalPathRef(), path);
+    private static synchronized boolean compareAndSetLocalPathEventRef(PathRefreshEvent event) {
+        return compareAndSetRef(getLocalPathEventRef(), event, PathRefreshEvent::equalsByData);
     }
 
-    private static synchronized boolean compareAndSetRemotePathRef(String path) {
-        return compareAndSetRef(getRemotePathRef(), path);
+    private static synchronized boolean compareAndSetRemotePathEventRef(PathRefreshEvent event) {
+        return compareAndSetRef(getRemotePathEventRef(), event, PathRefreshEvent::equalsByData);
     }
 
-    private static <T> boolean compareAndSetRef(AtomicReference<T> ref, T t) {
+    private static <T> boolean compareAndSetRef(AtomicReference<T> ref, T t, BiPredicate<T, T> equalsPredicate) {
         final T cur = ref.get();
-        if (!t.equals(cur)) {
+        if (!equalsPredicate.test(cur, t)) {
             ref.set(t);
             return true;
         }
@@ -333,6 +338,10 @@ public class Model {
     private static String getRemoteParentPath() {
         final String curPath = getRemotePath();
         return UnixPathUtil.getParentPath(curPath);
+    }
+
+    private static void logInfoWithEvent(PathRefreshEvent event, String msg) {
+        log.info("Event[source=%s,uuid=%s] - %s".formatted(event.source(), event.data().uuid(), msg));
     }
 
     /* Holders */

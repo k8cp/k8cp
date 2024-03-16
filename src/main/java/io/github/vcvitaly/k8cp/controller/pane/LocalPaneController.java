@@ -84,7 +84,7 @@ public class LocalPaneController extends PaneController {
 
     @Override
     protected BoolStatusReturningConsumer<String> getPathRefSettingConsumer() {
-        return Model::setLocalPathRef;
+        return Model::setLocalPathEventRef;
     }
 
     @Override
@@ -151,7 +151,7 @@ public class LocalPaneController extends PaneController {
         final RootInfoContainer root = localRootSelector.getValue();
         final String rootPath = root.path();
         if (!LocalFileUtil.isInTheSameRoot(rootPath, Model.getLocalPath())) {
-            if (Model.setLocalPathRef(rootPath)) {
+            if (Model.setLocalPathEventRef(rootPath)) {
                 executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
             }
         }

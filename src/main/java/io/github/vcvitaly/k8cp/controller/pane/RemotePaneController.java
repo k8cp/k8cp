@@ -77,7 +77,7 @@ public class RemotePaneController extends PaneController {
 
     @Override
     protected BoolStatusReturningConsumer<String> getPathRefSettingConsumer() {
-        return Model::setRemotePathRef;
+        return Model::setRemotePathEventRef;
     }
 
     @Override
