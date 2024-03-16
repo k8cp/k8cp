@@ -119,7 +119,7 @@ public class KubeClientImpl implements KubeClient {
 
         final int exitValue = proc.exitValue();
         if (exitValue != 0) {
-            log.error("Exit code: " + exitValue);
+            log.error("Exit code [%d] while running %s".formatted(exitValue, cmdParts));
         }
 
         return ref.outLines;
