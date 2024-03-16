@@ -24,6 +24,8 @@ module io.github.vcvitaly.k8cp {
     requires kotlin.stdlib;
     requires org.apache.commons.lang3;
     requires org.bouncycastle.pkix;
+    requires org.bouncycastle.provider;
+    requires org.bouncycastle.util;
 
     requires jdk.jdwp.agent;
 
