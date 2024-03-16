@@ -3,6 +3,7 @@ package io.github.vcvitaly.k8cp.controller.pane;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
+import io.github.vcvitaly.k8cp.domain.PathRefreshEvent;
 import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
@@ -62,15 +63,15 @@ public abstract class PaneController implements Initializable {
 
     protected abstract Logger getLog();
 
-    protected abstract BoolStatusReturningConsumer<String> getPathRefSettingConsumer();
+    protected abstract BoolStatusReturningConsumer<PathRefreshEvent> getPathEventRefSettingConsumer();
 
     protected void initView() {
         getView().setPlaceholder(getNoRowsToDisplayLbl());
         getView().getColumns().addAll(getTableColumns());
         refreshCrumbAndItems();
         initViewButtons();
-        initViewMouseSelection(getPathRefSettingConsumer());
-        initViewEnterKeySelection(getPathRefSettingConsumer());
+        initViewMouseSelection(getPathEventRefSettingConsumer());
+        initViewEnterKeySelection(getPathEventRefSettingConsumer());
         initBreadCrumbListener();
     }
 
@@ -104,11 +105,11 @@ public abstract class PaneController implements Initializable {
         initViewItems();
     }
 
-    protected void handleViewSelectionAction(BoolStatusReturningConsumer<String> pathRefSettingConsumer, FileManagerItem item) {
+    protected void handleViewSelectionAction(BoolStatusReturningConsumer<PathRefreshEvent> pathRefSettingConsumer, FileManagerItem item) {
         handleViewSelectionActionInternal(pathRefSettingConsumer, item);
     }
 
-    protected void initViewEnterKeySelection(BoolStatusReturningConsumer<String> pathRefSettingConsumer) {
+    protected void initViewEnterKeySelection(BoolStatusReturningConsumer<PathRefreshEvent> pathRefSettingConsumer) {
         getView().setOnKeyPressed(e -> {
             if (!getView().getSelectionModel().isEmpty() && e.getCode() == KeyCode.ENTER) {
                 handleViewSelectionAction(pathRefSettingConsumer, getView().getSelectionModel().getSelectedItem());
@@ -117,7 +118,7 @@ public abstract class PaneController implements Initializable {
         });
     }
 
-    protected void initViewMouseSelection(BoolStatusReturningConsumer<String> pathRefSettingConsumer) {
+    protected void initViewMouseSelection(BoolStatusReturningConsumer<PathRefreshEvent> pathRefSettingConsumer) {
         getView().setRowFactory(tv -> {
             final TableRow<FileManagerItem> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -131,10 +132,10 @@ public abstract class PaneController implements Initializable {
 
     protected void initBreadCrumbListener() {
         getBreadcrumbBar().selectedCrumbProperty()
-                .addListener((observable, oldValue, newValue) -> onBreadcrumb(getPathRefSettingConsumer(), newValue.getValue()));
+                .addListener((observable, oldValue, newValue) -> onBreadcrumb(getPathEventRefSettingConsumer(), newValue.getValue()));
     }
 
-    protected abstract void onBreadcrumb(BoolStatusReturningConsumer<String> pathRefSettingConsumer, BreadCrumbFile selection);
+    protected abstract void onBreadcrumb(BoolStatusReturningConsumer<PathRefreshEvent> pathRefSettingConsumer, BreadCrumbFile selection);
 
     protected void setCursorWait() {
         setCursor(Cursor.WAIT);
@@ -166,11 +167,11 @@ public abstract class PaneController implements Initializable {
     }
 
     protected void onBreadcrumbInternal(
-            BoolStatusReturningConsumer<String> pathRefSettingConsumer,
+            BoolStatusReturningConsumer<PathRefreshEvent> pathRefSettingConsumer,
             BreadCrumbFile selection,
             ThrowingRunnable fileResolvingRunnable
     ) {
-        if (pathRefSettingConsumer.accept(selection.getPath())) {
+        if (pathRefSettingConsumer.accept(selection.event())) {
             executeLongRunningAction(fileResolvingRunnable, this::handleError, this::initViewItems);
         }
     }
@@ -198,7 +199,7 @@ public abstract class PaneController implements Initializable {
         );
     }
 
-    private void handleViewSelectionActionInternal(BoolStatusReturningConsumer<String> pathRefSettingConsumer, FileManagerItem item) {
+    private void handleViewSelectionActionInternal(BoolStatusReturningConsumer<PathRefreshEvent> pathRefSettingConsumer, FileManagerItem item) {
         final FileType fileType = FileType.ofValueName(item.getFileType());
         if (fileType == FileType.DIRECTORY || fileType == FileType.PARENT_DIRECTORY) {
             if (pathRefSettingConsumer.accept(item.getPath())) {

@@ -3,6 +3,7 @@ package io.github.vcvitaly.k8cp.controller.pane;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
+import io.github.vcvitaly.k8cp.domain.PathRefreshEvent;
 import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.model.Model;
@@ -83,7 +84,7 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
-    protected BoolStatusReturningConsumer<String> getPathRefSettingConsumer() {
+    protected BoolStatusReturningConsumer<PathRefreshEvent> getPathEventRefSettingConsumer() {
         return Model::setLocalPathEventRef;
     }
 
@@ -143,7 +144,7 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
-    protected void onBreadcrumb(BoolStatusReturningConsumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
+    protected void onBreadcrumb(BoolStatusReturningConsumer<PathRefreshEvent> pathRefSettingConsumer, BreadCrumbFile selection) {
         onBreadcrumbInternal(pathRefSettingConsumer, selection, Model::resolveLocalFiles);
     }
 
