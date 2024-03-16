@@ -77,7 +77,7 @@ test {
 jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = [
-            '--strip-debug',
+//            '--strip-debug', // TODO uncomment
             '--compress', '2',
             '--no-header-files',
             '--no-man-pages',

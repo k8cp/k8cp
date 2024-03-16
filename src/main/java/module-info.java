@@ -25,6 +25,8 @@ module io.github.vcvitaly.k8cp {
     requires org.apache.commons.lang3;
     requires org.bouncycastle.pkix;
 
+    requires jdk.jdwp.agent;
+
     opens io.github.vcvitaly.k8cp to javafx.fxml;
     exports io.github.vcvitaly.k8cp;
     exports io.github.vcvitaly.k8cp.controller;
