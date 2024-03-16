@@ -11,7 +11,7 @@ import io.github.vcvitaly.k8cp.enumeration.OsFamily;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
-import io.github.vcvitaly.k8cp.factory.Context;
+import io.github.vcvitaly.k8cp.context.Context;
 import io.github.vcvitaly.k8cp.service.KubeConfigSelectionService;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
@@ -34,8 +34,6 @@ import javafx.collections.ObservableList;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import static io.github.vcvitaly.k8cp.util.Constants.NEW_INSTANCE_OF_MSG;
 
 @Slf4j
 public class Model {

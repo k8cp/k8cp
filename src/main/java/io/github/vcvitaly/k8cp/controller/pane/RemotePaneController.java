@@ -4,7 +4,7 @@ import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
-import io.github.vcvitaly.k8cp.factory.ServiceLocator;
+import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
 import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;

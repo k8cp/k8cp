@@ -3,7 +3,7 @@ package io.github.vcvitaly.k8cp.controller.init;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.exception.KubeContextExtractionException;
-import io.github.vcvitaly.k8cp.factory.ServiceLocator;
+import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import io.github.vcvitaly.k8cp.view.View;

@@ -1,4 +1,4 @@
-package io.github.vcvitaly.k8cp.factory;
+package io.github.vcvitaly.k8cp.context;
 
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import java.util.concurrent.atomic.AtomicReference;
