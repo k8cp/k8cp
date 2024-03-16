@@ -26,8 +26,13 @@ module io.github.vcvitaly.k8cp {
     requires org.bouncycastle.pkix;
     requires org.bouncycastle.provider;
     requires org.bouncycastle.util;
+    requires jdk.crypto.ec;
 
-    requires jdk.jdwp.agent;
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.fontawesome;
+    requires org.kordamp.ikonli.material2;
+
+//    requires jdk.jdwp.agent;
 
     opens io.github.vcvitaly.k8cp to javafx.fxml;
     exports io.github.vcvitaly.k8cp;
