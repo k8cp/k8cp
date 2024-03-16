@@ -44,71 +44,78 @@ public class View {
     }
 
     public void showMainWindow() {
-        createStageAndShow(
+        initStageAndShow(
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.MAIN)
-                        .build()
+                        .build(),
+                new Stage()
         );
     }
 
     public void showAboutModal() {
-        createStageAndShow(
+        initStageAndShow(
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.ABOUT)
                         .modality(Modality.APPLICATION_MODAL)
                         .resizeable(false)
-                        .build()
+                        .build(),
+                new Stage()
         );
     }
 
     public void showErrorModal(String errorMsg) {
-        createStageAndShow(
+        initStageAndShow(
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.ERROR)
                         .modality(Modality.APPLICATION_MODAL)
                         .title("%s - %s".formatted(Constants.TITLE, Constants.ERROR_TITLE_SUFFIX))
                         .controller(new ErrorController(errorMsg))
                         .resizeable(false)
-                        .build()
+                        .build(),
+                new Stage()
         );
     }
 
     public void showKubeConfigSelectionWindow() {
-        createStageAndShow(
+        initStageAndShow(
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.KUBE_CONFIG_SELECTION)
                         .resizeable(false)
-                        .build()
+                        .build(),
+                new Stage()
         );
     }
 
     public void showKubeNamespaceSelectionWindow() {
-        createStageAndShow(
+        initStageAndShow(
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.KUBE_NAMESPACE_SELECTION)
                         .resizeable(false)
-                        .build()
+                        .build(),
+                new Stage()
         );
     }
 
     public void showKubePodSelectionWindow() {
-        createStageAndShow(
+        initStageAndShow(
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.KUBE_POD_SELECTION)
                         .resizeable(false)
-                        .build()
+                        .build(),
+                new Stage()
         );
     }
 
     public void showFileInfoModal(String fileInfo) {
-        createStageAndShow(
+        initStageAndShow(
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.FILE_INFO)
                         .modality(Modality.APPLICATION_MODAL)
                         .title("%s - %s".formatted(Constants.TITLE, Constants.FILE_INFO_TITLE_SUFFIX))
                         .controller(new FileInfoController(fileInfo))
                         .resizeable(false)
-                        .build()
+                        .build(),
+                new Stage()
         );
     }
 
@@ -140,7 +147,7 @@ public class View {
     }
 
     /* Private methods */
-    private void createStageAndShow(StageCreationParam param) {
+    private void initStageAndShow(StageCreationParam param, Stage stage) {
         final FxmlView fxmlView = param.getFxmlView();
         final FXMLLoader loader = FxmlLoaderUtil.createFxmlLoader(fxmlView);
         final Initializable controller = param.getController();
@@ -153,7 +160,6 @@ public class View {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final Stage stage = new Stage();
         stage.setScene(scene);
         stage.getIcons().add(getMainIcon());
         stage.setTitle(param.getTitle() != null ? param.getTitle() : Constants.TITLE);
