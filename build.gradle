@@ -33,7 +33,7 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'io.github.vcvitaly.k8cp'
-    mainClass = 'io.github.vcvitaly.k8cp.HelloApplication'
+    mainClass = 'io.github.vcvitaly.k8cp.App'
 }
 
 javafx {
@@ -76,7 +76,7 @@ test {
 
 jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages', '--ignore-signing-information']
     launcher {
         name = 'app'
     }
@@ -84,6 +84,11 @@ jlink {
 
 jlinkZip {
     group = 'distribution'
+}
+
+tasks.register('dist') {
+    dependsOn clean, jlinkZip
+    description "Calls clean and then jlinkZip"
 }
 
 configurations
