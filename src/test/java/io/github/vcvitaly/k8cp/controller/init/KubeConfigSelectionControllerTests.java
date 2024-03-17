@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class KubeConfigSelectionControllerTests {
@@ -47,8 +48,16 @@ public class KubeConfigSelectionControllerTests {
     @ExtendWith(ApplicationExtension.class)
     class KubeConfigSelectionControllerChoiceBoxTest {
 
+        private static final View viewMock = mock(View.class);
+
+        private static void mockViewGetStage() {
+            when(viewMock.getCurrentStage()).thenReturn(mock(Stage.class));
+        }
+
         @BeforeAll
         static void beforeAll() {
+            mockViewGetStage();
+            ServiceLocator.setView(viewMock);
             final PathProvider pathProvider = mock(PathProvider.class);
             final Path homePath = TestUtil.getPath("/kubeconfig/ok");
             when(pathProvider.provideLocalHomePath()).thenReturn(homePath.toString());
@@ -88,6 +97,9 @@ public class KubeConfigSelectionControllerTests {
                     .usingRecursiveComparison()
                     .ignoringFields("path")
                     .isEqualTo(EXPECTED_CONFIG_CONTAINER);
+
+            robot.clickOn("#nextBtn");
+            verify(viewMock).showKubeNamespaceSelectionWindow();
         }
     }
 
@@ -95,8 +107,16 @@ public class KubeConfigSelectionControllerTests {
     @ExtendWith(ApplicationExtension.class)
     class KubeConfigSelectionControllerChooserTest {
 
+        private static final View viewMock = mock(View.class);
+
+        private static void mockViewGetStage() {
+            when(viewMock.getCurrentStage()).thenReturn(mock(Stage.class));
+        }
+
         @BeforeAll
         static void beforeAll() throws Exception {
+            mockViewGetStage();
+            ServiceLocator.setView(viewMock);
             final PathProvider pathProvider = mock(PathProvider.class);
             final String somePath = "some_path";
             when(pathProvider.provideLocalHomePath()).thenReturn(somePath);
@@ -129,13 +149,15 @@ public class KubeConfigSelectionControllerTests {
 
             robot.clickOn("#fsChooserBtn");
 
-            assertThat(robot.lookup("#nextBtn").queryButton().isDisable()).isFalse();
             assertThat(robot.lookup("#selectedKubeConfigFileLbl").queryAs(Label.class).getText())
                     .isEqualTo("You selected: %s - %s".formatted(CONTEXT_NAME, KUBE_CONFIG_YML_FILE_NAME));
             assertThat(robot.lookup("#nextBtn").queryButton().isDisable()).isFalse();
 
             assertThat(Context.kubeConfigSelectionRef.get())
                     .isEqualTo(EXPECTED_CONFIG_CONTAINER);
+
+            robot.clickOn("#nextBtn");
+            verify(viewMock).showKubeNamespaceSelectionWindow();
         }
     }
 }
