@@ -10,8 +10,10 @@ import io.github.vcvitaly.k8cp.service.impl.KubeConfigHelperImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigSelectionServiceImpl;
 import io.github.vcvitaly.k8cp.view.View;
 import java.nio.file.Path;
+import java.util.List;
 import javafx.scene.control.ChoiceBox;
 import javafx.stage.Stage;
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +21,6 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -49,11 +50,20 @@ class KubeConfigSelectionControllerTest {
 
     @Test
     void name(FxRobot robot) {
-        final ChoiceBox<KubeConfigContainer> choiceBox = robot.lookup(".choice-box").queryAs(ChoiceBox.class);
+        final ChoiceBox<KubeConfigContainer> choiceBox = robot.lookup("#configSelector").queryAs(ChoiceBox.class);
         assertThat(choiceBox.getValue())
                 .usingRecursiveComparison()
                 .ignoringFields("path")
                 .isEqualTo(new KubeConfigContainer("kind-kind", "kube_config.yml", null));
-
+        assertThat(choiceBox.getItems())
+                .usingRecursiveFieldByFieldElementComparator(
+                        RecursiveComparisonConfiguration.builder()
+                                .withIgnoredFields("path")
+                                .build()
+                ).containsExactlyInAnyOrderElementsOf(List.of(
+                        new KubeConfigContainer("kind-kind", "kube_config.yml", null),
+                        new KubeConfigContainer("kind-copy", "kube_config_copy.yml", null)
+                ));
+        assertThat(robot.lookup("#nextBtn").queryButton().isDisable()).isEqualTo(false);
     }
 }
