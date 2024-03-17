@@ -14,7 +14,7 @@ class KubeConfigHelperImplTest {
 
     @Test
     void extractContextNameTest_success() throws Exception {
-        final File resource = TestUtil.getFile("/kubeconfig/ok/kube_config.yml");
+        final File resource = TestUtil.getFile("/kubeconfig/ok/.kube/kube_config.yml");
         final String contextName = kubeConfigHelper.extractContextName(resource.toString());
 
         assertThat(contextName).isEqualTo("kind-kind");

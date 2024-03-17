@@ -46,7 +46,7 @@ public class ServiceLocator {
     }
 
     public static void setModel(Model model) {
-        modelRef.compareAndSet(null, model);
+        modelRef.set(model);
     }
 
     private static class KubeClientHolder {
