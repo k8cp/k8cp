@@ -47,8 +47,7 @@ public class View {
         initStageAndShow(
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.MAIN)
-                        .build(),
-                new Stage()
+                        .build()
         );
     }
 
@@ -58,8 +57,7 @@ public class View {
                         .fxmlView(FxmlView.ABOUT)
                         .modality(Modality.APPLICATION_MODAL)
                         .resizeable(false)
-                        .build(),
-                new Stage()
+                        .build()
         );
     }
 
@@ -71,8 +69,7 @@ public class View {
                         .title("%s - %s".formatted(Constants.TITLE, Constants.ERROR_TITLE_SUFFIX))
                         .controller(new ErrorController(errorMsg))
                         .resizeable(false)
-                        .build(),
-                new Stage()
+                        .build()
         );
     }
 
@@ -81,8 +78,7 @@ public class View {
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.KUBE_CONFIG_SELECTION)
                         .resizeable(false)
-                        .build(),
-                new Stage()
+                        .build()
         );
     }
 
@@ -91,8 +87,7 @@ public class View {
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.KUBE_NAMESPACE_SELECTION)
                         .resizeable(false)
-                        .build(),
-                new Stage()
+                        .build()
         );
     }
 
@@ -101,8 +96,7 @@ public class View {
                 StageCreationParam.builder()
                         .fxmlView(FxmlView.KUBE_POD_SELECTION)
                         .resizeable(false)
-                        .build(),
-                new Stage()
+                        .build()
         );
     }
 
@@ -114,8 +108,7 @@ public class View {
                         .title("%s - %s".formatted(Constants.TITLE, Constants.FILE_INFO_TITLE_SUFFIX))
                         .controller(new FileInfoController(fileInfo))
                         .resizeable(false)
-                        .build(),
-                new Stage()
+                        .build()
         );
     }
 
@@ -147,7 +140,7 @@ public class View {
     }
 
     /* Private methods */
-    private void initStageAndShow(StageCreationParam param, Stage stage) {
+    private void initStageAndShow(StageCreationParam param) {
         final FxmlView fxmlView = param.getFxmlView();
         final FXMLLoader loader = FxmlLoaderUtil.createFxmlLoader(fxmlView);
         final Initializable controller = param.getController();
@@ -160,6 +153,7 @@ public class View {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        final Stage stage = new Stage();
         stage.setScene(scene);
         stage.getIcons().add(getMainIcon());
         stage.setTitle(param.getTitle() != null ? param.getTitle() : Constants.TITLE);
