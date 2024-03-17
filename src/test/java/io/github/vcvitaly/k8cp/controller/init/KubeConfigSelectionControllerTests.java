@@ -4,6 +4,7 @@ import io.github.vcvitaly.k8cp.TestUtil;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
 import io.github.vcvitaly.k8cp.context.Context;
 import io.github.vcvitaly.k8cp.context.ServiceLocator;
+import io.github.vcvitaly.k8cp.controller.TestFxTest;
 import io.github.vcvitaly.k8cp.controller.helper.FileChooserHelper;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.model.Model;
@@ -45,7 +46,7 @@ public class KubeConfigSelectionControllerTests {
 
     @Nested
     @ExtendWith(ApplicationExtension.class)
-    class KubeConfigSelectionControllerChoiceBoxTest {
+    class KubeConfigSelectionControllerChoiceBoxTest extends TestFxTest {
 
         private static final View viewMock = mock(View.class);
 
@@ -55,7 +56,6 @@ public class KubeConfigSelectionControllerTests {
 
         @Start
         private void start(Stage stage) {
-            TestUtil.cleanupContext();
             mockViewGetStage();
             ServiceLocator.setView(viewMock);
             final PathProvider pathProvider = mock(PathProvider.class);
@@ -101,7 +101,7 @@ public class KubeConfigSelectionControllerTests {
 
     @Nested
     @ExtendWith(ApplicationExtension.class)
-    class KubeConfigSelectionControllerChooserTest {
+    class KubeConfigSelectionControllerChooserTest extends TestFxTest {
 
         private static final View viewMock = mock(View.class);
 
@@ -111,7 +111,6 @@ public class KubeConfigSelectionControllerTests {
 
         @Start
         private void start(Stage stage) throws Exception {
-            TestUtil.cleanupContext();
             mockViewGetStage();
             ServiceLocator.setView(viewMock);
             final PathProvider pathProvider = mock(PathProvider.class);
