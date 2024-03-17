@@ -24,6 +24,8 @@ import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.view.View;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -87,9 +89,14 @@ public class ServiceLocator {
             if (kubeConfigContainer == null) {
                 throw logAndReturnRuntimeException(new IllegalStateException("Kube config initialization has to be done first"));
             }
-            final KubeClient instance = new KubeClientImpl(kubeConfigContainer);
-            logCreatedNewInstanceOf(instance);
-            return instance;
+            try {
+                final String configYml = Files.readString(Paths.get(kubeConfigContainer.path()));
+                final KubeClient instance = new KubeClientImpl(configYml);
+                logCreatedNewInstanceOf(instance);
+                return instance;
+            } catch (Exception e) {
+                throw new RuntimeException("Could not read kube config due to - %s".formatted(e.getMessage()), e);
+            }
         }
     }
 

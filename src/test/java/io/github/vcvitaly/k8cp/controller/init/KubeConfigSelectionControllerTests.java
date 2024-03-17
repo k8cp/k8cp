@@ -73,7 +73,7 @@ public class KubeConfigSelectionControllerTests {
         }
 
         @Test
-        void choiceBoxIsLoadedSuccessfully(FxRobot robot) {
+        void kubeConfigChoiceBoxIsLoadedSuccessfully(FxRobot robot) {
             final ChoiceBox<KubeConfigContainer> choiceBox = robot.lookup("#configSelector").queryAs(ChoiceBox.class);
             assertThat(choiceBox.getValue())
                     .usingRecursiveComparison()
@@ -134,7 +134,7 @@ public class KubeConfigSelectionControllerTests {
         }
 
         @Test
-        void choiceBoxIsHiddenAndChooserIsExecuted(FxRobot robot) {
+        void kubeConfigChoiceBoxIsHiddenAndChooserIsExecuted(FxRobot robot) {
             assertThat(robot.lookup("#nextBtn").queryButton().isDisable()).isTrue();
             assertThat(robot.lookup("#configSelector").queryAs(ChoiceBox.class).isShowing()).isFalse();
             assertThat(robot.lookup("#chooseFileLbl").queryAs(Label.class).isVisible()).isFalse();
