@@ -56,6 +56,7 @@ public class KubeConfigSelectionControllerTests {
 
         @BeforeAll
         static void beforeAll() {
+            TestUtil.cleanupContext();
             mockViewGetStage();
             ServiceLocator.setView(viewMock);
             final PathProvider pathProvider = mock(PathProvider.class);
@@ -115,6 +116,7 @@ public class KubeConfigSelectionControllerTests {
 
         @BeforeAll
         static void beforeAll() throws Exception {
+            TestUtil.cleanupContext();
             mockViewGetStage();
             ServiceLocator.setView(viewMock);
             final PathProvider pathProvider = mock(PathProvider.class);
