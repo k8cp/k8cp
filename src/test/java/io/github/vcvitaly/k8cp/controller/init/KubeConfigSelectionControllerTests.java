@@ -48,9 +48,9 @@ public class KubeConfigSelectionControllerTests {
     @ExtendWith(ApplicationExtension.class)
     class KubeConfigSelectionControllerChoiceBoxTest extends TestFxTest {
 
-        private static final View viewMock = mock(View.class);
+        private final View viewMock = mock(View.class);
 
-        private static void mockViewGetStage() {
+        private void mockViewGetStage() {
             when(viewMock.getCurrentStage()).thenReturn(mock(Stage.class));
         }
 
@@ -103,9 +103,9 @@ public class KubeConfigSelectionControllerTests {
     @ExtendWith(ApplicationExtension.class)
     class KubeConfigSelectionControllerChooserTest extends TestFxTest {
 
-        private static final View viewMock = mock(View.class);
+        private final View viewMock = mock(View.class);
 
-        private static void mockViewGetStage() {
+        private void mockViewGetStage() {
             when(viewMock.getCurrentStage()).thenReturn(mock(Stage.class));
         }
 
