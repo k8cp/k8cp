@@ -4,6 +4,8 @@ import io.github.vcvitaly.k8cp.client.KubeClient;
 import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.KubeClientImpl;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
+import io.github.vcvitaly.k8cp.controller.helper.FileChooserHelper;
+import io.github.vcvitaly.k8cp.controller.helper.FileChooserHelperImpl;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
 import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
@@ -29,7 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ServiceLocator {
 
-    private static AtomicReference<Model> modelRef = new AtomicReference<>(ModelHolder.instance);
+    private static AtomicReference<Model> modelRef = new AtomicReference<>();
+
+    private static AtomicReference<FileChooserHelper> fileChooserHelperRef = new AtomicReference<>();
 
     private static void logCreatedNewInstanceOf(Object o) {
         log.info(Constants.NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
@@ -41,12 +45,26 @@ public class ServiceLocator {
     }
 
     /* Getters and setters */
-    public static Model getModel() {
+    public static synchronized Model getModel() {
+        if (modelRef.get() == null) {
+            modelRef.set(ModelHolder.instance);
+        }
         return modelRef.get();
     }
 
     public static void setModel(Model model) {
         modelRef.set(model);
+    }
+
+    public static synchronized FileChooserHelper getFileChooserHelper() {
+        if (fileChooserHelperRef.get() == null) {
+            fileChooserHelperRef.set(FileChooserHelperHolder.instance);
+        }
+        return fileChooserHelperRef.get();
+    }
+
+    public static void setFileChooserHelper(FileChooserHelper fileChooserHelper) {
+        fileChooserHelperRef.set(fileChooserHelper);
     }
 
     private static class KubeClientHolder {
@@ -164,6 +182,16 @@ public class ServiceLocator {
                     .pathProvider(PathProviderHolder.instance)
                     .localOsFamilyDetector(LocalOsFamilyDetectorHolder.instance)
                     .build();
+        }
+    }
+
+    private static class FileChooserHelperHolder {
+        private static final FileChooserHelper instance = createInstance();
+
+        private static FileChooserHelper createInstance() {
+            final FileChooserHelper instance = new FileChooserHelperImpl();
+            logCreatedNewInstanceOf(instance);
+            return instance;
         }
     }
 }

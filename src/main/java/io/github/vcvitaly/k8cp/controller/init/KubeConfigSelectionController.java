@@ -70,9 +70,7 @@ public class KubeConfigSelectionController implements Initializable {
     }
 
     private File getFileFromFileChooser() {
-        final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        return fileChooser.showOpenDialog(View.getInstance().getCurrentStage());
+        return ServiceLocator.getFileChooserHelper().getFile("Choose kube config file", View.getInstance().getCurrentStage());
     }
 
     private void setItemsIfKubeConfigsFound(ObservableList<KubeConfigContainer> kubeConfigList) {
