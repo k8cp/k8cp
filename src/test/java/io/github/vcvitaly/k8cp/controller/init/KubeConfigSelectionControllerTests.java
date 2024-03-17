@@ -19,7 +19,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,8 +53,8 @@ public class KubeConfigSelectionControllerTests {
             when(viewMock.getCurrentStage()).thenReturn(mock(Stage.class));
         }
 
-        @BeforeAll
-        static void beforeAll() {
+        @Start
+        private void start(Stage stage) {
             TestUtil.cleanupContext();
             mockViewGetStage();
             ServiceLocator.setView(viewMock);
@@ -70,10 +69,6 @@ public class KubeConfigSelectionControllerTests {
                             ))
                             .build()
             );
-        }
-
-        @Start
-        private void start(Stage stage) {
             View.getInstance().showKubeConfigSelectionWindow();
         }
 
@@ -114,8 +109,8 @@ public class KubeConfigSelectionControllerTests {
             when(viewMock.getCurrentStage()).thenReturn(mock(Stage.class));
         }
 
-        @BeforeAll
-        static void beforeAll() throws Exception {
+        @Start
+        private void start(Stage stage) throws Exception {
             TestUtil.cleanupContext();
             mockViewGetStage();
             ServiceLocator.setView(viewMock);
@@ -136,10 +131,6 @@ public class KubeConfigSelectionControllerTests {
             when(fileChooserHelper.getFile(anyString(), any(Stage.class)))
                     .thenReturn(TestUtil.getFile("/kubeconfig/ok/.kube/%s".formatted(KUBE_CONFIG_YML_FILE_NAME)));
             ServiceLocator.setFileChooserHelper(fileChooserHelper);
-        }
-
-        @Start
-        private void start(Stage stage) {
             View.getInstance().showKubeConfigSelectionWindow();
         }
 
