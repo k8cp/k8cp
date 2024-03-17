@@ -44,6 +44,7 @@ module io.github.vcvitaly.k8cp {
     exports io.github.vcvitaly.k8cp.enumeration;
     exports io.github.vcvitaly.k8cp.util;
     exports io.github.vcvitaly.k8cp.exception;
+    exports io.github.vcvitaly.k8cp.context;
     opens io.github.vcvitaly.k8cp.controller to javafx.fxml;
     opens io.github.vcvitaly.k8cp.controller.menu to javafx.fxml;
     opens io.github.vcvitaly.k8cp.controller.init to javafx.fxml;

@@ -36,7 +36,7 @@ public class RemotePaneController extends PaneController {
             initView();
         } catch (Exception e) {
             log.error("Could not init the remote view", e);
-            View.getInstance().showErrorModal(e.getMessage());
+            ServiceLocator.getView().showErrorModal(e.getMessage());
         }
     }
 

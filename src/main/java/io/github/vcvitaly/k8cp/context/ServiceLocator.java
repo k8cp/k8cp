@@ -23,6 +23,7 @@ import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
 import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
+import io.github.vcvitaly.k8cp.view.View;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ServiceLocator {
 
     private static AtomicReference<Model> modelRef = new AtomicReference<>();
-
     private static AtomicReference<FileChooserHelper> fileChooserHelperRef = new AtomicReference<>();
+    private static AtomicReference<View> viewRef = new AtomicReference<>();
 
     private static void logCreatedNewInstanceOf(Object o) {
         log.info(Constants.NEW_INSTANCE_OF_MSG.formatted(o.getClass().getSimpleName()));
@@ -65,6 +66,17 @@ public class ServiceLocator {
 
     public static void setFileChooserHelper(FileChooserHelper fileChooserHelper) {
         fileChooserHelperRef.set(fileChooserHelper);
+    }
+
+    public static synchronized View getView() {
+        if (viewRef.get() == null) {
+            viewRef.set(View.getInstance());
+        }
+        return viewRef.get();
+    }
+
+    public static void setView(View view) {
+        viewRef.set(view);
     }
 
     private static class KubeClientHolder {

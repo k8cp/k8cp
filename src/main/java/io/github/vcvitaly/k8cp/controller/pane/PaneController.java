@@ -1,5 +1,6 @@
 package io.github.vcvitaly.k8cp.controller.pane;
 
+import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
@@ -77,14 +78,14 @@ public abstract class PaneController implements Initializable {
     protected abstract void initViewCrumb();
 
     protected void initViewCrumb(List<BreadCrumbFile> breadCrumbFiles) {
-        final TreeItem<BreadCrumbFile> treeItem = View.getInstance().toTreeItem(breadCrumbFiles);
+        final TreeItem<BreadCrumbFile> treeItem = ServiceLocator.getView().toTreeItem(breadCrumbFiles);
         getBreadcrumbBar().setSelectedCrumb(treeItem);
     }
 
     protected abstract void initViewItems();
 
     protected void initViewItems(List<FileInfoContainer> files) {
-        final List<FileManagerItem> fileMangerItems = View.getInstance().toFileMangerItems(files);
+        final List<FileManagerItem> fileMangerItems = ServiceLocator.getView().toFileMangerItems(files);
         getView().setItems(FXCollections.observableList(fileMangerItems));
     }
 
@@ -184,12 +185,12 @@ public abstract class PaneController implements Initializable {
     protected abstract void resolveFilesAndBreadcrumbs() throws IOOperationException;
 
     private void setCursor(Cursor cursor) {
-        View.getInstance().getCurrentStage().getScene().setCursor(cursor);
+        ServiceLocator.getView().getCurrentStage().getScene().setCursor(cursor);
     }
 
     protected void handleError(Throwable t) {
         getLog().error("Error: ", t);
-        View.getInstance().showErrorModal(t.getMessage());
+        ServiceLocator.getView().showErrorModal(t.getMessage());
     }
 
     protected void onNavigationBtn(ThrowingRunnable longRunningRunnable) {
@@ -205,8 +206,8 @@ public abstract class PaneController implements Initializable {
                 executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
             }
         } else if (fileType == FileType.FILE || fileType == FileType.SYMLINK) {
-            final String fileItemInfo = View.getInstance().toFileItemInfo(item);
-            View.getInstance().showFileInfoModal(fileItemInfo);
+            final String fileItemInfo = ServiceLocator.getView().toFileItemInfo(item);
+            ServiceLocator.getView().showFileInfoModal(fileItemInfo);
         } else {
             throw new IllegalArgumentException("Unsupported file type " + fileType);
         }

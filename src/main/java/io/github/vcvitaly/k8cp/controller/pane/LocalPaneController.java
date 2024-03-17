@@ -43,7 +43,7 @@ public class LocalPaneController extends PaneController {
             initLocalRootSelector();
         } catch (Exception e) {
             log.error("Could not init the local view", e);
-            View.getInstance().showErrorModal(e.getMessage());
+            ServiceLocator.getView().showErrorModal(e.getMessage());
         }
     }
 

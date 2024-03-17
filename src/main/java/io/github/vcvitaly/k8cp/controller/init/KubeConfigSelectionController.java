@@ -42,14 +42,14 @@ public class KubeConfigSelectionController implements Initializable {
         } catch (IOOperationException | KubeContextExtractionException e) {
             log.error("Could not get kube config list", e);
             setItemsIfNoKubeConfigFound();
-            View.getInstance().showErrorModal(e.getMessage());
+            ServiceLocator.getView().showErrorModal(e.getMessage());
         }
     }
 
     private void onNext() {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
-        View.getInstance().closeStage(selectionStage);
-        View.getInstance().showKubeNamespaceSelectionWindow();
+        ServiceLocator.getView().closeStage(selectionStage);
+        ServiceLocator.getView().showKubeNamespaceSelectionWindow();
     }
 
     private void onFileSelection() {
@@ -64,13 +64,13 @@ public class KubeConfigSelectionController implements Initializable {
                 chooseFromFsLbl.setVisible(false);
                 selectedKubeConfigFileLbl.setText("You selected: " + selection.toString());
             } catch (KubeContextExtractionException ex) {
-                View.getInstance().showErrorModal(ex.getMessage());
+                ServiceLocator.getView().showErrorModal(ex.getMessage());
             }
         }
     }
 
     private File getFileFromFileChooser() {
-        return ServiceLocator.getFileChooserHelper().getFile("Choose kube config file", View.getInstance().getCurrentStage());
+        return ServiceLocator.getFileChooserHelper().getFile("Choose kube config file", ServiceLocator.getView().getCurrentStage());
     }
 
     private void setItemsIfKubeConfigsFound(ObservableList<KubeConfigContainer> kubeConfigList) {

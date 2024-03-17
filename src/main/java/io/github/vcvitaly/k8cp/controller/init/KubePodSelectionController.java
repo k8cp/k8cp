@@ -48,20 +48,20 @@ public class KubePodSelectionController implements Initializable {
         } catch (KubeApiException e) {
             log.error("Could not get pod list", e);
             errorLbl.setText("Could not get pod list");
-            View.getInstance().showErrorModal(e.getMessage());
+            ServiceLocator.getView().showErrorModal(e.getMessage());
         }
     }
 
     private void onNext() {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
-        View.getInstance().closeStage(selectionStage);
-        View.getInstance().showMainWindow();
+        ServiceLocator.getView().closeStage(selectionStage);
+        ServiceLocator.getView().showMainWindow();
     }
 
     private void onPrev() {
         final Stage selectionStage = (Stage) prevBtn.getScene().getWindow();
-        View.getInstance().closeStage(selectionStage);
-        View.getInstance().showKubeNamespaceSelectionWindow();
+        ServiceLocator.getView().closeStage(selectionStage);
+        ServiceLocator.getView().showKubeNamespaceSelectionWindow();
     }
 
     private void setKubePodSelection() {

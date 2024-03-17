@@ -42,20 +42,20 @@ public class KubeNamespaceSelectionController implements Initializable {
         } catch (KubeApiException e) {
             log.error("Could not get namespaces list", e);
             errorLbl.setText("Could not get namespaces list");
-            View.getInstance().showErrorModal(e.getMessage());
+            ServiceLocator.getView().showErrorModal(e.getMessage());
         }
     }
 
     private void onNext() {
         final Stage selectionStage = (Stage) nextBtn.getScene().getWindow();
-        View.getInstance().closeStage(selectionStage);
-        View.getInstance().showKubePodSelectionWindow();
+        ServiceLocator.getView().closeStage(selectionStage);
+        ServiceLocator.getView().showKubePodSelectionWindow();
     }
 
     private void onPrev() {
         final Stage selectionStage = (Stage) prevBtn.getScene().getWindow();
-        View.getInstance().closeStage(selectionStage);
-        View.getInstance().showKubeConfigSelectionWindow();
+        ServiceLocator.getView().closeStage(selectionStage);
+        ServiceLocator.getView().showKubeConfigSelectionWindow();
     }
 
     private void setKubeNamespaceSelection() {
