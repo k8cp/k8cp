@@ -2,6 +2,7 @@ package io.github.vcvitaly.k8cp.controller.init;
 
 import io.github.vcvitaly.k8cp.TestUtil;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
+import io.github.vcvitaly.k8cp.context.Context;
 import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.controller.helper.FileChooserHelper;
 import io.github.vcvitaly.k8cp.domain.KubeConfigContainer;
@@ -38,6 +39,9 @@ public class KubeConfigSelectionControllerTests {
     private static final String KUBE_CONFIG_YML_FILE_NAME = "kube_config.yml";
     private static final String CONTEXT_COPY_NAME = "kind-copy";
     private static final String KUBE_CONFIG_YML_FILE_COPY_NAME = "kube_config_copy.yml";
+    private static KubeConfigContainer EXPECTED_CONFIG_CONTAINER = new KubeConfigContainer(
+            CONTEXT_NAME, KUBE_CONFIG_YML_FILE_NAME, null
+    );
 
     @Nested
     @ExtendWith(ApplicationExtension.class)
@@ -69,7 +73,7 @@ public class KubeConfigSelectionControllerTests {
             assertThat(choiceBox.getValue())
                     .usingRecursiveComparison()
                     .ignoringFields("path")
-                    .isEqualTo(new KubeConfigContainer(CONTEXT_NAME, KUBE_CONFIG_YML_FILE_NAME, null));
+                    .isEqualTo(EXPECTED_CONFIG_CONTAINER);
             assertThat(choiceBox.getItems())
                     .usingRecursiveFieldByFieldElementComparator(
                             RecursiveComparisonConfiguration.builder()
@@ -80,6 +84,10 @@ public class KubeConfigSelectionControllerTests {
                             new KubeConfigContainer(CONTEXT_COPY_NAME, KUBE_CONFIG_YML_FILE_COPY_NAME, null)
                     ));
             assertThat(robot.lookup("#nextBtn").queryButton().isDisable()).isFalse();
+            assertThat(Context.kubeConfigSelectionRef.get())
+                    .usingRecursiveComparison()
+                    .ignoringFields("path")
+                    .isEqualTo(EXPECTED_CONFIG_CONTAINER);
         }
     }
 
@@ -95,9 +103,7 @@ public class KubeConfigSelectionControllerTests {
             final KubeConfigSelectionService kubeConfigSelectionService = mock(KubeConfigSelectionService.class);
             when(kubeConfigSelectionService.getConfigChoices(somePath)).thenReturn(Collections.emptyList());
             when(kubeConfigSelectionService.toKubeConfig(any(Path.class)))
-                    .thenReturn(new KubeConfigContainer(
-                            CONTEXT_NAME, KUBE_CONFIG_YML_FILE_NAME, null
-                    ));
+                    .thenReturn(EXPECTED_CONFIG_CONTAINER);
             ServiceLocator.setModel(
                     Model.builder()
                             .pathProvider(pathProvider)
@@ -123,11 +129,13 @@ public class KubeConfigSelectionControllerTests {
 
             robot.clickOn("#fsChooserBtn");
 
-
             assertThat(robot.lookup("#nextBtn").queryButton().isDisable()).isFalse();
             assertThat(robot.lookup("#selectedKubeConfigFileLbl").queryAs(Label.class).getText())
                     .isEqualTo("You selected: %s - %s".formatted(CONTEXT_NAME, KUBE_CONFIG_YML_FILE_NAME));
             assertThat(robot.lookup("#nextBtn").queryButton().isDisable()).isFalse();
+
+            assertThat(Context.kubeConfigSelectionRef.get())
+                    .isEqualTo(EXPECTED_CONFIG_CONTAINER);
         }
     }
 }

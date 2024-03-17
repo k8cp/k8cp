@@ -47,7 +47,6 @@ public class Model {
     private final AtomicReference<List<BreadCrumbFile>> remoteBreadcrumbTree = new AtomicReference<>();
     private final AtomicReference<List<FileInfoContainer>> localFiles = new AtomicReference<>();
     private final AtomicReference<List<FileInfoContainer>> remoteFiles = new AtomicReference<>();
-
     private final Supplier<KubeService> kubeServiceSupplier;
     private final LocalFsService localFsService;
     private final KubeConfigSelectionService kubeConfigSelectionService;
