@@ -19,6 +19,7 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,8 +49,11 @@ class KubeConfigSelectionControllerTest {
 
     @Test
     void name(FxRobot robot) {
-        final ChoiceBox<KubeConfigContainer> currentSelection = robot.lookup(".choice-box").queryAs(ChoiceBox.class);
-        assertThat(currentSelection.getValue().contextName()).isEqualTo("kind-kind");
-        assertThat(currentSelection.getValue().fileName()).isEqualTo("kube_config.yml");
+        final ChoiceBox<KubeConfigContainer> choiceBox = robot.lookup(".choice-box").queryAs(ChoiceBox.class);
+        assertThat(choiceBox.getValue())
+                .usingRecursiveComparison()
+                .ignoringFields("path")
+                .isEqualTo(new KubeConfigContainer("kind-kind", "kube_config.yml", null));
+
     }
 }

@@ -87,6 +87,7 @@ test {
             "--add-exports", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
             "--add-opens", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
             "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp.controller.init=org.testfx.monocle",
+            "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp.domain=org.assertj.core",
             "-Djava.awt.headless=true", "-Dtestfx.robot=glass", "-Dtestfx.headless=true", "-Dprism.order=sw"
     ])
 }
