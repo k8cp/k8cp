@@ -30,15 +30,19 @@ public class KubeNamespaceSelectionController implements Initializable {
         nextBtn.setOnAction(e -> onNext());
         try {
             final List<KubeNamespace> namespaces = ServiceLocator.getModel().getKubeNamespaces();
-            namespaceSelector.setItems(FXCollections.observableList(namespaces));
-            final KubeNamespace selectedItem = ItemSelectionUtil.getSelectionItem(
-                    namespaces,
-                    selection -> selection.name().equals(Constants.DEFAULT_NAMESPACE_NAME)
-            );
-            namespaceSelector.setValue(selectedItem);
-            setKubeNamespaceSelection(selectedItem);
-            namespaceSelector.valueProperty().addListener(observable -> setKubeNamespaceSelection());
-            nextBtn.setDisable(false);
+            if (!namespaces.isEmpty()) {
+                namespaceSelector.setItems(FXCollections.observableList(namespaces));
+                final KubeNamespace selectedItem = ItemSelectionUtil.getSelectionItem(
+                        namespaces,
+                        selection -> selection.name().equals(Constants.DEFAULT_NAMESPACE_NAME)
+                );
+                namespaceSelector.setValue(selectedItem);
+                setKubeNamespaceSelection(selectedItem);
+                namespaceSelector.valueProperty().addListener(observable -> setKubeNamespaceSelection());
+                nextBtn.setDisable(false);
+            } else {
+                errorLbl.setText("There are no namespaces in this cluster");
+            }
         } catch (KubeApiException e) {
             log.error("Could not get namespaces list", e);
             errorLbl.setText("Could not get namespaces list");
