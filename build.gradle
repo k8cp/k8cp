@@ -73,6 +73,16 @@ dependencies {
 
     testImplementation 'org.zeroturnaround:zt-zip:1.17'
     testImplementation 'org.hamcrest:hamcrest:2.1'
+
+    testImplementation ("org.testcontainers:testcontainers:1.19.7") {
+        exclude group: "org.hamcrest", module: "hamcrest-core"
+    }
+    testImplementation ("org.testcontainers:junit-jupiter:1.19.7") {
+        exclude group: "org.hamcrest", module: "hamcrest-core"
+    }
+    testImplementation ("org.testcontainers:k3s:1.19.7") {
+        exclude group: "org.hamcrest", module: "hamcrest-core"
+    }
 }
 
 test {
@@ -88,6 +98,7 @@ test {
             "--add-opens", "javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
             "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp.controller.init=org.testfx.monocle",
             "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp.domain=org.assertj.core",
+            "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp.client.impl=junit.jupiter",
             "-Djava.awt.headless=true", "-Dtestfx.robot=glass", "-Dtestfx.headless=true", "-Dprism.order=sw"
     ])
 }

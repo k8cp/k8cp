@@ -1,24 +1,13 @@
 package io.github.vcvitaly.k8cp.controller.init;
 
-import io.github.vcvitaly.k8cp.context.ServiceLocator;
-import io.github.vcvitaly.k8cp.model.Model;
-import io.github.vcvitaly.k8cp.view.View;
-import javafx.stage.Stage;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class KubeNamespaceSelectionControllerTests {
 
-    @Nested
+    /*@Nested
     @ExtendWith(ApplicationExtension.class)
     class KubeNamespaceSelectionControllerSuccessTest {
         private final View viewMock = mock(View.class);
+
+        private final K3sContainer k3s = new K3sContainer(DockerImageName.parse("rancher/k3s:v1.26.14-k3s1"));
 
         private void mockViewGetStage() {
             when(viewMock.getCurrentStage()).thenReturn(mock(Stage.class));
@@ -40,5 +29,5 @@ public class KubeNamespaceSelectionControllerTests {
         void namespaceChoiceBoxIsLoadedSuccessfully() {
 
         }
-    }
+    }*/
 }
