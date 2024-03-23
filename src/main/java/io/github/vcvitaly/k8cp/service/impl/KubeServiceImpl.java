@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KubeServiceImpl implements KubeService {
 
-    private static final List<String> LS_PARTS = List.of("ls", "--time-style=long-iso", "-l");
+    private static final List<String> LS_PARTS = List.of("ls", "--full-time", "-l");
     private static final List<String> ECHO_HOME_PARTS = List.of("sh", "-c", "echo $HOME");
     private static final String DIRECTORY_MODIFIER = "d";
     private static final String SYMLINK_MODIFIER = "l";
@@ -77,7 +77,7 @@ public class KubeServiceImpl implements KubeService {
         final long size = Long.parseLong(parts[4]);
         final String date = parts[5];
         final String time = parts[6];
-        final String nameRaw = parts[7];
+        final String nameRaw = parts[8];
         final String fullPath = UnixPathUtil.concatPaths(path, nameRaw);
         final String name = StringUtil.stripEndingSlash(nameRaw);
         final FileSizeContainer fileSizeContainer = sizeConverter.toFileSizeDto(size);
