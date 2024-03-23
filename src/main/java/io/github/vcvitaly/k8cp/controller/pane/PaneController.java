@@ -9,7 +9,6 @@ import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
 import io.github.vcvitaly.k8cp.util.ThrowingRunnable;
-import io.github.vcvitaly.k8cp.view.View;
 import java.util.List;
 import java.util.function.Consumer;
 import javafx.collections.FXCollections;
@@ -49,7 +48,7 @@ public abstract class PaneController implements Initializable {
         return col;
     }
 
-    protected abstract TableView<FileManagerItem> getView();
+    protected abstract TableView<FileManagerItem> getTableView();
 
     protected abstract BreadCrumbBar<BreadCrumbFile> getBreadcrumbBar();
 
@@ -66,8 +65,8 @@ public abstract class PaneController implements Initializable {
     protected abstract BoolStatusReturningConsumer<String> getPathRefSettingConsumer();
 
     protected void initView() {
-        getView().setPlaceholder(getNoRowsToDisplayLbl());
-        getView().getColumns().addAll(getTableColumns());
+        getTableView().setPlaceholder(getNoRowsToDisplayLbl());
+        getTableView().getColumns().addAll(getTableColumns());
         refreshCrumbAndItems();
         initViewButtons();
         initViewMouseSelection(getPathRefSettingConsumer());
@@ -86,7 +85,7 @@ public abstract class PaneController implements Initializable {
 
     protected void initViewItems(List<FileInfoContainer> files) {
         final List<FileManagerItem> fileMangerItems = ServiceLocator.getView().toFileMangerItems(files);
-        getView().setItems(FXCollections.observableList(fileMangerItems));
+        getTableView().setItems(FXCollections.observableList(fileMangerItems));
     }
 
     protected void initViewButtons() {
@@ -110,16 +109,16 @@ public abstract class PaneController implements Initializable {
     }
 
     protected void initViewEnterKeySelection(BoolStatusReturningConsumer<String> pathRefSettingConsumer) {
-        getView().setOnKeyPressed(e -> {
-            if (!getView().getSelectionModel().isEmpty() && e.getCode() == KeyCode.ENTER) {
-                handleViewSelectionAction(pathRefSettingConsumer, getView().getSelectionModel().getSelectedItem());
+        getTableView().setOnKeyPressed(e -> {
+            if (!getTableView().getSelectionModel().isEmpty() && e.getCode() == KeyCode.ENTER) {
+                handleViewSelectionAction(pathRefSettingConsumer, getTableView().getSelectionModel().getSelectedItem());
                 e.consume();
             }
         });
     }
 
     protected void initViewMouseSelection(BoolStatusReturningConsumer<String> pathRefSettingConsumer) {
-        getView().setRowFactory(tv -> {
+        getTableView().setRowFactory(tv -> {
             final TableRow<FileManagerItem> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 2 && !row.isEmpty()) {

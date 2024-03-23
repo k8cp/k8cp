@@ -41,7 +41,7 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected TableView<FileManagerItem> getView() {
+    protected TableView<FileManagerItem> getTableView() {
         return rightView;
     }
 

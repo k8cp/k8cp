@@ -48,7 +48,7 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
-    protected TableView<FileManagerItem> getView() {
+    protected TableView<FileManagerItem> getTableView() {
         return leftView;
     }
 
