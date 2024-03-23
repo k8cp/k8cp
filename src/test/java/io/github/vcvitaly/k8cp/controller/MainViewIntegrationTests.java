@@ -32,6 +32,7 @@ import java.util.List;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
@@ -72,12 +73,10 @@ class MainViewIntegrationTests extends K3sTest {
     @Nested
     @ExtendWith(ApplicationExtension.class)
     class SuccessTest extends TestFxTest {
-        private final View viewMock = mock(View.class);
         private Model model;
 
         @Start
         private void start(Stage stage) {
-            ServiceLocator.setView(viewMock);
             final LocalOsFamilyDetector localOsFamilyDetector = new LocalOsFamilyDetectorImpl();
             final PathProvider pathProvider = mock(PathProvider.class);
             when(pathProvider.provideRemoteRootPath()).thenReturn(Constants.UNIX_ROOT);
@@ -105,14 +104,39 @@ class MainViewIntegrationTests extends K3sTest {
         @Test
         void localAndRemotePanesAreLoadedSuccessfully(FxRobot robot) {
             final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
-            assertThat(localView.getItems()).containsExactlyElementsOf(List.of(
+            final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
+            assertThat(localView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
                     FileManagerItem.builder()
-                            .path("")
-                            .name("")
-                            .size(1)
-                            .sizeUnit(FileSizeUnit.KB)
+                            .name("..")
+                            .fileType(FileType.PARENT_DIRECTORY)
+                            .build(),
+                    FileManagerItem.builder()
+                            .name("bigfile")
+                            .size(2)
+                            .sizeUnit(FileSizeUnit.MB)
+                            .fileType(FileType.FILE)
+                            .build()
+            ));
+            assertThat(remoteView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt", "size")
+                            .build()
+            ).containsAll(List.of(
+                    FileManagerItem.builder()
+                            .name("root")
                             .fileType(FileType.DIRECTORY)
-                            .changedAt("")
+                            .build(),
+                    FileManagerItem.builder()
+                            .name("home")
+                            .fileType(FileType.DIRECTORY)
+                            .build(),
+                    FileManagerItem.builder()
+                            .name("etc")
+                            .fileType(FileType.DIRECTORY)
                             .build()
             ));
         }
