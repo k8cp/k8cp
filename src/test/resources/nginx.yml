@@ -6,6 +6,6 @@ spec:
 #  runtimeClassName: kata-fc
   containers:
     - name: nginx
-      image: 1.25.4-alpine
+      image: nginx:1.25.4-alpine
       ports:
         - containerPort: 80

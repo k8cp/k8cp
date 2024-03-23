@@ -7,6 +7,7 @@ import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Yaml;
 import java.io.File;
@@ -28,14 +29,30 @@ class KubeClientImplTest {
 
     @Container
     private static final K3sContainer K3S = new K3sContainer(DockerImageName.parse("rancher/k3s:v1.27.4-k3s1"));
+    private static final String DEFAULT_NAMESPACE = "default";
 
-    private static String podName;
+    private static V1Pod nginxPod;
+    private static String nginxPodName;
 
     private final KubeClientImpl kubeClient = new KubeClientImpl(K3S.getKubeConfigYaml());
 
     @BeforeAll
-    static void beforeAll() throws URISyntaxException, IOException, ApiException {
-        podName = createNginxPod(K3S).getMetadata().getName();
+    static void beforeAll() throws Exception {
+        final ApiClient client = getClient(K3S);
+        final CoreV1Api api = getApi(client);
+        nginxPod = createNginxPod(api);
+        nginxPodName = nginxPod.getMetadata().getName();
+        for (int i = 0; i < 120; i++) {
+            final V1PodList list = api.listNamespacedPod(DEFAULT_NAMESPACE).execute();
+            final V1Pod foundNginxPod = list.getItems().stream().filter(pod -> pod.getMetadata().getName().equals(nginxPodName))
+                    .findFirst().get();
+            final String phase = foundNginxPod.getStatus().getPhase();
+            if (phase.equals("Running")) {
+                break;
+            }
+            Thread.sleep(1_000);
+            System.out.printf("Waiting for %s to be started%n", nginxPodName);
+        }
     }
 
     @Test
@@ -43,20 +60,20 @@ class KubeClientImplTest {
         final List<KubeNamespace> namespaces = kubeClient.getNamespaces();
 
         assertThat(namespaces)
-                .contains(new KubeNamespace("default"));
+                .contains(new KubeNamespace(DEFAULT_NAMESPACE));
     }
 
     @Test
     void getPodsTest() throws Exception {
-        final List<KubePod> pods = kubeClient.getPods("default");
+        final List<KubePod> pods = kubeClient.getPods(DEFAULT_NAMESPACE);
 
         assertThat(pods)
-                .contains(new KubePod(podName));
+                .contains(new KubePod(nginxPodName));
     }
 
     @Test
     void execAndReturnOutTest() throws Exception {
-        final List<String> lines = kubeClient.execAndReturnOut("default", podName, new String[]{"ls", "/"});
+        final List<String> lines = kubeClient.execAndReturnOut(DEFAULT_NAMESPACE, nginxPodName, new String[]{"ls", "/"});
 
         assertThat(lines).contains("root", "home");
     }
@@ -77,9 +94,7 @@ class KubeClientImplTest {
         return api.createNamespacedPod(namespace, yamlPod).execute();
     }
 
-    private static V1Pod createNginxPod(K3sContainer k3s) throws URISyntaxException, IOException, ApiException {
-        final ApiClient client = getClient(k3s);
-        final CoreV1Api coreApi = getApi(client);
-        return createPod(coreApi, "default", "/nginx.yml");
+    private static V1Pod createNginxPod(CoreV1Api coreApi) throws URISyntaxException, IOException, ApiException {
+        return createPod(coreApi, DEFAULT_NAMESPACE, "/nginx.yml");
     }
 }
