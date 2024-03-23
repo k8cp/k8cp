@@ -8,6 +8,8 @@ import io.github.vcvitaly.k8cp.client.impl.KubeClientImpl;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
 import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
+import io.github.vcvitaly.k8cp.domain.KubeNamespace;
+import io.github.vcvitaly.k8cp.domain.KubePod;
 import io.github.vcvitaly.k8cp.enumeration.FileSizeUnit;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.model.Model;
@@ -94,6 +96,8 @@ class MainViewIntegrationTests extends K3sTest {
                             .localOsFamilyDetector(localOsFamilyDetector)
                             .build()
             );
+            model.setKubeNamespaceSelection(new KubeNamespace(DEFAULT_NAMESPACE));
+            model.setKubePodSelection(new KubePod(nginxPodName));
             ServiceLocator.setModel(model);
             View.getInstance().showMainWindow();
         }

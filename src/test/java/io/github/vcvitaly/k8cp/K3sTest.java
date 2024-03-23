@@ -27,7 +27,7 @@ public abstract class K3sTest {
     protected static String nginxPodName;
 
     @BeforeAll
-    static void beforeAll() throws Exception {
+    static void beforeK3sTest() throws Exception {
         final ApiClient client = getClient(K3S);
         final CoreV1Api api = getApi(client);
         nginxPod = createNginxPod(api);
@@ -43,6 +43,7 @@ public abstract class K3sTest {
             Thread.sleep(1_000);
             System.out.printf("Waiting for %s to be started%n", nginxPodName);
         }
+        System.out.println("Nginx pod is started");
     }
 
     private static ApiClient getClient(K3sContainer k3s) throws IOException {
