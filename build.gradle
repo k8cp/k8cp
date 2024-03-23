@@ -100,6 +100,7 @@ test {
             "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp.domain=org.assertj.core",
             "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp.client.impl=junit.jupiter",
             "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp=junit.jupiter",
+            "--add-opens", "io.github.vcvitaly.k8cp/io.github.vcvitaly.k8cp.controller=org.testfx.junit5",
             "-Djava.awt.headless=true", "-Dtestfx.robot=glass", "-Dtestfx.headless=true", "-Dprism.order=sw"
     ])
 }
