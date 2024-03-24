@@ -7,6 +7,7 @@ import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
+import io.github.vcvitaly.k8cp.service.RootInfoConverter;
 import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.Constants;
@@ -30,6 +31,7 @@ public class LocalFsServiceImpl implements LocalFsService {
     private final LocalFsClient localFsClient;
     private final SizeConverter sizeConverter;
     private final WindowsRootResolver windowsRootResolver;
+    private final RootInfoConverter rootInfoConverter;
 
     @Override
     public List<FileInfoContainer> listFiles(String path, boolean showHidden) throws IOOperationException {
@@ -38,9 +40,8 @@ public class LocalFsServiceImpl implements LocalFsService {
 
     @Override
     public List<RootInfoContainer> listWindowsRoots() {
-        return windowsRootResolver.listLocalRoots().stream()
-                .map(this::toRootInfoContainer)
-                .toList();
+        final List<Path> paths = windowsRootResolver.listLocalRoots();
+        return rootInfoConverter.convert(paths);
     }
 
     @Override
@@ -93,19 +94,11 @@ public class LocalFsServiceImpl implements LocalFsService {
         return DateTimeUtil.toLocalDateTime(fileTime);
     }
 
-    private RootInfoContainer toRootInfoContainer(Path path) {
-        return new RootInfoContainer(path.toString(), LocalFileUtil.normalizeRootPath(path));
-    }
-
     private List<RootInfoContainer> listUnixRoots(String rootsDir) throws IOOperationException {
         final List<RootInfoContainer> roots = new ArrayList<>();
         roots.add(new RootInfoContainer(Constants.UNIX_ROOT, Constants.UNIX_ROOT));
         final List<Path> paths = listPathsInternal(rootsDir);
-        roots.addAll(
-                paths.stream()
-                        .map(this::toRootInfoContainer)
-                        .toList()
-        );
+        roots.addAll(rootInfoConverter.convert(paths));
         return roots;
     }
 }

@@ -10,6 +10,7 @@ import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
+import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileSizeUnit;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.model.Model;
@@ -17,6 +18,7 @@ import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
 import io.github.vcvitaly.k8cp.service.PathProvider;
+import io.github.vcvitaly.k8cp.service.RootInfoConverter;
 import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
@@ -30,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Function;
 import javafx.scene.Node;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -96,8 +99,17 @@ class MainViewIntegrationTests extends K3sTest {
             final LocalFsClient localFsClient = new LocalFsClientImpl();
             final SizeConverter sizeConverter = new SizeConverterImpl();
             final WindowsRootResolver windowsRootResolver = mock(WindowsRootResolver.class);
-            when(windowsRootResolver.listLocalRoots()).thenReturn(List.of(TEST_FS_1_PATH, TEST_FS_2_PATH));
-            final LocalFsService localFsService = new LocalFsServiceImpl(localFsClient, sizeConverter, windowsRootResolver);
+            final List<Path> roots = List.of(TEST_FS_1_PATH, TEST_FS_2_PATH);
+            when(windowsRootResolver.listLocalRoots()).thenReturn(roots);
+            final RootInfoConverter rootInfoConverter = mock(RootInfoConverter.class);
+            Function<Path, RootInfoContainer> rootCreator = p -> new RootInfoContainer(p.toString(), p.getFileName().toString());
+            when(rootInfoConverter.convert(roots)).thenReturn(List.of(
+                    rootCreator.apply(TEST_FS_1_PATH),
+                    rootCreator.apply(TEST_FS_2_PATH)
+            ));
+            final LocalFsService localFsService = new LocalFsServiceImpl(
+                    localFsClient, sizeConverter, windowsRootResolver, rootInfoConverter
+            );
             final KubeClient kubeClient = new KubeClientImpl(K3S.getKubeConfigYaml());
             final KubeService kubeService = new KubeServiceImpl(kubeClient, sizeConverter);
             model = spy(
