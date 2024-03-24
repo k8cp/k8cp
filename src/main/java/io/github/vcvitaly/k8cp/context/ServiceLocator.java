@@ -201,7 +201,9 @@ public class ServiceLocator {
         private static final LocalRootResolver instance = createInstance();
 
         private static LocalRootResolver createInstance() {
-            final LocalRootResolver instance = new LocalRootResolverImpl();
+            final LocalRootResolver instance = new LocalRootResolverImpl(
+                    LocalFsClientHolder.instance, RootInfoConverterHolder.instance
+            );
             logCreatedNewInstanceOf(instance);
             return instance;
         }
