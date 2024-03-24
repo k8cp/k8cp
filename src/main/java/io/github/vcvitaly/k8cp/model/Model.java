@@ -134,13 +134,7 @@ public class Model {
 
     public RootInfoContainer getMainRoot() {
         final OsFamily osFamily = localOsFamilyDetector.detectOsFamily();
-        return switch (osFamily) {
-            case WINDOWS -> new RootInfoContainer(
-                    Constants.WINDOWS_ROOT,
-                    LocalFileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT))
-            );
-            case LINUX, MACOS -> new RootInfoContainer(Constants.UNIX_ROOT, Constants.UNIX_ROOT);
-        };
+        return localFsService.getMainRoot(osFamily);
     }
 
     public FileInfoContainer getRemoteParentDirectory() {

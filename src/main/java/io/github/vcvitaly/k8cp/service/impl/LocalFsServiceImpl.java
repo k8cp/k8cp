@@ -5,6 +5,7 @@ import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileSizeContainer;
 import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
+import io.github.vcvitaly.k8cp.enumeration.OsFamily;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.RootInfoConverter;
@@ -52,6 +53,11 @@ public class LocalFsServiceImpl implements LocalFsService {
     @Override
     public List<RootInfoContainer> listMacosRoots() throws IOOperationException {
         return listUnixRoots(VOLUMES_DIR);
+    }
+
+    @Override
+    public RootInfoContainer getMainRoot(OsFamily osFamily) {
+        return localRootResolver.getMainRoot(osFamily);
     }
 
     private List<FileInfoContainer> listFilesInternal(String path, boolean showHidden) throws IOOperationException {
