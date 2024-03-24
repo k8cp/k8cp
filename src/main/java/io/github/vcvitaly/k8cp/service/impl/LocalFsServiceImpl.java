@@ -8,7 +8,7 @@ import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.RootInfoConverter;
-import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
+import io.github.vcvitaly.k8cp.service.LocalRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
@@ -30,7 +30,7 @@ public class LocalFsServiceImpl implements LocalFsService {
     private static final String VOLUMES_DIR = "/Volumes";
     private final LocalFsClient localFsClient;
     private final SizeConverter sizeConverter;
-    private final WindowsRootResolver windowsRootResolver;
+    private final LocalRootResolver localRootResolver;
     private final RootInfoConverter rootInfoConverter;
 
     @Override
@@ -40,7 +40,7 @@ public class LocalFsServiceImpl implements LocalFsService {
 
     @Override
     public List<RootInfoContainer> listWindowsRoots() {
-        final List<Path> paths = windowsRootResolver.listLocalRoots();
+        final List<Path> paths = localRootResolver.listLocalRoots();
         return rootInfoConverter.convert(paths);
     }
 

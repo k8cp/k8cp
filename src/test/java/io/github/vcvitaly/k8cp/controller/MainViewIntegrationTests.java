@@ -19,7 +19,7 @@ import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
 import io.github.vcvitaly.k8cp.service.PathProvider;
 import io.github.vcvitaly.k8cp.service.RootInfoConverter;
-import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
+import io.github.vcvitaly.k8cp.service.LocalRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
@@ -98,9 +98,9 @@ class MainViewIntegrationTests extends K3sTest {
             when(pathProvider.provideLocalHomePath()).thenReturn(Paths.get(TEST_FS_1_PATH.toString(), "home", "user").toString());
             final LocalFsClient localFsClient = new LocalFsClientImpl();
             final SizeConverter sizeConverter = new SizeConverterImpl();
-            final WindowsRootResolver windowsRootResolver = mock(WindowsRootResolver.class);
+            final LocalRootResolver localRootResolver = mock(LocalRootResolver.class);
             final List<Path> roots = List.of(TEST_FS_1_PATH, TEST_FS_2_PATH);
-            when(windowsRootResolver.listLocalRoots()).thenReturn(roots);
+            when(localRootResolver.listLocalRoots()).thenReturn(roots);
             final RootInfoConverter rootInfoConverter = mock(RootInfoConverter.class);
             Function<Path, RootInfoContainer> rootCreator = p -> new RootInfoContainer(p.toString(), p.getFileName().toString());
             when(rootInfoConverter.convert(roots)).thenReturn(List.of(
@@ -108,7 +108,7 @@ class MainViewIntegrationTests extends K3sTest {
                     rootCreator.apply(TEST_FS_2_PATH)
             ));
             final LocalFsService localFsService = new LocalFsServiceImpl(
-                    localFsClient, sizeConverter, windowsRootResolver, rootInfoConverter
+                    localFsClient, sizeConverter, localRootResolver, rootInfoConverter
             );
             final KubeClient kubeClient = new KubeClientImpl(K3S.getKubeConfigYaml());
             final KubeService kubeService = new KubeServiceImpl(kubeClient, sizeConverter);

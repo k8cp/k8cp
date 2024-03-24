@@ -15,7 +15,7 @@ import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
 import io.github.vcvitaly.k8cp.service.PathProvider;
 import io.github.vcvitaly.k8cp.service.RootInfoConverter;
-import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
+import io.github.vcvitaly.k8cp.service.LocalRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigHelperImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigSelectionServiceImpl;
@@ -24,7 +24,7 @@ import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
 import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
 import io.github.vcvitaly.k8cp.service.impl.RootInfoConverterImpl;
-import io.github.vcvitaly.k8cp.service.impl.WindowsRootResolverImpl;
+import io.github.vcvitaly.k8cp.service.impl.LocalRootResolverImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.view.View;
@@ -147,7 +147,7 @@ public class ServiceLocator {
             final LocalFsServiceImpl instance = new LocalFsServiceImpl(
                     LocalFsClientHolder.instance,
                     SizeConverterHolder.instance,
-                    WindowsRootResolverHolder.instance,
+                    LocalRootResolverHolder.instance,
                     RootInfoConverterHolder.instance
             );
             logCreatedNewInstanceOf(instance);
@@ -197,11 +197,11 @@ public class ServiceLocator {
         }
     }
 
-    private static class WindowsRootResolverHolder {
-        private static final WindowsRootResolver instance = createInstance();
+    private static class LocalRootResolverHolder {
+        private static final LocalRootResolver instance = createInstance();
 
-        private static WindowsRootResolver createInstance() {
-            final WindowsRootResolver instance = new WindowsRootResolverImpl();
+        private static LocalRootResolver createInstance() {
+            final LocalRootResolver instance = new LocalRootResolverImpl();
             logCreatedNewInstanceOf(instance);
             return instance;
         }

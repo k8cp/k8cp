@@ -1,12 +1,12 @@
 package io.github.vcvitaly.k8cp.service.impl;
 
-import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
+import io.github.vcvitaly.k8cp.service.LocalRootResolver;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-public class WindowsRootResolverImpl implements WindowsRootResolver {
+public class LocalRootResolverImpl implements LocalRootResolver {
     @Override
     public List<Path> listLocalRoots() {
         final File[] roots = File.listRoots();
