@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import javafx.scene.Node;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
@@ -51,6 +53,10 @@ import static org.mockito.Mockito.when;
 class MainViewIntegrationTests extends K3sTest {
 
     private static final Path TEST_FS_PATH;
+    private static final FileManagerItem PARENT_DIRECTORY_ITEM = FileManagerItem.builder()
+            .name("..")
+            .fileType(FileType.PARENT_DIRECTORY)
+            .build();
 
     static {
         try {
@@ -102,18 +108,88 @@ class MainViewIntegrationTests extends K3sTest {
         }
 
         @Test
-        void localAndRemotePanesAreLoadedSuccessfully(FxRobot robot) {
+        void localPaneIsLoadedSuccessfully_navigateToParentViaTableCell_navigateBackHome(FxRobot robot) {
+            // Initial assert
             final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
-            final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
+            assertLocalHomeFiles(localView);
+
+            // Navigate to parent via table cell click
+            robot.doubleClickOn(
+                    (Node) robot.lookup(".table-row-cell")
+                            .match(
+                                    (TableRow<FileManagerItem> row) -> {
+                                        final FileManagerItem item = row.getItem();
+                                        return item != null && item.getName().equals("..") &&
+                                                row.getTableView().getItems().stream().anyMatch(fmi -> fmi.getName().equals("bigfile"));
+                                    }
+                            ).query()
+            );
+
+            // Assert
             assertThat(localView.getItems()).usingRecursiveFieldByFieldElementComparator(
                     RecursiveComparisonConfiguration.builder()
                             .withIgnoredFields("path", "changedAt")
                             .build()
             ).containsExactlyInAnyOrderElementsOf(List.of(
+                    PARENT_DIRECTORY_ITEM,
                     FileManagerItem.builder()
-                            .name("..")
-                            .fileType(FileType.PARENT_DIRECTORY)
-                            .build(),
+                            .name("user")
+                            .fileType(FileType.DIRECTORY)
+                            .build()
+            ));
+
+            // Navigate back home
+            robot.clickOn("#leftHomeBtn");
+
+            // Assert
+            assertLocalHomeFiles(localView);
+        }
+
+        @Test
+        void remotePaneIsLoadedSuccessfully_navigateToRootHome_navigateBackToRoot(FxRobot robot) {
+            // Initial assert
+            final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
+            assertRemoteRootFiles(remoteView);
+            int itemsHashCode = remoteView.getItems().hashCode();
+
+            // Navigate to root via table cell click
+            robot.doubleClickOn(
+                    (Node) robot.lookup(".table-row-cell")
+                            .match(
+                                    (TableRow<FileManagerItem> row) -> {
+                                        final FileManagerItem item = row.getItem();
+                                        return item != null && item.getName().equals("root") &&
+                                                row.getTableView().getItems().stream().anyMatch(fmi -> fmi.getName().equals("mnt"));
+                                    }
+                            ).query()
+            );
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertThat(remoteView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
+                    PARENT_DIRECTORY_ITEM
+            ));
+
+            // Navigate back to root
+            itemsHashCode = remoteView.getItems().hashCode();
+            robot.clickOn("#rightRootBtn");
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertRemoteRootFiles(remoteView);
+        }
+
+        private static void assertLocalHomeFiles(TableView<FileManagerItem> localView) {
+            assertThat(localView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
+                    PARENT_DIRECTORY_ITEM,
                     FileManagerItem.builder()
                             .name("bigfile")
                             .size(2)
@@ -121,6 +197,9 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.FILE)
                             .build()
             ));
+        }
+
+        private static void assertRemoteRootFiles(TableView<FileManagerItem> remoteView) {
             assertThat(remoteView.getItems()).usingRecursiveFieldByFieldElementComparator(
                     RecursiveComparisonConfiguration.builder()
                             .withIgnoredFields("path", "changedAt", "size")
@@ -139,6 +218,20 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.DIRECTORY)
                             .build()
             ));
+        }
+    }
+
+    private static void waitForItemsToChange(TableView<FileManagerItem> view, int oldItemsHashCode) {
+        for (int i = 0; i < 100; i++) {
+            if (view.getItems().hashCode() != oldItemsHashCode) {
+                break;
+            }
+            System.out.println("Waiting for the items to change after double click action");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
