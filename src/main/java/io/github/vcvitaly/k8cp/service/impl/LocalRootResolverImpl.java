@@ -26,11 +26,13 @@ public class LocalRootResolverImpl implements LocalRootResolver {
     private final RootInfoConverter rootInfoConverter;
 
     @Override
-    public List<Path> listWindowsRoots() {
+    public List<RootInfoContainer> listWindowsRoots() {
         final File[] roots = File.listRoots();
-        return Arrays.stream(roots)
-                .map(File::toPath)
-                .toList();
+        return rootInfoConverter.convert(
+                Arrays.stream(roots)
+                        .map(File::toPath)
+                        .toList()
+        );
     }
 
     @Override

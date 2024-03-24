@@ -147,8 +147,7 @@ public class ServiceLocator {
             final LocalFsServiceImpl instance = new LocalFsServiceImpl(
                     LocalFsClientHolder.instance,
                     SizeConverterHolder.instance,
-                    LocalRootResolverHolder.instance,
-                    RootInfoConverterHolder.instance
+                    LocalRootResolverHolder.instance
             );
             logCreatedNewInstanceOf(instance);
             return instance;

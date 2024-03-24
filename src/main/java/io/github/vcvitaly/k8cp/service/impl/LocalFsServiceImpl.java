@@ -9,7 +9,6 @@ import io.github.vcvitaly.k8cp.enumeration.OsFamily;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalRootResolver;
-import io.github.vcvitaly.k8cp.service.RootInfoConverter;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
 import io.github.vcvitaly.k8cp.util.LocalFileUtil;
@@ -29,7 +28,6 @@ public class LocalFsServiceImpl implements LocalFsService {
     private final LocalFsClient localFsClient;
     private final SizeConverter sizeConverter;
     private final LocalRootResolver localRootResolver;
-    private final RootInfoConverter rootInfoConverter;
 
     @Override
     public List<FileInfoContainer> listFiles(String path, boolean showHidden) throws IOOperationException {
@@ -38,8 +36,7 @@ public class LocalFsServiceImpl implements LocalFsService {
 
     @Override
     public List<RootInfoContainer> listWindowsRoots() {
-        final List<Path> paths = localRootResolver.listWindowsRoots();
-        return rootInfoConverter.convert(paths);
+        return localRootResolver.listWindowsRoots();
     }
 
     @Override
