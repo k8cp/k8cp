@@ -100,7 +100,7 @@ class MainViewIntegrationTests extends K3sTest {
             final SizeConverter sizeConverter = new SizeConverterImpl();
             final LocalRootResolver localRootResolver = mock(LocalRootResolver.class);
             final List<Path> roots = List.of(TEST_FS_1_PATH, TEST_FS_2_PATH);
-            when(localRootResolver.listLocalRoots()).thenReturn(roots);
+            when(localRootResolver.listWindowsRoots()).thenReturn(roots);
             final RootInfoConverter rootInfoConverter = mock(RootInfoConverter.class);
             Function<Path, RootInfoContainer> rootCreator = p -> new RootInfoContainer(p.toString(), p.getFileName().toString());
             when(rootInfoConverter.convert(roots)).thenReturn(List.of(

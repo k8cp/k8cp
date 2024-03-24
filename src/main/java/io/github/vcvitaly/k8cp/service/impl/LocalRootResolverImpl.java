@@ -8,7 +8,7 @@ import java.util.List;
 
 public class LocalRootResolverImpl implements LocalRootResolver {
     @Override
-    public List<Path> listLocalRoots() {
+    public List<Path> listWindowsRoots() {
         final File[] roots = File.listRoots();
         return Arrays.stream(roots)
                 .map(File::toPath)

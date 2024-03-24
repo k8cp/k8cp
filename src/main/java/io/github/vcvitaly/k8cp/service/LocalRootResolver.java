@@ -4,5 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface LocalRootResolver {
-    List<Path> listLocalRoots();
+    List<Path> listWindowsRoots();
+
+
 }

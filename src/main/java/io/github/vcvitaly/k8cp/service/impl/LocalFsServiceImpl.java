@@ -40,7 +40,7 @@ public class LocalFsServiceImpl implements LocalFsService {
 
     @Override
     public List<RootInfoContainer> listWindowsRoots() {
-        final List<Path> paths = localRootResolver.listLocalRoots();
+        final List<Path> paths = localRootResolver.listWindowsRoots();
         return rootInfoConverter.convert(paths);
     }
 
