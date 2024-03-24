@@ -17,7 +17,7 @@ class LocalFsClientImplTest {
     @Test
     void listsFilesTest() throws Exception {
         final Path testFsPath = Files.createTempDirectory("test_fs");
-        ZipUtil.unpack(TestUtil.getFile("/test_fs.zip"), testFsPath.toFile());
+        ZipUtil.unpack(TestUtil.getFile("/test_fs_1.zip"), testFsPath.toFile());
 
         final List<Path> paths = localFsClient.listFiles(testFsPath.toString());
         assertThat(paths.stream().map(p -> p.getFileName().toString()))

@@ -14,6 +14,7 @@ import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
 import io.github.vcvitaly.k8cp.service.PathProvider;
+import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigHelperImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigSelectionServiceImpl;
@@ -21,6 +22,7 @@ import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
 import io.github.vcvitaly.k8cp.service.impl.PathProviderImpl;
+import io.github.vcvitaly.k8cp.service.impl.WindowsRootResolverImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.view.View;
@@ -141,7 +143,7 @@ public class ServiceLocator {
 
         private static LocalFsService createInstance() {
             final LocalFsServiceImpl instance = new LocalFsServiceImpl(
-                    LocalFsClientHolder.instance, SizeConverterHolder.instance
+                    LocalFsClientHolder.instance, SizeConverterHolder.instance, WindowsRootResolverHolder.instance
             );
             logCreatedNewInstanceOf(instance);
             return instance;
@@ -185,6 +187,16 @@ public class ServiceLocator {
 
         private static LocalOsFamilyDetector createInstance() {
             final LocalOsFamilyDetector instance = new LocalOsFamilyDetectorImpl();
+            logCreatedNewInstanceOf(instance);
+            return instance;
+        }
+    }
+
+    private static class WindowsRootResolverHolder {
+        private static final WindowsRootResolver instance = createInstance();
+
+        private static WindowsRootResolver createInstance() {
+            final WindowsRootResolver instance = new WindowsRootResolverImpl();
             logCreatedNewInstanceOf(instance);
             return instance;
         }

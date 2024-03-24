@@ -7,11 +7,11 @@ import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
+import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
 import io.github.vcvitaly.k8cp.util.LocalFileUtil;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,7 +19,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +29,7 @@ public class LocalFsServiceImpl implements LocalFsService {
     private static final String VOLUMES_DIR = "/Volumes";
     private final LocalFsClient localFsClient;
     private final SizeConverter sizeConverter;
+    private final WindowsRootResolver windowsRootResolver;
 
     @Override
     public List<FileInfoContainer> listFiles(String path, boolean showHidden) throws IOOperationException {
@@ -38,9 +38,7 @@ public class LocalFsServiceImpl implements LocalFsService {
 
     @Override
     public List<RootInfoContainer> listWindowsRoots() {
-        final File[] roots = File.listRoots();
-        return Arrays.stream(roots)
-                .map(File::toPath)
+        return windowsRootResolver.listLocalRoots().stream()
                 .map(this::toRootInfoContainer)
                 .toList();
     }

@@ -17,6 +17,7 @@ import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
 import io.github.vcvitaly.k8cp.service.PathProvider;
+import io.github.vcvitaly.k8cp.service.WindowsRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
@@ -52,7 +53,8 @@ import static org.mockito.Mockito.when;
 
 class MainViewIntegrationTests extends K3sTest {
 
-    private static final Path TEST_FS_PATH;
+    private static final Path TEST_FS_1_PATH;
+    private static final Path TEST_FS_2_PATH;
     private static final FileManagerItem PARENT_DIRECTORY_ITEM = FileManagerItem.builder()
             .name("..")
             .fileType(FileType.PARENT_DIRECTORY)
@@ -60,7 +62,8 @@ class MainViewIntegrationTests extends K3sTest {
 
     static {
         try {
-            TEST_FS_PATH = Files.createTempDirectory("test_fs");
+            TEST_FS_1_PATH = Files.createTempDirectory("test_fs_1_");
+            TEST_FS_2_PATH = Files.createTempDirectory("test_fs_2_");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -68,12 +71,14 @@ class MainViewIntegrationTests extends K3sTest {
 
     @BeforeAll
     static void beforeAll() throws Exception {
-        ZipUtil.unpack(TestUtil.getFile("/test_fs.zip"), TEST_FS_PATH.toFile());
+        ZipUtil.unpack(TestUtil.getFile("/test_fs_1.zip"), TEST_FS_1_PATH.toFile());
+        ZipUtil.unpack(TestUtil.getFile("/test_fs_2.zip"), TEST_FS_2_PATH.toFile());
     }
 
     @AfterAll
     static void afterAll() throws Exception {
-        FileUtils.deleteDirectory(TEST_FS_PATH.toFile());
+        FileUtils.deleteDirectory(TEST_FS_1_PATH.toFile());
+        FileUtils.deleteDirectory(TEST_FS_2_PATH.toFile());
     }
 
     @Nested
@@ -86,11 +91,13 @@ class MainViewIntegrationTests extends K3sTest {
             final LocalOsFamilyDetector localOsFamilyDetector = new LocalOsFamilyDetectorImpl();
             final PathProvider pathProvider = mock(PathProvider.class);
             when(pathProvider.provideRemoteRootPath()).thenReturn(Constants.UNIX_ROOT);
-            when(pathProvider.provideLocalRootPath()).thenReturn(TEST_FS_PATH.toString());
-            when(pathProvider.provideLocalHomePath()).thenReturn(Paths.get(TEST_FS_PATH.toString(), "home", "user").toString());
+            when(pathProvider.provideLocalRootPath()).thenReturn(TEST_FS_1_PATH.toString());
+            when(pathProvider.provideLocalHomePath()).thenReturn(Paths.get(TEST_FS_1_PATH.toString(), "home", "user").toString());
             final LocalFsClient localFsClient = new LocalFsClientImpl();
             final SizeConverter sizeConverter = new SizeConverterImpl();
-            final LocalFsService localFsService = new LocalFsServiceImpl(localFsClient, sizeConverter);
+            final WindowsRootResolver windowsRootResolver = mock(WindowsRootResolver.class);
+            when(windowsRootResolver.listLocalRoots()).thenReturn(List.of(TEST_FS_1_PATH, TEST_FS_2_PATH));
+            final LocalFsService localFsService = new LocalFsServiceImpl(localFsClient, sizeConverter, windowsRootResolver);
             final KubeClient kubeClient = new KubeClientImpl(K3S.getKubeConfigYaml());
             final KubeService kubeService = new KubeServiceImpl(kubeClient, sizeConverter);
             model = spy(
