@@ -11,7 +11,7 @@ public class LocalFileUtil {
         if (showHidden) {
             return true;
         }
-        if (p.equals(p.getRoot())) {
+        if (p.equals(getRoot(p))) {
             return true;
         }
         return !p.getFileName().toString().startsWith(".") && !p.toFile().isHidden();
@@ -29,9 +29,23 @@ public class LocalFileUtil {
         return isRoot(path) ? normalizeRootPath(path) : path.getFileName().toString();
     }
 
-    public static boolean isInTheSameRoot(String path1Str, String path2Str) {
-        final Path path1 = Paths.get(path1Str);
-        final Path path2 = Paths.get(path2Str);
-        return path1.getRoot().equals(path2.getRoot());
+    public static boolean isInTheSameRoot(Path path1, Path path2) {
+        return getRoot(path1).equals(getRoot(path2));
+    }
+
+    public static Path getRoot(Path path1) {
+        return path1.getRoot();
+    }
+
+    public static Path concatPaths(Path p1, Path p2) {
+        return p1.resolve(p2);
+    }
+
+    public static Path getPath(String path) {
+        return Paths.get(path);
+    }
+
+    public static Path getParent(Path path) {
+        return path.getParent();
     }
 }

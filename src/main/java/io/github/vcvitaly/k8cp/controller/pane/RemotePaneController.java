@@ -6,8 +6,8 @@ import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
-import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.control.Button;
@@ -76,7 +76,7 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected BoolStatusReturningConsumer<String> getPathRefSettingConsumer() {
+    protected BoolStatusReturningConsumer<Path> getPathRefSettingConsumer() {
         return ServiceLocator.getModel()::setRemotePathRef;
     }
 
@@ -124,7 +124,7 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected void onBreadcrumb(BoolStatusReturningConsumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
+    protected void onBreadcrumb(BoolStatusReturningConsumer<Path> pathRefSettingConsumer, BreadCrumbFile selection) {
         onBreadcrumbInternal(pathRefSettingConsumer, selection, ServiceLocator.getModel()::resolveRemoteFiles);
     }
 }

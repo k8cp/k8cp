@@ -16,6 +16,6 @@ public class RootInfoConverterImpl implements RootInfoConverter {
     }
 
     private RootInfoContainer toRootInfoContainer(Path path) {
-        return new RootInfoContainer(path.toString(), LocalFileUtil.normalizeRootPath(path));
+        return new RootInfoContainer(path, LocalFileUtil.normalizeRootPath(path));
     }
 }

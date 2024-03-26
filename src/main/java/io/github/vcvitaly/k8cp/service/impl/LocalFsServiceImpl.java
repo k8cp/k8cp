@@ -30,7 +30,7 @@ public class LocalFsServiceImpl implements LocalFsService {
     private final LocalRootResolver localRootResolver;
 
     @Override
-    public List<FileInfoContainer> listFiles(String path, boolean showHidden) throws IOOperationException {
+    public List<FileInfoContainer> listFiles(Path path, boolean showHidden) throws IOOperationException {
         return listFilesInternal(path, showHidden);
     }
 
@@ -54,7 +54,7 @@ public class LocalFsServiceImpl implements LocalFsService {
         return localRootResolver.getMainRoot(osFamily);
     }
 
-    private List<FileInfoContainer> listFilesInternal(String path, boolean showHidden) throws IOOperationException {
+    private List<FileInfoContainer> listFilesInternal(Path path, boolean showHidden) throws IOOperationException {
         final List<Path> pathsUnfiltered = listPathsInternal(path);
         final List<Path> paths = pathsUnfiltered.stream()
                 .filter(p -> LocalFileUtil.shouldBeShownBasedOnHiddenFlag(p, showHidden))
@@ -67,7 +67,7 @@ public class LocalFsServiceImpl implements LocalFsService {
         return list;
     }
 
-    private List<Path> listPathsInternal(String path) throws IOOperationException {
+    private List<Path> listPathsInternal(Path path) throws IOOperationException {
         return localFsClient.listFiles(path);
     }
 
@@ -77,7 +77,7 @@ public class LocalFsServiceImpl implements LocalFsService {
             final FileSizeContainer fileSizeContainer = sizeConverter.toFileSizeDto(size);
             final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
             return FileInfoContainer.builder()
-                    .path(path.toString())
+                    .path(path)
                     .name(LocalFileUtil.getPathFilename(path))
                     .sizeBytes(size)
                     .size(fileSizeContainer.sizeInUnit())

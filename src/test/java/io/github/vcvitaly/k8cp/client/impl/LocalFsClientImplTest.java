@@ -1,12 +1,13 @@
 package io.github.vcvitaly.k8cp.client.impl;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 import io.github.vcvitaly.k8cp.TestUtil;
-import java.nio.file.Files;
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.List;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
-import org.zeroturnaround.zip.ZipUtil;
+import org.tinyzip.TinyZip;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,12 +17,15 @@ class LocalFsClientImplTest {
 
     @Test
     void listsFilesTest() throws Exception {
-        final Path testFsPath = Files.createTempDirectory("test_fs");
-        ZipUtil.unpack(TestUtil.getFile("/test_fs_1.zip"), testFsPath.toFile());
+        final Configuration configuration = Configuration.forCurrentPlatform().toBuilder().setWorkingDirectory("/").build();
+        try (final FileSystem fs = Jimfs.newFileSystem(configuration)) {
+            final Path root = fs.getPath("/");
 
-        final List<Path> paths = localFsClient.listFiles(testFsPath.toString());
-        assertThat(paths.stream().map(p -> p.getFileName().toString()))
-                .containsExactlyInAnyOrderElementsOf(List.of("root", "home", "etc"));
-        FileUtils.deleteDirectory(testFsPath.toFile());
+            TinyZip.unzip(TestUtil.getPath("/test_fs_1.zip"), root);
+
+            final List<Path> paths = localFsClient.listFiles(root);
+            assertThat(paths.stream().map(p -> p.getFileName().toString()))
+                    .containsExactlyInAnyOrderElementsOf(List.of("root", "home", "etc"));
+        }
     }
 }

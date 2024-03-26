@@ -49,17 +49,17 @@ public class LocalRootResolverImpl implements LocalRootResolver {
     public RootInfoContainer getMainRoot(OsFamily osFamily) {
         return switch (osFamily) {
             case WINDOWS -> new RootInfoContainer(
-                    Constants.WINDOWS_ROOT,
+                    LocalFileUtil.getPath(Constants.WINDOWS_ROOT),
                     LocalFileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT))
             );
-            case LINUX, MACOS -> new RootInfoContainer(Constants.UNIX_ROOT, Constants.UNIX_ROOT);
+            case LINUX, MACOS -> new RootInfoContainer(LocalFileUtil.getPath(Constants.UNIX_ROOT), Constants.UNIX_ROOT);
         };
     }
 
     private List<RootInfoContainer> listUnixRoots(String rootsDir) throws IOOperationException {
         final List<RootInfoContainer> roots = new ArrayList<>();
-        roots.add(new RootInfoContainer(Constants.UNIX_ROOT, Constants.UNIX_ROOT));
-        final List<Path> paths = localFsClient.listFiles(rootsDir);
+        roots.add(new RootInfoContainer(LocalFileUtil.getPath(Constants.UNIX_ROOT), Constants.UNIX_ROOT));
+        final List<Path> paths = localFsClient.listFiles(Paths.get(rootsDir));
         roots.addAll(rootInfoConverter.convert(paths));
         return roots;
     }

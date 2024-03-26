@@ -9,8 +9,8 @@ import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
 import io.github.vcvitaly.k8cp.util.LocalFileUtil;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
-import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -83,7 +83,7 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
-    protected BoolStatusReturningConsumer<String> getPathRefSettingConsumer() {
+    protected BoolStatusReturningConsumer<Path> getPathRefSettingConsumer() {
         return ServiceLocator.getModel()::setLocalPathRef;
     }
 
@@ -113,8 +113,9 @@ public class LocalPaneController extends PaneController {
     @Override
     protected void onParentBtn() {
         onNavigationBtn(() -> {
-            ServiceLocator.getModel().setLocalPathRefToParent();
-            resolveFilesAndBreadcrumbs();
+            if (ServiceLocator.getModel().setLocalPathRefToParent()) {
+                resolveFilesAndBreadcrumbs();
+            }
         });
     }
 
@@ -143,13 +144,13 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
-    protected void onBreadcrumb(BoolStatusReturningConsumer<String> pathRefSettingConsumer, BreadCrumbFile selection) {
+    protected void onBreadcrumb(BoolStatusReturningConsumer<Path> pathRefSettingConsumer, BreadCrumbFile selection) {
         onBreadcrumbInternal(pathRefSettingConsumer, selection, ServiceLocator.getModel()::resolveLocalFiles);
     }
 
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
-        final String rootPath = root.path();
+        final Path rootPath = root.path();
         if (!LocalFileUtil.isInTheSameRoot(rootPath, ServiceLocator.getModel().getLocalPath())) {
             if (ServiceLocator.getModel().setLocalPathRef(rootPath)) {
                 executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);

@@ -14,6 +14,7 @@ import io.github.vcvitaly.k8cp.service.impl.KubeConfigHelperImpl;
 import io.github.vcvitaly.k8cp.service.impl.KubeConfigSelectionServiceImpl;
 import io.github.vcvitaly.k8cp.view.View;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import javafx.scene.control.ChoiceBox;
@@ -60,7 +61,7 @@ public class KubeConfigSelectionControllerTests {
             ServiceLocator.setView(viewMock);
             final PathProvider pathProvider = mock(PathProvider.class);
             final Path homePath = TestUtil.getPath("/kubeconfig/ok");
-            when(pathProvider.provideLocalHomePath()).thenReturn(homePath.toString());
+            when(pathProvider.provideLocalHomePath()).thenReturn(homePath);
             ServiceLocator.setModel(
                     Model.builder()
                             .pathProvider(pathProvider)
@@ -114,7 +115,7 @@ public class KubeConfigSelectionControllerTests {
             mockViewGetStage();
             ServiceLocator.setView(viewMock);
             final PathProvider pathProvider = mock(PathProvider.class);
-            final String somePath = "some_path";
+            final Path somePath = Paths.get("some_path");
             when(pathProvider.provideLocalHomePath()).thenReturn(somePath);
             final KubeConfigSelectionService kubeConfigSelectionService = mock(KubeConfigSelectionService.class);
             when(kubeConfigSelectionService.getConfigChoices(somePath)).thenReturn(Collections.emptyList());

@@ -27,6 +27,7 @@ import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
+import io.github.vcvitaly.k8cp.util.LocalFileUtil;
 import io.github.vcvitaly.k8cp.view.View;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -80,7 +81,7 @@ class MainViewIntegrationTests extends K3sTest {
         };
         TEST_FS_1_PATH = tmpPathCreator.apply(TEST_FS_1);
         TEST_FS_2_PATH = tmpPathCreator.apply(TEST_FS_2);
-        Function<Path, RootInfoContainer> rootCreator = p -> new RootInfoContainer(p.toString(), p.getFileName().toString());
+        Function<Path, RootInfoContainer> rootCreator = p -> new RootInfoContainer(p, p.getFileName().toString());
         ROOTS = List.of(
                 rootCreator.apply(TEST_FS_1_PATH),
                 rootCreator.apply(TEST_FS_2_PATH)
@@ -108,9 +109,9 @@ class MainViewIntegrationTests extends K3sTest {
         private void start(Stage stage) throws IOOperationException {
             final LocalOsFamilyDetector localOsFamilyDetector = new LocalOsFamilyDetectorImpl();
             final PathProvider pathProvider = mock(PathProvider.class);
-            when(pathProvider.provideRemoteRootPath()).thenReturn(Constants.UNIX_ROOT);
-            when(pathProvider.provideLocalRootPath()).thenReturn(TEST_FS_1_PATH.toString());
-            when(pathProvider.provideLocalHomePath()).thenReturn(Paths.get(TEST_FS_1_PATH.toString(), "home", "user").toString());
+            when(pathProvider.provideRemoteRootPath()).thenReturn(LocalFileUtil.getPath(Constants.UNIX_ROOT));
+            when(pathProvider.provideLocalRootPath()).thenReturn(TEST_FS_1_PATH);
+            when(pathProvider.provideLocalHomePath()).thenReturn(TEST_FS_1_PATH.resolve("home").resolve("user"));
             final LocalFsClient localFsClient = new LocalFsClientImpl();
             final SizeConverter sizeConverter = new SizeConverterImpl();
             final LocalRootResolver localRootResolver = mock(LocalRootResolver.class);
