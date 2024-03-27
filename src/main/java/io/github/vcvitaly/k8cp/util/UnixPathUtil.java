@@ -36,6 +36,6 @@ public class UnixPathUtil {
     }
 
     public static String normalizePathToString(Path path) {
-        return path.toString().replaceAll(Constants.WINDOWS_SEPARATOR, Constants.UNIX_SEPARATOR);
+        return path.toString().replaceAll(Constants.WINDOWS_SEPARATOR_REGEX, Constants.UNIX_SEPARATOR);
     }
 }

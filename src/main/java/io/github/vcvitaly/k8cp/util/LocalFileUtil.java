@@ -22,7 +22,9 @@ public class LocalFileUtil {
     }
 
     public static String normalizeRootPath(Path root) {
-        return root.toString().replace(Constants.WINDOWS_DRIVE_LETTER_SUFFIX, "");
+        return root.toString()
+                .replace(Constants.WINDOWS_DRIVE_LETTER_SUFFIX, "")
+                .replace(Constants.WINDOWS_SEPARATOR, Constants.UNIX_SEPARATOR);
     }
 
     public static String getPathFilename(Path path) {
