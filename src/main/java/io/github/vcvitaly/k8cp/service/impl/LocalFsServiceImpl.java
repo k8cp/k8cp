@@ -56,9 +56,12 @@ public class LocalFsServiceImpl implements LocalFsService {
 
     private List<FileInfoContainer> listFilesInternal(Path path, boolean showHidden) throws IOOperationException {
         final List<Path> pathsUnfiltered = listPathsInternal(path);
-        final List<Path> paths = pathsUnfiltered.stream()
-                .filter(p -> PathUtil.shouldBeShownBasedOnHiddenFlag(p, showHidden))
-                .toList();
+        final List<Path> paths = new ArrayList<>();
+        for (Path p : pathsUnfiltered) {
+            if (PathUtil.shouldBeShownBasedOnHiddenFlag(p, showHidden)) {
+                paths.add(p);
+            }
+        }
         final List<FileInfoContainer> list = new ArrayList<>();
         for (Path p : paths) {
             final FileInfoContainer fileInfoContainer = toFileInfoContainer(p);

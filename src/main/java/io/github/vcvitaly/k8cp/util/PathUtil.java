@@ -1,5 +1,8 @@
 package io.github.vcvitaly.k8cp.util;
 
+import io.github.vcvitaly.k8cp.exception.IOOperationException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import lombok.experimental.UtilityClass;
@@ -7,14 +10,18 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class PathUtil {
 
-    public static boolean shouldBeShownBasedOnHiddenFlag(Path p, boolean showHidden) {
+    public static boolean shouldBeShownBasedOnHiddenFlag(Path p, boolean showHidden) throws IOOperationException {
         if (showHidden) {
             return true;
         }
         if (p.equals(getRoot(p))) {
             return true;
         }
-        return !p.getFileName().toString().startsWith(".") && !p.toFile().isHidden();
+        try {
+            return !p.getFileName().toString().startsWith(".") && !Files.isHidden(p);
+        } catch (IOException e) {
+            throw new IOOperationException("Cannot verify if %s is hidden".formatted(p), e);
+        }
     }
 
     public static boolean isRoot(Path p) {

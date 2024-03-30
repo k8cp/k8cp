@@ -1,5 +1,7 @@
 package io.github.vcvitaly.k8cp.controller;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 import io.github.vcvitaly.k8cp.K3sTest;
 import io.github.vcvitaly.k8cp.TestUtil;
 import io.github.vcvitaly.k8cp.client.KubeClient;
@@ -19,29 +21,27 @@ import io.github.vcvitaly.k8cp.model.Model;
 import io.github.vcvitaly.k8cp.service.KubeService;
 import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
-import io.github.vcvitaly.k8cp.service.PathProvider;
 import io.github.vcvitaly.k8cp.service.LocalRootResolver;
+import io.github.vcvitaly.k8cp.service.PathProvider;
+import io.github.vcvitaly.k8cp.service.RootInfoConverter;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.service.impl.KubeServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
+import io.github.vcvitaly.k8cp.service.impl.RootInfoConverterImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.PathUtil;
 import io.github.vcvitaly.k8cp.view.View;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.function.Function;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,7 +51,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
-import org.zeroturnaround.zip.ZipUtil;
+import org.tinyzip.TinyZip;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,43 +61,33 @@ import static org.mockito.Mockito.when;
 
 class MainViewIntegrationTests extends K3sTest {
 
-    private static final String TEST_FS_1 = "test_fs_1";
-    private static final String TEST_FS_2 = "test_fs_2";
-    private static final Path TEST_FS_1_PATH;
-    private static final Path TEST_FS_2_PATH;
     private static final FileManagerItem PARENT_DIRECTORY_ITEM = FileManagerItem.builder()
             .name("..")
             .fileType(FileType.PARENT_DIRECTORY)
             .build();
-    private static final List<RootInfoContainer> ROOTS;
-
-    static {
-        Function<String, Path> tmpPathCreator = dirName -> {
-            try {
-                return Paths.get(Files.createTempDirectory(dirName + "_").toString(), dirName);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
-        TEST_FS_1_PATH = tmpPathCreator.apply(TEST_FS_1);
-        TEST_FS_2_PATH = tmpPathCreator.apply(TEST_FS_2);
-        Function<Path, RootInfoContainer> rootCreator = p -> new RootInfoContainer(p, p.getFileName().toString());
-        ROOTS = List.of(
-                rootCreator.apply(TEST_FS_1_PATH),
-                rootCreator.apply(TEST_FS_2_PATH)
-        );
-    }
+    private static FileSystem TEST_FS_1;
+    private static FileSystem TEST_FS_2;
+    private static Path TEST_FS_1_PATH;
+    private static Path TEST_FS_2_PATH;
+    private static List<RootInfoContainer> ROOTS;
 
     @BeforeAll
     static void beforeAll() throws Exception {
-        ZipUtil.unpack(TestUtil.getFile("/%s.zip".formatted(TEST_FS_1)), TEST_FS_1_PATH.toFile());
-        ZipUtil.unpack(TestUtil.getFile("/%s.zip".formatted(TEST_FS_2)), TEST_FS_2_PATH.toFile());
+        final Configuration configuration = Configuration.forCurrentPlatform().toBuilder().setWorkingDirectory("/").build();
+        TEST_FS_1 = Jimfs.newFileSystem(configuration);
+        TEST_FS_2 = Jimfs.newFileSystem(configuration);
+        TEST_FS_1_PATH = TEST_FS_1.getPath("/");
+        TEST_FS_2_PATH = TEST_FS_2.getPath("/");
+        TinyZip.unzip(TestUtil.getPath("/test_fs_1.zip"), TEST_FS_1_PATH);
+        TinyZip.unzip(TestUtil.getPath("/test_fs_2.zip"), TEST_FS_2_PATH);
+        final RootInfoConverter rootInfoConverter = new RootInfoConverterImpl();
+        ROOTS = rootInfoConverter.convert(List.of(TEST_FS_1_PATH, TEST_FS_2_PATH));
     }
 
     @AfterAll
     static void afterAll() throws Exception {
-        FileUtils.deleteDirectory(TEST_FS_1_PATH.toFile());
-        FileUtils.deleteDirectory(TEST_FS_2_PATH.toFile());
+        TEST_FS_1.close();
+        TEST_FS_2.close();
     }
 
     @Nested
