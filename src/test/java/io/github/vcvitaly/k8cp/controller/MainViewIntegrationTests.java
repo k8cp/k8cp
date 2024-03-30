@@ -34,7 +34,9 @@ import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
 import io.github.vcvitaly.k8cp.util.PathUtil;
 import io.github.vcvitaly.k8cp.view.View;
+import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import javafx.scene.Node;
@@ -72,6 +74,7 @@ class MainViewIntegrationTests extends K3sTest {
     private static Path TEST_FS_1_PATH;
     private static Path TEST_FS_2_PATH;
     private static List<RootInfoContainer> ROOTS;
+    private static Path LOCAL_HOME;
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -84,6 +87,7 @@ class MainViewIntegrationTests extends K3sTest {
         TinyZip.unzip(TestUtil.getPath("/test_fs_2.zip"), TEST_FS_2_PATH);
         final RootInfoConverter rootInfoConverter = new RootInfoConverterImpl();
         ROOTS = rootInfoConverter.convert(List.of(TEST_FS_1_PATH, TEST_FS_2_PATH));
+        LOCAL_HOME = TEST_FS_1_PATH.resolve("home").resolve("user");
     }
 
     @AfterAll
@@ -103,7 +107,7 @@ class MainViewIntegrationTests extends K3sTest {
             final PathProvider pathProvider = mock(PathProvider.class);
             when(pathProvider.provideRemoteRootPath()).thenReturn(PathUtil.getPath(Constants.UNIX_ROOT));
             when(pathProvider.provideLocalRootPath()).thenReturn(TEST_FS_1_PATH);
-            when(pathProvider.provideLocalHomePath()).thenReturn(TEST_FS_1_PATH.resolve("home").resolve("user"));
+            when(pathProvider.provideLocalHomePath()).thenReturn(LOCAL_HOME);
             final LocalFsClient localFsClient = new LocalFsClientImpl();
             final SizeConverter sizeConverter = new SizeConverterImpl();
             final LocalRootResolver localRootResolver = mock(LocalRootResolver.class);
@@ -260,6 +264,126 @@ class MainViewIntegrationTests extends K3sTest {
             assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
         }
 
+        @Test
+        void localPaneIsLoadedSuccessfully_navigateToParentViaParentButton_navigateToRoot(FxRobot robot) {
+            // Initial assert
+            final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
+            assertLocalHomeFiles(localView);
+            final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+
+            // Navigate to parent via parent button click
+            robot.clickOn("#leftParentBtn");
+
+            // Assert
+            assertThat(localView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
+                    PARENT_DIRECTORY_ITEM,
+                    FileManagerItem.builder()
+                            .name("user")
+                            .fileType(FileType.DIRECTORY)
+                            .build()
+            ));
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("home");
+
+            // Navigate to root
+            robot.clickOn("#leftRootBtn");
+
+            // Assert
+            assertLocalRootFiles(localView);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+        }
+
+        @Test
+        void localPaneIsLoadedSuccessfully_createNewFile_Refresh(FxRobot robot) throws IOException {
+            // Initial assert
+            final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
+            assertLocalHomeFiles(localView);
+            final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+
+            // Create a new file
+            Files.createFile(LOCAL_HOME.resolve("new_file.txt"));
+
+            // Refresh
+            robot.clickOn("#leftRefreshBtn");
+
+            // Assert
+            assertThat(localView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
+                    PARENT_DIRECTORY_ITEM,
+                    FileManagerItem.builder()
+                            .name("bigfile")
+                            .size(2)
+                            .sizeUnit(FileSizeUnit.MB)
+                            .fileType(FileType.FILE)
+                            .build(),
+                    FileManagerItem.builder()
+                            .name("new_file.txt")
+                            .size(0)
+                            .sizeUnit(FileSizeUnit.KB)
+                            .fileType(FileType.FILE)
+                            .build()
+            ));
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+        }
+
+        @Test
+        void localPaneIsLoadedSuccessfully_navigateToParent_navigateToChild(FxRobot robot) {
+            // Initial assert
+            final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
+            assertLocalHomeFiles(localView);
+            final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+
+            // Navigate to parent
+            robot.doubleClickOn(
+                    (Node) robot.lookup(".table-row-cell")
+                            .match(
+                                    (TableRow<FileManagerItem> row) -> {
+                                        final FileManagerItem item = row.getItem();
+                                        return item != null && item.getName().equals("..") &&
+                                                row.getTableView().getItems().stream().anyMatch(fmi -> fmi.getName().equals("bigfile"));
+                                    }
+                            ).query()
+            );
+
+            // Assert
+            assertThat(localView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
+                    PARENT_DIRECTORY_ITEM,
+                    FileManagerItem.builder()
+                            .name("user")
+                            .fileType(FileType.DIRECTORY)
+                            .build()
+            ));
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("home");
+
+            // Navigate to child
+            robot.doubleClickOn(
+                    (Node) robot.lookup(".table-row-cell")
+                            .match(
+                                    (TableRow<FileManagerItem> row) -> {
+                                        final FileManagerItem item = row.getItem();
+                                        return item != null && item.getName().equals("user");
+                                    }
+                            ).query()
+            );
+
+            // Assert
+            assertLocalHomeFiles(localView);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+        }
+
         private static void assertLocalHomeFiles(TableView<FileManagerItem> localView) {
             assertThat(localView.getItems()).usingRecursiveFieldByFieldElementComparator(
                     RecursiveComparisonConfiguration.builder()
@@ -292,6 +416,27 @@ class MainViewIntegrationTests extends K3sTest {
                             .build(),
                     FileManagerItem.builder()
                             .name("etc")
+                            .fileType(FileType.DIRECTORY)
+                            .build()
+            ));
+        }
+
+        private static void assertLocalRootFiles(TableView<FileManagerItem> localView) {
+            assertThat(localView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
+                    FileManagerItem.builder()
+                            .name("etc")
+                            .fileType(FileType.DIRECTORY)
+                            .build(),
+                    FileManagerItem.builder()
+                            .name("home")
+                            .fileType(FileType.DIRECTORY)
+                            .build(),
+                    FileManagerItem.builder()
+                            .name("root")
                             .fileType(FileType.DIRECTORY)
                             .build()
             ));
