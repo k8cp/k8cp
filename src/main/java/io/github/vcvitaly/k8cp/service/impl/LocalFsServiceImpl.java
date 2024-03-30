@@ -11,7 +11,7 @@ import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalRootResolver;
 import io.github.vcvitaly.k8cp.service.SizeConverter;
 import io.github.vcvitaly.k8cp.util.DateTimeUtil;
-import io.github.vcvitaly.k8cp.util.LocalFileUtil;
+import io.github.vcvitaly.k8cp.util.PathUtil;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,7 +57,7 @@ public class LocalFsServiceImpl implements LocalFsService {
     private List<FileInfoContainer> listFilesInternal(Path path, boolean showHidden) throws IOOperationException {
         final List<Path> pathsUnfiltered = listPathsInternal(path);
         final List<Path> paths = pathsUnfiltered.stream()
-                .filter(p -> LocalFileUtil.shouldBeShownBasedOnHiddenFlag(p, showHidden))
+                .filter(p -> PathUtil.shouldBeShownBasedOnHiddenFlag(p, showHidden))
                 .toList();
         final List<FileInfoContainer> list = new ArrayList<>();
         for (Path p : paths) {
@@ -78,7 +78,7 @@ public class LocalFsServiceImpl implements LocalFsService {
             final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
             return FileInfoContainer.builder()
                     .path(path)
-                    .name(LocalFileUtil.getPathFilename(path))
+                    .name(PathUtil.getPathFilename(path))
                     .sizeBytes(size)
                     .size(fileSizeContainer.sizeInUnit())
                     .sizeUnit(fileSizeContainer.unit())

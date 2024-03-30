@@ -7,7 +7,7 @@ import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
-import io.github.vcvitaly.k8cp.util.LocalFileUtil;
+import io.github.vcvitaly.k8cp.util.PathUtil;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
 import java.net.URL;
 import java.nio.file.Path;
@@ -151,7 +151,7 @@ public class LocalPaneController extends PaneController {
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
         final Path rootPath = root.path();
-        if (!LocalFileUtil.isInTheSameRoot(rootPath, ServiceLocator.getModel().getLocalPath())) {
+        if (!PathUtil.isInTheSameRoot(rootPath, ServiceLocator.getModel().getLocalPath())) {
             if (ServiceLocator.getModel().setLocalPathRef(rootPath)) {
                 executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
             }

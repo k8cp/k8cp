@@ -27,7 +27,7 @@ import io.github.vcvitaly.k8cp.service.impl.LocalFsServiceImpl;
 import io.github.vcvitaly.k8cp.service.impl.LocalOsFamilyDetectorImpl;
 import io.github.vcvitaly.k8cp.service.impl.SizeConverterImpl;
 import io.github.vcvitaly.k8cp.util.Constants;
-import io.github.vcvitaly.k8cp.util.LocalFileUtil;
+import io.github.vcvitaly.k8cp.util.PathUtil;
 import io.github.vcvitaly.k8cp.view.View;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -109,7 +109,7 @@ class MainViewIntegrationTests extends K3sTest {
         private void start(Stage stage) throws IOOperationException {
             final LocalOsFamilyDetector localOsFamilyDetector = new LocalOsFamilyDetectorImpl();
             final PathProvider pathProvider = mock(PathProvider.class);
-            when(pathProvider.provideRemoteRootPath()).thenReturn(LocalFileUtil.getPath(Constants.UNIX_ROOT));
+            when(pathProvider.provideRemoteRootPath()).thenReturn(PathUtil.getPath(Constants.UNIX_ROOT));
             when(pathProvider.provideLocalRootPath()).thenReturn(TEST_FS_1_PATH);
             when(pathProvider.provideLocalHomePath()).thenReturn(TEST_FS_1_PATH.resolve("home").resolve("user"));
             final LocalFsClient localFsClient = new LocalFsClientImpl();

@@ -2,7 +2,7 @@ package io.github.vcvitaly.k8cp.service.impl;
 
 import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
 import io.github.vcvitaly.k8cp.service.RootInfoConverter;
-import io.github.vcvitaly.k8cp.util.LocalFileUtil;
+import io.github.vcvitaly.k8cp.util.PathUtil;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -16,6 +16,6 @@ public class RootInfoConverterImpl implements RootInfoConverter {
     }
 
     private RootInfoContainer toRootInfoContainer(Path path) {
-        return new RootInfoContainer(path, LocalFileUtil.normalizeRootPath(path));
+        return new RootInfoContainer(path, PathUtil.normalizeRootPath(path));
     }
 }

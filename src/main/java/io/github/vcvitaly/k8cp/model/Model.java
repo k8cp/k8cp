@@ -18,7 +18,7 @@ import io.github.vcvitaly.k8cp.service.LocalFsService;
 import io.github.vcvitaly.k8cp.service.LocalOsFamilyDetector;
 import io.github.vcvitaly.k8cp.service.PathProvider;
 import io.github.vcvitaly.k8cp.util.Constants;
-import io.github.vcvitaly.k8cp.util.LocalFileUtil;
+import io.github.vcvitaly.k8cp.util.PathUtil;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -100,7 +100,7 @@ public class Model {
         final List<FileInfoContainer> files = new ArrayList<>(
                 localFsService.listFiles(currentPath, false)
         );
-        if (!LocalFileUtil.isRoot(currentPath)) {
+        if (!PathUtil.isRoot(currentPath)) {
             files.add(getLocalParentDirectory());
         }
         files.sort(Comparator.naturalOrder());
@@ -144,7 +144,7 @@ public class Model {
                         false
                 )
         );
-        if (!LocalFileUtil.isRoot(currentPath)) {
+        if (!PathUtil.isRoot(currentPath)) {
             files.add(getRemoteParentDirectory());
         }
         files.sort(Comparator.naturalOrder());
@@ -224,7 +224,7 @@ public class Model {
     }
 
     public void setRemotePathRefToHome() throws IOOperationException {
-        final Path home = LocalFileUtil.getPath(
+        final Path home = PathUtil.getPath(
                 kubeServiceSupplier.get().getHomeDir(
                         kubeNamespaceSelectionRef.get().name(),
                         kubePodSelectionRef.get().name()
@@ -270,7 +270,7 @@ public class Model {
 
     /* Private methods */
     private BreadCrumbFile toBreadCrumbFile(Path path) {
-        final String pathName = LocalFileUtil.getPathFilename(path);
+        final String pathName = PathUtil.getPathFilename(path);
         return new BreadCrumbFile(path, pathName);
     }
 
@@ -324,7 +324,7 @@ public class Model {
     }
 
     private Path getParentOrItself(Path path) {
-        if (LocalFileUtil.isRoot(path)) {
+        if (PathUtil.isRoot(path)) {
             return path;
         }
         return path.getParent();

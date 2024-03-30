@@ -7,7 +7,7 @@ import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.service.LocalRootResolver;
 import io.github.vcvitaly.k8cp.service.RootInfoConverter;
 import io.github.vcvitaly.k8cp.util.Constants;
-import io.github.vcvitaly.k8cp.util.LocalFileUtil;
+import io.github.vcvitaly.k8cp.util.PathUtil;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,16 +49,16 @@ public class LocalRootResolverImpl implements LocalRootResolver {
     public RootInfoContainer getMainRoot(OsFamily osFamily) {
         return switch (osFamily) {
             case WINDOWS -> new RootInfoContainer(
-                    LocalFileUtil.getPath(Constants.WINDOWS_ROOT),
-                    LocalFileUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT))
+                    PathUtil.getPath(Constants.WINDOWS_ROOT),
+                    PathUtil.normalizeRootPath(Paths.get(Constants.WINDOWS_ROOT))
             );
-            case LINUX, MACOS -> new RootInfoContainer(LocalFileUtil.getPath(Constants.UNIX_ROOT), Constants.UNIX_ROOT);
+            case LINUX, MACOS -> new RootInfoContainer(PathUtil.getPath(Constants.UNIX_ROOT), Constants.UNIX_ROOT);
         };
     }
 
     private List<RootInfoContainer> listUnixRoots(String rootsDir) throws IOOperationException {
         final List<RootInfoContainer> roots = new ArrayList<>();
-        roots.add(new RootInfoContainer(LocalFileUtil.getPath(Constants.UNIX_ROOT), Constants.UNIX_ROOT));
+        roots.add(new RootInfoContainer(PathUtil.getPath(Constants.UNIX_ROOT), Constants.UNIX_ROOT));
         final List<Path> paths = localFsClient.listFiles(Paths.get(rootsDir));
         roots.addAll(rootInfoConverter.convert(paths));
         return roots;
