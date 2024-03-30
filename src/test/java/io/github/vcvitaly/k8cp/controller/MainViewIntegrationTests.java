@@ -9,6 +9,7 @@ import io.github.vcvitaly.k8cp.client.LocalFsClient;
 import io.github.vcvitaly.k8cp.client.impl.KubeClientImpl;
 import io.github.vcvitaly.k8cp.client.impl.LocalFsClientImpl;
 import io.github.vcvitaly.k8cp.context.ServiceLocator;
+import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
@@ -43,6 +44,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
+import org.controlsfx.control.BreadCrumbBar;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
@@ -134,6 +136,8 @@ class MainViewIntegrationTests extends K3sTest {
             // Initial assert
             final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
             assertLocalHomeFiles(localView);
+            final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
 
             // Navigate to parent via table cell click
             robot.doubleClickOn(
@@ -159,12 +163,14 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.DIRECTORY)
                             .build()
             ));
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("home");
 
             // Navigate back home
             robot.clickOn("#leftHomeBtn");
 
             // Assert
             assertLocalHomeFiles(localView);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
         }
 
         @Test
@@ -172,6 +178,8 @@ class MainViewIntegrationTests extends K3sTest {
             // Initial assert
             final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
             assertRemoteRootFiles(remoteView);
+            final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
             int itemsHashCode = remoteView.getItems().hashCode();
 
             // Navigate to root via table cell click
@@ -195,6 +203,7 @@ class MainViewIntegrationTests extends K3sTest {
             ).containsExactlyInAnyOrderElementsOf(List.of(
                     PARENT_DIRECTORY_ITEM
             ));
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("root");
 
             // Navigate back to root
             itemsHashCode = remoteView.getItems().hashCode();
@@ -203,6 +212,7 @@ class MainViewIntegrationTests extends K3sTest {
 
             // Assert
             assertRemoteRootFiles(remoteView);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
         }
 
         @Test
@@ -213,6 +223,8 @@ class MainViewIntegrationTests extends K3sTest {
             final ChoiceBox<RootInfoContainer> choiceBox = robot.lookup("#localRootSelector").queryAs(ChoiceBox.class);
             assertThat(choiceBox.getValue()).isEqualTo(ROOTS.getFirst());
             assertThat(choiceBox.getItems()).containsExactlyInAnyOrderElementsOf(ROOTS);
+            final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
             final int itemsHashCode = localView.getItems().hashCode();
 
             // Navigate to another root
@@ -236,6 +248,8 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.DIRECTORY)
                             .build()
             ));
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+
 
             // Navigate back home
             robot.clickOn("#leftHomeBtn");
@@ -243,6 +257,7 @@ class MainViewIntegrationTests extends K3sTest {
             // Assert
             assertThat(choiceBox.getValue()).isEqualTo(ROOTS.getFirst());
             assertLocalHomeFiles(localView);
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
         }
 
         private static void assertLocalHomeFiles(TableView<FileManagerItem> localView) {
