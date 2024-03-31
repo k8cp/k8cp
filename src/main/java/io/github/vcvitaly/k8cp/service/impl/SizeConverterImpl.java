@@ -8,6 +8,12 @@ import org.apache.commons.io.FileUtils;
 public class SizeConverterImpl implements SizeConverter {
     @Override
     public FileSizeContainer toFileSizeDto(long size) {
+        if (size < 0) {
+            throw new IllegalStateException("File size is negative: " + size);
+        }
+        if (size == 0) {
+            return new FileSizeContainer(size, 0, FileSizeUnit.KB);
+        }
         if (size < FileUtils.ONE_KB) {
             return new FileSizeContainer(size, 1, FileSizeUnit.KB);
         }
