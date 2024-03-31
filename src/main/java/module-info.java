@@ -2,9 +2,6 @@ module io.github.vcvitaly.k8cp {
     requires javafx.controls;
     requires javafx.fxml;
 
-    requires java.annotation;
-//    requires jsr305;
-
     requires org.controlsfx.controls;
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
@@ -15,17 +12,33 @@ module io.github.vcvitaly.k8cp {
     requires ch.qos.logback.classic;
 
     requires static lombok;
-    requires io.kubernetes.client.java;
-    requires io.kubernetes.client.java.api;
-
-    requires org.apache.commons.io;
     requires org.yaml.snakeyaml;
-    requires com.google.gson;
-    requires kotlin.stdlib;
-    requires org.apache.commons.lang3;
-    requires org.bouncycastle.pkix;
-    requires org.bouncycastle.provider;
-    requires org.bouncycastle.util;
+    requires kubernetes.client;
+    requires kubernetes.client.api;
+    /*requires kubernetes.model.admissionregistration;
+    requires kubernetes.model.apiextensions;
+    requires kubernetes.model.apps;
+    requires kubernetes.model.autoscaling;
+    requires kubernetes.model.batch;
+    requires kubernetes.model.certificates;
+    requires kubernetes.model.common;
+    requires kubernetes.model.coordination;
+    requires kubernetes.model.core;
+    requires kubernetes.model.discovery;
+    requires kubernetes.model.events;
+    requires kubernetes.model.extensions;
+    requires kubernetes.model.flowcontrol;
+    requires kubernetes.model.gatewayapi;
+    requires kubernetes.model.metrics;
+    requires kubernetes.model.networking;
+    requires kubernetes.model.node;
+    requires kubernetes.model.policy;
+    requires kubernetes.model.rbac;
+    requires kubernetes.model.resource;
+    requires kubernetes.model.scheduling;
+    requires kubernetes.model.storageclass;*/
+    requires org.apache.commons.io;
+    requires com.fasterxml.jackson.annotation;
 
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.fontawesome;
