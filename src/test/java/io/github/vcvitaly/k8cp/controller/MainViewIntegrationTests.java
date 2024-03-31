@@ -448,7 +448,7 @@ class MainViewIntegrationTests extends K3sTest {
             if (view.getItems().hashCode() != oldItemsHashCode) {
                 break;
             }
-            System.out.println("Waiting for the items to change after double click action");
+            System.out.printf("Waiting for the [%s] items to change%n", view.getId());
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
