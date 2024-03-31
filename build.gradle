@@ -20,11 +20,14 @@ repositories {
 ext {
     junitVersion = '5.10.2'
     platform = getPlatform()
-    javaVer = JavaVersion.VERSION_21
+    javaVer = JavaVersion.VERSION_22
 }
 
 java {
-    sourceCompatibility = javaVer
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(22)
+        vendor = JvmVendorSpec.AMAZON
+    }
 }
 
 tasks.withType(JavaCompile) {
@@ -56,7 +59,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.12'
     implementation 'ch.qos.logback:logback-classic:1.5.2'
 
-    implementation ("io.kubernetes:client-java:20.0.0") {
+    implementation ("io.kubernetes:client-java:20.0.1") {
         exclude group: "com.google.code.findbugs", module: "jsr305"
         exclude group: "com.amazonaws", module: "aws-java-sdk-sts"
     }
