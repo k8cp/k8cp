@@ -178,48 +178,6 @@ class MainViewIntegrationTests extends K3sTest {
         }
 
         @Test
-        void remotePaneIsLoadedSuccessfully_navigateToRootHome_navigateBackToRoot(FxRobot robot) {
-            // Initial assert
-            final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
-            assertRemoteRootFiles(remoteView);
-            final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
-            int itemsHashCode = remoteView.getItems().hashCode();
-
-            // Navigate to root via table cell click
-            robot.doubleClickOn(
-                    (Node) robot.lookup(".table-row-cell")
-                            .match(
-                                    (TableRow<FileManagerItem> row) -> {
-                                        final FileManagerItem item = row.getItem();
-                                        return item != null && item.getName().equals("root") &&
-                                                row.getTableView().getItems().stream().anyMatch(fmi -> fmi.getName().equals("mnt"));
-                                    }
-                            ).query()
-            );
-            waitForItemsToChange(remoteView, itemsHashCode);
-
-            // Assert
-            assertThat(remoteView.getItems()).usingRecursiveFieldByFieldElementComparator(
-                    RecursiveComparisonConfiguration.builder()
-                            .withIgnoredFields("path", "changedAt")
-                            .build()
-            ).containsExactlyInAnyOrderElementsOf(List.of(
-                    PARENT_DIRECTORY_ITEM
-            ));
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("root");
-
-            // Navigate back to root
-            itemsHashCode = remoteView.getItems().hashCode();
-            robot.clickOn("#rightRootBtn");
-            waitForItemsToChange(remoteView, itemsHashCode);
-
-            // Assert
-            assertRemoteRootFiles(remoteView);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
-        }
-
-        @Test
         void localPaneIsLoadedSuccessfully_navigateToAnotherRoot_navigateBackHome(FxRobot robot) {
             // Initial assert
             final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
@@ -306,7 +264,8 @@ class MainViewIntegrationTests extends K3sTest {
             assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
 
             // Create a new file
-            Files.createFile(LOCAL_HOME.resolve("new_file.txt"));
+            final Path newFilePath = LOCAL_HOME.resolve("new_file.txt");
+            Files.createFile(newFilePath);
 
             // Refresh
             robot.clickOn("#leftRefreshBtn");
@@ -332,6 +291,9 @@ class MainViewIntegrationTests extends K3sTest {
                             .build()
             ));
             assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+
+            // Cleanup
+            Files.deleteIfExists(newFilePath);
         }
 
         @Test
@@ -382,6 +344,186 @@ class MainViewIntegrationTests extends K3sTest {
             // Assert
             assertLocalHomeFiles(localView);
             assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+        }
+
+        @Test
+        void remotePaneIsLoadedSuccessfully_navigateToRootHomeViaTableCell_navigateBackToRootViaRootBtn(FxRobot robot) {
+            // Initial assert
+            final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
+            assertRemoteRootFiles(remoteView);
+            final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            int itemsHashCode = remoteView.getItems().hashCode();
+
+            // Navigate to root home via table cell click
+            robot.doubleClickOn(
+                    (Node) robot.lookup(".table-row-cell")
+                            .match(
+                                    (TableRow<FileManagerItem> row) -> {
+                                        final FileManagerItem item = row.getItem();
+                                        return item != null && item.getName().equals("root") &&
+                                                row.getTableView().getItems().stream().anyMatch(fmi -> fmi.getName().equals("mnt"));
+                                    }
+                            ).query()
+            );
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertThat(remoteView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
+                    PARENT_DIRECTORY_ITEM
+            ));
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("root");
+
+            // Navigate back to root
+            itemsHashCode = remoteView.getItems().hashCode();
+            robot.clickOn("#rightRootBtn");
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertRemoteRootFiles(remoteView);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+        }
+
+        @Test
+        void remotePaneIsLoadedSuccessfully_navigateToRootHomeViaHomeBtn_navigateBackToRootViaRootBtn(FxRobot robot) {
+            // Initial assert
+            final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
+            assertRemoteRootFiles(remoteView);
+            final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            int itemsHashCode = remoteView.getItems().hashCode();
+
+            // Navigate to root home via home btn
+            robot.clickOn("#rightHomeBtn");
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertThat(remoteView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsExactlyInAnyOrderElementsOf(List.of(
+                    PARENT_DIRECTORY_ITEM
+            ));
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("root");
+
+            // Navigate back to root via root btn
+            itemsHashCode = remoteView.getItems().hashCode();
+            robot.clickOn("#rightRootBtn");
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertRemoteRootFiles(remoteView);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+        }
+
+        @Test
+        void remotePaneIsLoadedSuccessfully_navigateToChildViaTableCell_navigateToParentViaTableCell(FxRobot robot) {
+            // Initial assert
+            final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
+            assertRemoteRootFiles(remoteView);
+            final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            int itemsHashCode = remoteView.getItems().hashCode();
+
+            // Navigate to root home via home btn
+            robot.doubleClickOn(
+                    (Node) robot.lookup(".table-row-cell")
+                            .match(
+                                    (TableRow<FileManagerItem> row) -> {
+                                        final FileManagerItem item = row.getItem();
+                                        return row.getTableView().getId().equals("rightView") &&
+                                                item != null && item.getName().equals("etc");
+                                    }
+                            ).query()
+            );
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertThat(remoteView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsAll(List.of(
+                    PARENT_DIRECTORY_ITEM,
+                    FileManagerItem.builder()
+                            .name("passwd")
+                            .size(1)
+                            .sizeUnit(FileSizeUnit.KB)
+                            .fileType(FileType.FILE)
+                            .build()
+            ));
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("etc");
+
+            // Navigate back to root via table cell
+            itemsHashCode = remoteView.getItems().hashCode();
+            robot.doubleClickOn(
+                    (Node) robot.lookup(".table-row-cell")
+                            .match(
+                                    (TableRow<FileManagerItem> row) -> {
+                                        final FileManagerItem item = row.getItem();
+                                        return row.getTableView().getId().equals("rightView") &&
+                                                item != null && item.getName().equals("..");
+                                    }
+                            ).query()
+            );
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertRemoteRootFiles(remoteView);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+        }
+
+        @Test
+        void remotePaneIsLoadedSuccessfully_navigateToChildViaTableCell_navigateToParentViaParentBtn(FxRobot robot) {
+            // Initial assert
+            final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
+            assertRemoteRootFiles(remoteView);
+            final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            int itemsHashCode = remoteView.getItems().hashCode();
+
+            // Navigate to root home via home btn
+            robot.doubleClickOn(
+                    (Node) robot.lookup(".table-row-cell")
+                            .match(
+                                    (TableRow<FileManagerItem> row) -> {
+                                        final FileManagerItem item = row.getItem();
+                                        return row.getTableView().getId().equals("rightView") &&
+                                                item != null && item.getName().equals("etc");
+                                    }
+                            ).query()
+            );
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertThat(remoteView.getItems()).usingRecursiveFieldByFieldElementComparator(
+                    RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("path", "changedAt")
+                            .build()
+            ).containsAll(List.of(
+                    PARENT_DIRECTORY_ITEM,
+                    FileManagerItem.builder()
+                            .name("passwd")
+                            .size(1)
+                            .sizeUnit(FileSizeUnit.KB)
+                            .fileType(FileType.FILE)
+                            .build()
+            ));
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("etc");
+
+            // Navigate back to root via table cell
+            itemsHashCode = remoteView.getItems().hashCode();
+            robot.clickOn("#rightParentBtn");
+            waitForItemsToChange(remoteView, itemsHashCode);
+
+            // Assert
+            assertRemoteRootFiles(remoteView);
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
         }
 
         private static void assertLocalHomeFiles(TableView<FileManagerItem> localView) {
