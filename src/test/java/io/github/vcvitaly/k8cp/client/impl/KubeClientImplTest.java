@@ -4,6 +4,7 @@ import io.github.vcvitaly.k8cp.K3sTest;
 import io.github.vcvitaly.k8cp.domain.KubeNamespace;
 import io.github.vcvitaly.k8cp.domain.KubePod;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,8 +31,12 @@ class KubeClientImplTest extends K3sTest {
 
     @Test
     void execAndReturnOutTest() throws Exception {
-        final List<String> lines = kubeClient.execAndReturnOut(DEFAULT_NAMESPACE, nginxPodName, new String[]{"ls", "/"});
-
-        assertThat(lines).contains("root", "home");
+        final List<String> lines = kubeClient.execAndReturnOut(DEFAULT_NAMESPACE, nginxPodName, new String[]{"ls", "-l", "/"});
+        final Set<String> expectedPaths = Set.of("root", "home", "etc");
+        assertThat(lines)
+                .anySatisfy(
+                        s -> assertThat(expectedPaths)
+                                .anySatisfy(path -> assertThat(s).contains(path))
+                );
     }
 }
