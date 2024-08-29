@@ -3,11 +3,11 @@ import org.openjfx.gradle.JavaFXPlatform
 plugins {
     id 'java'
     id 'application'
-    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.javamodularity.moduleplugin' version '1.8.15'
     id 'org.openjfx.javafxplugin' version '0.1.0'
     id "com.google.osdetector" version "1.7.3"
     id 'org.beryx.jlink' version '3.0.1'
-    id "io.freefair.lombok" version "8.6"
+    id "io.freefair.lombok" version "8.10"
 }
 
 group 'io.github.vcvitaly'
@@ -18,7 +18,7 @@ repositories {
 }
 
 ext {
-    junitVersion = '5.10.2'
+    junitVersion = '5.11.0'
     platform = getPlatform()
     javaVer = JavaVersion.VERSION_21
 }
@@ -46,17 +46,17 @@ dependencies {
     implementation('net.synedra:validatorfx:0.4.0') {
         exclude(group: 'org.openjfx')
     }
-    implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1')
-    implementation 'org.kordamp.ikonli:ikonli-fontawesome-pack:12.3.1'
-    implementation 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1'
-    implementation 'org.kordamp.ikonli:ikonli-material2-pack:12.3.1'
+    implementation "org.kordamp.ikonli:ikonli-javafx:${ikonliVersion}"
+    implementation "org.kordamp.ikonli:ikonli-fontawesome-pack:${ikonliVersion}"
+    implementation "org.kordamp.ikonli:ikonli-fontawesome5-pack:${ikonliVersion}"
+    implementation "org.kordamp.ikonli:ikonli-material2-pack:${ikonliVersion}"
 //    implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
 
-    implementation 'ch.qos.logback:logback-core:1.5.2'
-    implementation 'org.slf4j:slf4j-api:2.0.12'
-    implementation 'ch.qos.logback:logback-classic:1.5.2'
+    implementation "ch.qos.logback:logback-core:${logbackVersion}"
+    implementation "org.slf4j:slf4j-api:2.0.16"
+    implementation "ch.qos.logback:logback-classic:${logbackVersion}"
 
-    implementation ("io.kubernetes:client-java:20.0.0") {
+    implementation ("io.kubernetes:client-java:21.0.1") {
         exclude group: "com.google.code.findbugs", module: "jsr305"
         exclude group: "com.amazonaws", module: "aws-java-sdk-sts"
     }
@@ -65,22 +65,22 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 
-    testImplementation 'org.mockito:mockito-core:5.11.0'
-    testImplementation "org.assertj:assertj-core:3.25.1"
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testImplementation "org.assertj:assertj-core:3.26.3"
     testImplementation "org.testfx:testfx-junit5:4.0.18"
     testImplementation 'org.testfx:testfx-core:4.0.18'
     testImplementation 'org.testfx:openjfx-monocle:21.0.2'
 
     testImplementation 'org.zeroturnaround:zt-zip:1.17'
-    testImplementation 'org.hamcrest:hamcrest:2.1'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
 
-    testImplementation ("org.testcontainers:testcontainers:1.19.7") {
+    testImplementation ("org.testcontainers:testcontainers:${testcontainersVersion}") {
         exclude group: "org.hamcrest", module: "hamcrest-core"
     }
-    testImplementation ("org.testcontainers:junit-jupiter:1.19.7") {
+    testImplementation ("org.testcontainers:junit-jupiter:${testcontainersVersion}") {
         exclude group: "org.hamcrest", module: "hamcrest-core"
     }
-    testImplementation ("org.testcontainers:k3s:1.19.7") {
+    testImplementation ("org.testcontainers:k3s:${testcontainersVersion}") {
         exclude group: "org.hamcrest", module: "hamcrest-core"
     }
 
