@@ -10,6 +10,7 @@ import io.github.vcvitaly.k8cp.service.KubeConfigHelper;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,9 @@ public class KubeConfigSelectionServiceImpl implements KubeConfigSelectionServic
     @Override
     public List<KubeConfigContainer> getConfigChoices(Path kubeFolderPath) throws IOOperationException, KubeContextExtractionException {
         final List<KubeConfigContainer> list = new ArrayList<>();
-        for (Path path : localFsClient.listFiles(kubeFolderPath)) {
+        final List<Path> paths = new ArrayList<>(localFsClient.listFiles(kubeFolderPath));
+        paths.sort(Comparator.comparing(p -> p.getFileName().toString()));
+        for (Path path : paths) {
             if (!Files.isDirectory(path) && Files.isReadable(path) && kubeConfigHelper.validate(path.toString())) {
                 KubeConfigContainer kubeConfigContainer = toKubeConfig(path);
                 list.add(kubeConfigContainer);
