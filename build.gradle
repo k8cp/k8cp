@@ -21,6 +21,7 @@ ext {
     junitVersion = '5.11.0'
     platform = getPlatform()
     javaVer = JavaVersion.VERSION_21
+    javaFxVer = JavaVersion.VERSION_22
 }
 
 java {
@@ -37,7 +38,7 @@ application {
 }
 
 javafx {
-    version = javaVer
+    version = javaFxVer
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
