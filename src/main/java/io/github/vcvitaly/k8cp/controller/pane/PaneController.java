@@ -4,6 +4,7 @@ import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
+import io.github.vcvitaly.k8cp.domain.PathRefreshEvent;
 import io.github.vcvitaly.k8cp.enumeration.FileManagerColumn;
 import io.github.vcvitaly.k8cp.enumeration.FileType;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
@@ -63,15 +64,15 @@ public abstract class PaneController implements Initializable {
 
     protected abstract Logger getLog();
 
-    protected abstract BoolStatusReturningConsumer<Path> getPathRefSettingConsumer();
+    protected abstract BoolStatusReturningConsumer<PathRefreshEvent> getPathRefEventSettingConsumer();
 
     protected void initView() {
         getTableView().setPlaceholder(getNoRowsToDisplayLbl());
         getTableView().getColumns().addAll(getTableColumns());
         refreshCrumbAndItems();
         initViewButtons();
-        initViewMouseSelection(getPathRefSettingConsumer());
-        initViewEnterKeySelection(getPathRefSettingConsumer());
+        initViewMouseSelection(getPathRefEventSettingConsumer());
+        initViewEnterKeySelection(getPathRefEventSettingConsumer());
         initBreadCrumbListener();
     }
 
@@ -132,7 +133,7 @@ public abstract class PaneController implements Initializable {
 
     protected void initBreadCrumbListener() {
         getBreadcrumbBar().selectedCrumbProperty()
-                .addListener((observable, oldValue, newValue) -> onBreadcrumb(getPathRefSettingConsumer(), newValue.getValue()));
+                .addListener((observable, oldValue, newValue) -> onBreadcrumb(getPathRefEventSettingConsumer(), newValue.getValue()));
     }
 
     protected abstract void onBreadcrumb(BoolStatusReturningConsumer<Path> pathRefSettingConsumer, BreadCrumbFile selection);
