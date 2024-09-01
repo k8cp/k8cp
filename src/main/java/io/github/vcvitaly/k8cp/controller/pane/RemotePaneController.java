@@ -9,7 +9,6 @@ import io.github.vcvitaly.k8cp.enumeration.PathRefreshEventSource;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.control.Button;
@@ -126,7 +125,12 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected void onBreadcrumb(BoolStatusReturningConsumer<Path> pathRefSettingConsumer, BreadCrumbFile selection) {
-        onBreadcrumbInternal(pathRefSettingConsumer, selection, ServiceLocator.getModel()::resolveRemoteFiles);
+    protected void onBreadcrumb(BoolStatusReturningConsumer<PathRefreshEvent> pathEventRefSettingConsumer, BreadCrumbFile selection) {
+        onBreadcrumbInternal(pathEventRefSettingConsumer, selection, ServiceLocator.getModel()::resolveRemoteFiles);
+    }
+
+    @Override
+    protected PathRefreshEventSource getTableSelectionPathRefEventSource() {
+        return PathRefreshEventSource.REMOTE_TABLE_SELECTION;
     }
 }

@@ -119,7 +119,7 @@ public class Model {
     public void resolveLocalBreadcrumbTree() {
         final PathRefreshEvent localPathEvent = getLocalPathEvent();
         final Path currentPath = localPathEvent.data().path();
-        final List<BreadCrumbFile> tree = resolveBreadCrumbFiles(currentPath);
+        final List<BreadCrumbFile> tree = resolveBreadCrumbFiles(currentPath, localPathEvent.source());
         localBreadcrumbTree.set(tree);
         logInfoWithEvent(localPathEvent, "resolved the local breadcrumb tree for [%s] to [%s]".formatted(currentPath, tree));
     }
@@ -165,7 +165,7 @@ public class Model {
     public void resolveRemoteBreadcrumbTree() {
         final PathRefreshEvent remotePathEvent = getRemotePathEvent();
         final Path currentPath = remotePathEvent.data().path();
-        final List<BreadCrumbFile> tree = resolveBreadCrumbFiles(currentPath);
+        final List<BreadCrumbFile> tree = resolveBreadCrumbFiles(currentPath, remotePathEvent.source());
         remoteBreadcrumbTree.set(tree);
         logInfoWithEvent(remotePathEvent, "resolved the remote breadcrumb tree for [%s] to [%s]".formatted(currentPath, tree));
     }
@@ -272,9 +272,9 @@ public class Model {
     }
 
     /* Private methods */
-    private BreadCrumbFile toBreadCrumbFile(Path path) {
+    private BreadCrumbFile toBreadCrumbFile(Path path, PathRefreshEventSource source) {
         final String pathName = PathUtil.getPathFilename(path);
-        return new BreadCrumbFile(path, pathName);
+        return new BreadCrumbFile(PathRefreshEvent.of(source, path), pathName);
     }
 
     private Path getLocalParentPath() {
@@ -317,10 +317,10 @@ public class Model {
         return e;
     }
 
-    private List<BreadCrumbFile> resolveBreadCrumbFiles(Path tmpPath) {
+    private List<BreadCrumbFile> resolveBreadCrumbFiles(Path tmpPath, PathRefreshEventSource source) {
         final Queue<BreadCrumbFile> reversedTree = new LinkedList<>();
         while (tmpPath != null) {
-            reversedTree.add(toBreadCrumbFile(tmpPath));
+            reversedTree.add(toBreadCrumbFile(tmpPath, source));
             tmpPath = tmpPath.getParent();
         }
         return reversedTree.stream().toList().reversed();

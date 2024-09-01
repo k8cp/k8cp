@@ -146,13 +146,18 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
-    protected void onBreadcrumb(BoolStatusReturningConsumer<Path> pathRefSettingConsumer, BreadCrumbFile selection) {
-        onBreadcrumbInternal(pathRefSettingConsumer, selection, ServiceLocator.getModel()::resolveLocalFiles);
+    protected void onBreadcrumb(BoolStatusReturningConsumer<PathRefreshEvent> pathEventRefSettingConsumer, BreadCrumbFile selection) {
+        onBreadcrumbInternal(pathEventRefSettingConsumer, selection, ServiceLocator.getModel()::resolveLocalFiles);
+    }
+
+    @Override
+    protected PathRefreshEventSource getTableSelectionPathRefEventSource() {
+        return PathRefreshEventSource.LOCAL_TABLE_SELECTION;
     }
 
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
-        final Path rootPath = root.path();
+        final Path rootPath = root.event().data().path();
         if (!PathUtil.isInTheSameRoot(rootPath, ServiceLocator.getModel().getLocalPath())) {
             if (ServiceLocator.getModel()
                     .setLocalPathEventRef(PathRefreshEvent.of(PathRefreshEventSource.LOCAL_ROOT_SELECTION, rootPath))) {
