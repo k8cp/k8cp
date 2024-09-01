@@ -157,7 +157,7 @@ public class LocalPaneController extends PaneController {
 
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
-        final Path rootPath = root.event().data().path();
+        final Path rootPath = root.path();
         if (!PathUtil.isInTheSameRoot(rootPath, ServiceLocator.getModel().getLocalPath())) {
             if (ServiceLocator.getModel()
                     .setLocalPathEventRef(PathRefreshEvent.of(PathRefreshEventSource.LOCAL_ROOT_SELECTION, rootPath))) {
