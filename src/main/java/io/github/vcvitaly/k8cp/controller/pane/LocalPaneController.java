@@ -1,14 +1,16 @@
 package io.github.vcvitaly.k8cp.controller.pane;
 
+import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
+import io.github.vcvitaly.k8cp.domain.PathRefreshEvent;
 import io.github.vcvitaly.k8cp.domain.RootInfoContainer;
+import io.github.vcvitaly.k8cp.enumeration.PathRefreshEventSource;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
-import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
-import io.github.vcvitaly.k8cp.util.PathUtil;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
+import io.github.vcvitaly.k8cp.util.PathUtil;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
@@ -83,8 +85,8 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
-    protected BoolStatusReturningConsumer<Path> getPathRefSettingConsumer() {
-        return ServiceLocator.getModel()::setLocalPathRef;
+    protected BoolStatusReturningConsumer<PathRefreshEvent> getPathRefEventSettingConsumer() {
+        return ServiceLocator.getModel()::setLocalPathEventRef;
     }
 
     @Override
@@ -113,7 +115,7 @@ public class LocalPaneController extends PaneController {
     @Override
     protected void onParentBtn() {
         onNavigationBtn(() -> {
-            if (ServiceLocator.getModel().setLocalPathRefToParent()) {
+            if (ServiceLocator.getModel().setLocalPathEventRefToParent(PathRefreshEventSource.LOCAL_PARENT_BUTTON)) {
                 resolveFilesAndBreadcrumbs();
             }
         });
@@ -122,7 +124,7 @@ public class LocalPaneController extends PaneController {
     @Override
     protected void onHomeBtn() {
         onNavigationBtn(() -> {
-            ServiceLocator.getModel().setLocalPathRefToHome();
+            ServiceLocator.getModel().setLocalPathEventRefToHome(PathRefreshEventSource.LOCAL_HOME_BUTTON);
             resolveFilesAndBreadcrumbs();
         });
         localRootSelector.setValue(ServiceLocator.getModel().getMainRoot());
@@ -131,7 +133,7 @@ public class LocalPaneController extends PaneController {
     @Override
     protected void onRootBtn() {
         onNavigationBtn(() -> {
-            ServiceLocator.getModel().setLocalPathRefToRoot();
+            ServiceLocator.getModel().setLocalPathEventRefToRoot(PathRefreshEventSource.LOCAL_ROOT_BUTTON);
             resolveFilesAndBreadcrumbs();
         });
         localRootSelector.setValue(ServiceLocator.getModel().getMainRoot());
@@ -144,15 +146,21 @@ public class LocalPaneController extends PaneController {
     }
 
     @Override
-    protected void onBreadcrumb(BoolStatusReturningConsumer<Path> pathRefSettingConsumer, BreadCrumbFile selection) {
-        onBreadcrumbInternal(pathRefSettingConsumer, selection, ServiceLocator.getModel()::resolveLocalFiles);
+    protected void onBreadcrumb(BoolStatusReturningConsumer<PathRefreshEvent> pathEventRefSettingConsumer, BreadCrumbFile selection) {
+        onBreadcrumbInternal(pathEventRefSettingConsumer, selection, ServiceLocator.getModel()::resolveLocalFiles);
+    }
+
+    @Override
+    protected PathRefreshEventSource getTableSelectionPathRefEventSource() {
+        return PathRefreshEventSource.LOCAL_TABLE_SELECTION;
     }
 
     private void onLocalRootSelection() {
         final RootInfoContainer root = localRootSelector.getValue();
         final Path rootPath = root.path();
         if (!PathUtil.isInTheSameRoot(rootPath, ServiceLocator.getModel().getLocalPath())) {
-            if (ServiceLocator.getModel().setLocalPathRef(rootPath)) {
+            if (ServiceLocator.getModel()
+                    .setLocalPathEventRef(PathRefreshEvent.of(PathRefreshEventSource.LOCAL_ROOT_SELECTION, rootPath))) {
                 executeLongRunningAction(this::resolveFilesAndBreadcrumbs, this::handleError, this::refreshCrumbAndItems);
             }
         }

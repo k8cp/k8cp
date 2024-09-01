@@ -141,7 +141,7 @@ class MainViewIntegrationTests extends K3sTest {
             final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
             assertLocalHomeFiles(localView);
             final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
 
             // Navigate to parent via table cell click
             robot.doubleClickOn(
@@ -167,14 +167,14 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.DIRECTORY)
                             .build()
             ));
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("home");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("home");
 
             // Navigate back home
             robot.clickOn("#leftHomeBtn");
 
             // Assert
             assertLocalHomeFiles(localView);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
         }
 
         @Test
@@ -186,7 +186,7 @@ class MainViewIntegrationTests extends K3sTest {
             assertThat(choiceBox.getValue()).isEqualTo(ROOTS.getFirst());
             assertThat(choiceBox.getItems()).containsExactlyInAnyOrderElementsOf(ROOTS);
             final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
             final int itemsHashCode = localView.getItems().hashCode();
 
             // Navigate to another root
@@ -210,7 +210,7 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.DIRECTORY)
                             .build()
             ));
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
 
 
             // Navigate back home
@@ -219,7 +219,7 @@ class MainViewIntegrationTests extends K3sTest {
             // Assert
             assertThat(choiceBox.getValue()).isEqualTo(ROOTS.getFirst());
             assertLocalHomeFiles(localView);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
         }
 
         @Test
@@ -228,7 +228,7 @@ class MainViewIntegrationTests extends K3sTest {
             final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
             assertLocalHomeFiles(localView);
             final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
 
             // Navigate to parent via parent button click
             robot.clickOn("#leftParentBtn");
@@ -245,14 +245,14 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.DIRECTORY)
                             .build()
             ));
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("home");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("home");
 
             // Navigate to root
             robot.clickOn("#leftRootBtn");
 
             // Assert
             assertLocalRootFiles(localView);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
         }
 
         @Test
@@ -261,7 +261,7 @@ class MainViewIntegrationTests extends K3sTest {
             final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
             assertLocalHomeFiles(localView);
             final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
 
             // Create a new file
             final Path newFilePath = LOCAL_HOME.resolve("new_file.txt");
@@ -290,7 +290,7 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.FILE)
                             .build()
             ));
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
 
             // Cleanup
             Files.deleteIfExists(newFilePath);
@@ -302,7 +302,7 @@ class MainViewIntegrationTests extends K3sTest {
             final TableView<FileManagerItem> localView = robot.lookup("#leftView").queryAs(TableView.class);
             assertLocalHomeFiles(localView);
             final BreadCrumbBar<BreadCrumbFile> localBreadCrumbBar = robot.lookup("#leftBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
 
             // Navigate to parent
             robot.doubleClickOn(
@@ -328,7 +328,7 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.DIRECTORY)
                             .build()
             ));
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("home");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("home");
 
             // Navigate to child
             robot.doubleClickOn(
@@ -343,7 +343,7 @@ class MainViewIntegrationTests extends K3sTest {
 
             // Assert
             assertLocalHomeFiles(localView);
-            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("user");
+            assertThat(localBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("user");
         }
 
         @Test
@@ -352,7 +352,7 @@ class MainViewIntegrationTests extends K3sTest {
             final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
             assertRemoteRootFiles(remoteView);
             final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
             int itemsHashCode = remoteView.getItems().hashCode();
 
             // Navigate to root home via table cell click
@@ -376,7 +376,7 @@ class MainViewIntegrationTests extends K3sTest {
             ).containsExactlyInAnyOrderElementsOf(List.of(
                     PARENT_DIRECTORY_ITEM
             ));
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("root");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("root");
 
             // Navigate back to root
             itemsHashCode = remoteView.getItems().hashCode();
@@ -385,7 +385,7 @@ class MainViewIntegrationTests extends K3sTest {
 
             // Assert
             assertRemoteRootFiles(remoteView);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
         }
 
         @Test
@@ -394,7 +394,7 @@ class MainViewIntegrationTests extends K3sTest {
             final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
             assertRemoteRootFiles(remoteView);
             final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
             int itemsHashCode = remoteView.getItems().hashCode();
 
             // Navigate to root home via home btn
@@ -409,7 +409,7 @@ class MainViewIntegrationTests extends K3sTest {
             ).containsExactlyInAnyOrderElementsOf(List.of(
                     PARENT_DIRECTORY_ITEM
             ));
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("root");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("root");
 
             // Navigate back to root via root btn
             itemsHashCode = remoteView.getItems().hashCode();
@@ -418,7 +418,7 @@ class MainViewIntegrationTests extends K3sTest {
 
             // Assert
             assertRemoteRootFiles(remoteView);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
         }
 
         @Test
@@ -427,7 +427,7 @@ class MainViewIntegrationTests extends K3sTest {
             final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
             assertRemoteRootFiles(remoteView);
             final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
             int itemsHashCode = remoteView.getItems().hashCode();
 
             // Navigate to root home via home btn
@@ -457,7 +457,7 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.FILE)
                             .build()
             ));
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("etc");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("etc");
 
             // Navigate back to root via table cell
             itemsHashCode = remoteView.getItems().hashCode();
@@ -475,7 +475,7 @@ class MainViewIntegrationTests extends K3sTest {
 
             // Assert
             assertRemoteRootFiles(remoteView);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
         }
 
         @Test
@@ -484,7 +484,7 @@ class MainViewIntegrationTests extends K3sTest {
             final TableView<FileManagerItem> remoteView = robot.lookup("#rightView").queryAs(TableView.class);
             assertRemoteRootFiles(remoteView);
             final BreadCrumbBar<BreadCrumbFile> remoteBreadCrumbBar = robot.lookup("#rightBreadcrumbBar").queryAs(BreadCrumbBar.class);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
             int itemsHashCode = remoteView.getItems().hashCode();
 
             // Navigate to root home via home btn
@@ -514,7 +514,7 @@ class MainViewIntegrationTests extends K3sTest {
                             .fileType(FileType.FILE)
                             .build()
             ));
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("etc");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("etc");
 
             // Navigate back to root via table cell
             itemsHashCode = remoteView.getItems().hashCode();
@@ -523,7 +523,7 @@ class MainViewIntegrationTests extends K3sTest {
 
             // Assert
             assertRemoteRootFiles(remoteView);
-            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().getName()).isEqualTo("/");
+            assertThat(remoteBreadCrumbBar.selectedCrumbProperty().getValue().getValue().name()).isEqualTo("/");
         }
 
         private static void assertLocalHomeFiles(TableView<FileManagerItem> localView) {

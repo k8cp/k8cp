@@ -1,13 +1,14 @@
 package io.github.vcvitaly.k8cp.controller.pane;
 
+import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.domain.BreadCrumbFile;
 import io.github.vcvitaly.k8cp.domain.FileInfoContainer;
 import io.github.vcvitaly.k8cp.domain.FileManagerItem;
+import io.github.vcvitaly.k8cp.domain.PathRefreshEvent;
+import io.github.vcvitaly.k8cp.enumeration.PathRefreshEventSource;
 import io.github.vcvitaly.k8cp.exception.IOOperationException;
-import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.BoolStatusReturningConsumer;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.control.Button;
@@ -76,8 +77,8 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected BoolStatusReturningConsumer<Path> getPathRefSettingConsumer() {
-        return ServiceLocator.getModel()::setRemotePathRef;
+    protected BoolStatusReturningConsumer<PathRefreshEvent> getPathRefEventSettingConsumer() {
+        return ServiceLocator.getModel()::setRemotePathEventRef;
     }
 
     @Override
@@ -95,7 +96,7 @@ public class RemotePaneController extends PaneController {
     @Override
     protected void onParentBtn() {
         onNavigationBtn(() -> {
-            if (ServiceLocator.getModel().setRemotePathRefToParent()) {
+            if (ServiceLocator.getModel().setRemotePathEventRefToParent(PathRefreshEventSource.REMOTE_PARENT_BUTTON)) {
                 resolveFilesAndBreadcrumbs();
             }
         });
@@ -104,7 +105,7 @@ public class RemotePaneController extends PaneController {
     @Override
     protected void onHomeBtn() {
         onNavigationBtn(() -> {
-            ServiceLocator.getModel().setRemotePathRefToHome();
+            ServiceLocator.getModel().setRemotePathEventRefToHome(PathRefreshEventSource.REMOTE_HOME_BUTTON);
             resolveFilesAndBreadcrumbs();
         });
     }
@@ -112,7 +113,7 @@ public class RemotePaneController extends PaneController {
     @Override
     protected void onRootBtn() {
         onNavigationBtn(() -> {
-            ServiceLocator.getModel().setRemotePathRefToRoot();
+            ServiceLocator.getModel().setRemotePathEventRefToRoot(PathRefreshEventSource.REMOTE_ROOT_BUTTON);
             resolveFilesAndBreadcrumbs();
         });
     }
@@ -124,7 +125,12 @@ public class RemotePaneController extends PaneController {
     }
 
     @Override
-    protected void onBreadcrumb(BoolStatusReturningConsumer<Path> pathRefSettingConsumer, BreadCrumbFile selection) {
-        onBreadcrumbInternal(pathRefSettingConsumer, selection, ServiceLocator.getModel()::resolveRemoteFiles);
+    protected void onBreadcrumb(BoolStatusReturningConsumer<PathRefreshEvent> pathEventRefSettingConsumer, BreadCrumbFile selection) {
+        onBreadcrumbInternal(pathEventRefSettingConsumer, selection, ServiceLocator.getModel()::resolveRemoteFiles);
+    }
+
+    @Override
+    protected PathRefreshEventSource getTableSelectionPathRefEventSource() {
+        return PathRefreshEventSource.REMOTE_TABLE_SELECTION;
     }
 }
