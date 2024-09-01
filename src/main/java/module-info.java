@@ -26,7 +26,6 @@ module io.github.vcvitaly.k8cp {
     requires org.bouncycastle.pkix;
     requires org.bouncycastle.provider;
     requires org.bouncycastle.util;
-    requires jdk.crypto.ec;
     requires org.apache.commons.codec;
 
     requires org.kordamp.ikonli.core;

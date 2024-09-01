@@ -20,7 +20,7 @@ repositories {
 ext {
     junitVersion = '5.11.0'
     platform = getPlatform()
-    javaVer = JavaVersion.VERSION_21
+    javaVer = JavaVersion.VERSION_22
 }
 
 java {
