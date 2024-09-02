@@ -14,6 +14,7 @@ import io.github.vcvitaly.k8cp.util.ThrowingRunnable;
 import java.util.List;
 import java.util.function.Consumer;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
@@ -87,7 +88,9 @@ public abstract class PaneController implements Initializable {
 
     protected void initViewItems(List<FileInfoContainer> files) {
         final List<FileManagerItem> fileMangerItems = ServiceLocator.getView().toFileMangerItems(files);
-        getTableView().setItems(FXCollections.observableList(fileMangerItems));
+        final SortedList<FileManagerItem> items = new SortedList<>(FXCollections.observableList(fileMangerItems));
+        getTableView().setItems(items);
+        items.comparatorProperty().bind(getTableView().comparatorProperty());
     }
 
     protected void initViewButtons() {
