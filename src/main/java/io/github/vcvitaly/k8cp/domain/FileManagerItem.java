@@ -25,4 +25,10 @@ public class FileManagerItem {
         this.fileType = fileType.toString();
         this.changedAt = changedAt != null ? changedAt : "";
     }
+
+    @Override
+    public String toString() {
+        return "FileManagerItem{path=%s, name='%s', size=[%d,%s], fileType='%s', changedAt='%s'}"
+                .formatted(path, name, size.sizeBytes(), size.sizeRepresentation(), fileType, changedAt);
+    }
 }
