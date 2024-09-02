@@ -10,19 +10,18 @@ import lombok.Data;
 public class FileManagerItem {
     private Path path;
     private String name;
-    private String size;
+    private SizeHolder size;
     private String fileType;
     private String changedAt;
 
     @Builder
-    public FileManagerItem(Path path, String name, Integer size, FileSizeUnit sizeUnit, FileType fileType, String changedAt) {
+    public FileManagerItem(Path path, String name, Long sizeBytes, Integer size, FileSizeUnit sizeUnit, FileType fileType,
+                           String changedAt) {
         this.path = path;
         this.name = name;
-        if (fileType == FileType.FILE && size != null && sizeUnit != null) {
-            this.size = "%s %s".formatted(size, sizeUnit);
-        } else {
-            this.size = "";
-        }
+        this.size = fileType == FileType.FILE && size != null && sizeUnit != null ?
+                new SizeHolder(sizeBytes, "%s %s".formatted(size, sizeUnit)) :
+                new SizeHolder(0L, "");
         this.fileType = fileType.toString();
         this.changedAt = changedAt != null ? changedAt : "";
     }
