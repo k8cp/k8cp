@@ -184,6 +184,7 @@ public class View {
         return FileManagerItem.builder()
                 .path(fileInfoContainer.getPath())
                 .name(fileInfoContainer.getName())
+                .sizeBytes(fileInfoContainer.getSizeBytes())
                 .size(fileInfoContainer.getSize())
                 .sizeUnit(fileInfoContainer.getSizeUnit())
                 .fileType(fileInfoContainer.getFileType())

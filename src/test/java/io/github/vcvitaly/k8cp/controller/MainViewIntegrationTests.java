@@ -279,12 +279,14 @@ class MainViewIntegrationTests extends K3sTest {
                     PARENT_DIRECTORY_ITEM,
                     FileManagerItem.builder()
                             .name("bigfile")
+                            .sizeBytes(2_500_000L)
                             .size(2)
                             .sizeUnit(FileSizeUnit.MB)
                             .fileType(FileType.FILE)
                             .build(),
                     FileManagerItem.builder()
                             .name("new_file.txt")
+                            .sizeBytes(0L)
                             .size(0)
                             .sizeUnit(FileSizeUnit.KB)
                             .fileType(FileType.FILE)
@@ -452,6 +454,7 @@ class MainViewIntegrationTests extends K3sTest {
                     PARENT_DIRECTORY_ITEM,
                     FileManagerItem.builder()
                             .name("passwd")
+                            .sizeBytes(1225L)
                             .size(1)
                             .sizeUnit(FileSizeUnit.KB)
                             .fileType(FileType.FILE)
@@ -509,6 +512,7 @@ class MainViewIntegrationTests extends K3sTest {
                     PARENT_DIRECTORY_ITEM,
                     FileManagerItem.builder()
                             .name("passwd")
+                            .sizeBytes(1225L)
                             .size(1)
                             .sizeUnit(FileSizeUnit.KB)
                             .fileType(FileType.FILE)
@@ -535,6 +539,7 @@ class MainViewIntegrationTests extends K3sTest {
                     PARENT_DIRECTORY_ITEM,
                     FileManagerItem.builder()
                             .name("bigfile")
+                            .sizeBytes(2_500_000L)
                             .size(2)
                             .sizeUnit(FileSizeUnit.MB)
                             .fileType(FileType.FILE)
