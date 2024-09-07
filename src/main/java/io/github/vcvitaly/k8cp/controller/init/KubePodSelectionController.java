@@ -1,10 +1,10 @@
 package io.github.vcvitaly.k8cp.controller.init;
 
 import io.github.vcvitaly.k8cp.domain.KubePod;
+import io.github.vcvitaly.k8cp.domain.PodContainer;
 import io.github.vcvitaly.k8cp.exception.KubeApiException;
 import io.github.vcvitaly.k8cp.context.ServiceLocator;
 import io.github.vcvitaly.k8cp.util.ItemSelectionUtil;
-import io.github.vcvitaly.k8cp.view.View;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -18,9 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class KubePodSelectionController implements Initializable {
-    public Label choosePodLbl;
+    public Label podSelectionLbl;
     public ChoiceBox<KubePod> podSelector;
-    public Label errorLbl;
+    public Label podErrorLbl;
+    public Label containerSelectionLbl;
+    public ChoiceBox<PodContainer> containerSelector;
+    public Label containerSelectionError;
     public Button prevBtn;
     public Button nextBtn;
 
@@ -41,13 +44,13 @@ public class KubePodSelectionController implements Initializable {
                 podSelector.valueProperty().addListener(observable -> setKubePodSelection());
                 nextBtn.setDisable(false);
             } else {
-                choosePodLbl.setVisible(false);
+                podSelectionLbl.setVisible(false);
                 podSelector.setVisible(false);
-                errorLbl.setText("There are no pods in this namespace");
+                podErrorLbl.setText("There are no pods in this namespace");
             }
         } catch (KubeApiException e) {
             log.error("Could not get pod list", e);
-            errorLbl.setText("Could not get pod list");
+            podErrorLbl.setText("Could not get pod list");
             ServiceLocator.getView().showErrorModal(e.getMessage());
         }
     }

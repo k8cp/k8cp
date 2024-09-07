@@ -6,13 +6,14 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
-      stylesheets="@../styles/configChoice.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="io.github.vcvitaly.k8cp.controller.init.KubePodSelectionController">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@../styles/configChoice.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.vcvitaly.k8cp.controller.init.KubePodSelectionController">
    <VBox alignment="CENTER" prefHeight="300.0" prefWidth="600.0" styleClass="config-choice-container">
-      <Label fx:id="choosePodLbl" text="Choose a kube pod:" />
+      <Label fx:id="podSelectionLbl" text="Choose a kube pod:" />
       <ChoiceBox fx:id="podSelector" prefWidth="150.0" />
-      <Label fx:id="errorLbl" />
+      <Label fx:id="podErrorLbl" />
+      <Label fx:id="containerSelectionLbl" text="Choose a container:" />
+      <ChoiceBox fx:id="containerSelector" prefWidth="150.0" />
+      <Label fx:id="containerSelectionError" />
    </VBox>
    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0">
       <VBox alignment="CENTER" prefHeight="100.0" prefWidth="300.0">
